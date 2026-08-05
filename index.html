@@ -7,6 +7,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* ... (mismos estilos que antes) ... */
         * {
             margin: 0;
             padding: 0;
@@ -459,6 +460,12 @@
         .btn-submit i {
             font-size: 0.8rem;
             color: #aaaaaa;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         /* Popup de confirmación */
@@ -1079,7 +1086,10 @@
 
     <script>
         (function() {
-            // ---------- Configuración ----------
+            // ---------- CONFIGURACIÓN ----------
+            // ⚠️ REEMPLAZA ESTA URL CON LA DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT
+            const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzVay45A2R0fUXBSejOlWNdRtO9hw6U3PVlFNFYVaz9_oMyiE_PG0Ulh6n1S7XTTUy4Rw/exec';
+            
             const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
             const morningHours = [9, 10, 11, 12];
             const afternoonHours = [16, 17, 18, 19, 20];
@@ -1104,7 +1114,7 @@
             const popupDetails = document.getElementById('popupDetails');
             const popupCloseBtn = document.getElementById('popupCloseBtn');
 
-            // ---------- Funciones de cookies ----------
+            // ---------- FUNCIONES DE COOKIES ----------
             function setCookie(name, value, days) {
                 const date = new Date();
                 date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -1129,7 +1139,27 @@
                 document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             }
 
-            // ---------- Guardar datos en cookies ----------
+            // ---------- GUARDAR EN GOOGLE SHEETS ----------
+            async function saveToGoogleSheets(data) {
+                try {
+                    const response = await fetch(GOOGLE_SHEETS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    // Con no-cors no podemos leer la respuesta, pero el envío funciona
+                    return { success: true };
+                } catch (error) {
+                    console.error('Error al guardar en Google Sheets:', error);
+                    return { success: false, error: error.message };
+                }
+            }
+
+            // ---------- GUARDAR DATOS EN COOKIES ----------
             function saveFormDataToCookies() {
                 const nombre = nombreInput.value.trim();
                 const email = emailInput.value.trim();
@@ -1152,7 +1182,7 @@
                 }
             }
 
-            // ---------- Cargar datos desde cookies ----------
+            // ---------- CARGAR DATOS DESDE COOKIES ----------
             function loadFormDataFromCookies() {
                 const nombre = getCookie('reserva_nombre');
                 const email = getCookie('reserva_email');
@@ -1176,7 +1206,7 @@
                 }
             }
 
-            // ---------- Funciones del calendario ----------
+            // ---------- FUNCIONES DEL CALENDARIO ----------
             function getToday() {
                 const now = new Date();
                 return new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -1223,7 +1253,7 @@
                     date.getDate() === today.getDate();
             }
 
-            // ---------- Actualizar feedback visual ----------
+            // ---------- ACTUALIZAR FEEDBACK VISUAL ----------
             function updateFeedback() {
                 const checked = document.querySelector('input[name="slot"]:checked');
                 if (checked) {
@@ -1236,12 +1266,10 @@
                 }
             }
 
-            // ---------- Mostrar popup de confirmación ----------
+            // ---------- MOSTRAR POPUP DE CONFIRMACIÓN ----------
             function showConfirmationPopup(nombre, email, telefono, horario) {
-                // Limpiar detalles anteriores
                 popupDetails.innerHTML = '';
                 
-                // Crear filas de detalles
                 const fields = [
                     { label: 'Nombre', value: nombre },
                     { label: 'Email', value: email },
@@ -1259,18 +1287,17 @@
                     popupDetails.appendChild(row);
                 });
                 
-                // Mostrar popup
                 popupOverlay.classList.add('show');
                 document.body.style.overflow = 'hidden';
             }
 
-            // ---------- Cerrar popup ----------
+            // ---------- CERRAR POPUP ----------
             function closePopup() {
                 popupOverlay.classList.remove('show');
                 document.body.style.overflow = '';
             }
 
-            // ---------- Enviar mensaje por WhatsApp ----------
+            // ---------- ENVIAR MENSAJE POR WHATSAPP ----------
             function sendWhatsAppMessage(nombre, email, telefono, horario) {
                 const message = `📋 *NUEVA RESERVA*\n\n` +
                     `👤 *Nombre:* ${nombre}\n` +
@@ -1281,12 +1308,10 @@
                 
                 const encodedMessage = encodeURIComponent(message);
                 const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
-                
-                // Abrir WhatsApp en una nueva ventana
                 window.open(url, '_blank');
             }
 
-            // ---------- Renderizar tabla ----------
+            // ---------- RENDERIZAR TABLA ----------
             function renderTable() {
                 const today = getToday();
 
@@ -1402,7 +1427,7 @@
                 updateFeedback();
             }
 
-            // ---------- Eventos ----------
+            // ---------- EVENTOS ----------
             nombreInput.addEventListener('input', saveFormDataToCookies);
             emailInput.addEventListener('input', saveFormDataToCookies);
             telefonoInput.addEventListener('input', saveFormDataToCookies);
@@ -1439,28 +1464,24 @@
                 alert('🗑️ Cookies eliminadas. Los datos han sido borrados.');
             });
 
-            // Cerrar popup al hacer clic en el botón
             popupCloseBtn.addEventListener('click', closePopup);
 
-            // Cerrar popup al hacer clic fuera del contenedor
             popupOverlay.addEventListener('click', function(e) {
                 if (e.target === this) {
                     closePopup();
                 }
             });
 
-            // Cerrar popup con tecla ESC
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && popupOverlay.classList.contains('show')) {
                     closePopup();
                 }
             });
 
-            // ---------- Submit del formulario (PARTE CRÍTICA) ----------
-            document.getElementById('reservationForm').addEventListener('submit', function(e) {
+            // ---------- SUBMIT DEL FORMULARIO ----------
+            document.getElementById('reservationForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
-                // 1. Validar campos
                 const nombre = nombreInput.value.trim();
                 const email = emailInput.value.trim();
                 const telefono = telefonoInput.value.trim();
@@ -1477,33 +1498,47 @@
                     return;
                 }
 
-                // 2. Deshabilitar botón para evitar doble envío
+                // Deshabilitar botón
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
                 try {
-                    // 3. Guardar datos en cookies
-                    saveFormDataToCookies();
+                    // Preparar datos para Google Sheets
+                    const [dia, hora] = selected.value.split(' ');
+                    const data = {
+                        fecha: dia,
+                        hora: hora,
+                        nombre: nombre,
+                        email: email,
+                        telefono: telefono
+                    };
 
-                    // 4. Enviar mensaje por WhatsApp
-                    sendWhatsAppMessage(nombre, email, telefono, selected.value);
-
-                    // 5. Mostrar popup de confirmación
-                    showConfirmationPopup(nombre, email, telefono, selected.value);
-
-                    // 6. Restaurar botón
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Reservar';
+                    // Guardar en Google Sheets
+                    const result = await saveToGoogleSheets(data);
+                    
+                    if (result.success) {
+                        // Guardar en cookies
+                        saveFormDataToCookies();
+                        
+                        // Enviar WhatsApp
+                        sendWhatsAppMessage(nombre, email, telefono, selected.value);
+                        
+                        // Mostrar popup
+                        showConfirmationPopup(nombre, email, telefono, selected.value);
+                    } else {
+                        alert('❌ Error al guardar la reserva. Por favor, intenta nuevamente.');
+                    }
 
                 } catch (error) {
-                    console.error('Error en el envío:', error);
+                    console.error('Error:', error);
                     alert('❌ Ocurrió un error al procesar la reserva. Por favor, intenta nuevamente.');
+                } finally {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Reservar';
                 }
             });
 
-            // ---------- Inicializar ----------
+            // ---------- INICIALIZAR ----------
             loadFormDataFromCookies();
             renderTable();
 
