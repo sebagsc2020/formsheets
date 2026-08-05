@@ -143,6 +143,7 @@
             border-radius: 10px;
             background: #111;
             padding: 2px;
+            scroll-behavior: smooth;
         }
         .table-wrapper::-webkit-scrollbar {
             height: 4px;
@@ -160,9 +161,9 @@
         }
         .schedule-table {
             width: 100%;
-            min-width: 400px;
+            min-width: 480px;
             border-collapse: collapse;
-            font-size: clamp(9px, 1.6vw, 12px);
+            font-size: clamp(8px, 1.4vw, 12px);
             border-radius: 10px;
             overflow: hidden;
             table-layout: fixed;
@@ -170,21 +171,21 @@
         .schedule-table th {
             background: #111;
             color: #b0b0b0;
-            padding: 4px 2px;
+            padding: 3px 1px;
             font-weight: 600;
-            font-size: clamp(8px, 1.3vw, 11px);
+            font-size: clamp(7px, 1.1vw, 10px);
             border-bottom: 2px solid #2a2a2a;
             position: sticky;
             top: 0;
             z-index: 10;
             text-align: center;
-            width: 42px;
-            min-width: 32px;
-            max-width: 50px;
+            width: 50px;
+            min-width: 38px;
+            max-width: 65px;
         }
         .schedule-table th .day-date {
             display: block;
-            font-size: clamp(6px, 1vw, 9px);
+            font-size: clamp(5px, 0.8vw, 8px);
             font-weight: 400;
             opacity: 0.6;
             margin-top: 1px;
@@ -205,9 +206,9 @@
         .schedule-table th.today-header .today-badge {
             background: #d4a820;
             color: #1a1a1a;
-            font-size: 6px;
-            padding: 1px 4px;
-            border-radius: 6px;
+            font-size: 5px;
+            padding: 1px 3px;
+            border-radius: 4px;
             display: inline-block;
             margin-top: 1px;
             font-weight: 700;
@@ -215,14 +216,14 @@
             box-shadow: 0 0 15px rgba(212, 168, 32, 0.12);
         }
         .schedule-table td {
-            padding: 3px 1px;
+            padding: 2px 1px;
             text-align: center;
             border-bottom: 1px solid #2a2a2a;
             background: #1a1a1a;
             transition: background 0.2s;
-            width: 42px;
-            min-width: 32px;
-            max-width: 50px;
+            width: 50px;
+            min-width: 38px;
+            max-width: 65px;
         }
         .schedule-table tr:last-child td {
             border-bottom: none;
@@ -233,8 +234,8 @@
             background: #141414;
             width: 36px;
             min-width: 28px;
-            max-width: 40px;
-            font-size: clamp(8px, 1.3vw, 11px);
+            max-width: 44px;
+            font-size: clamp(7px, 1.1vw, 10px);
             border-right: 1px solid #2a2a2a;
             position: sticky;
             left: 0;
@@ -243,21 +244,21 @@
         .schedule-table tr.separator-row td {
             background: #111;
             border-bottom: 3px solid #3a3220;
-            padding: 2px 1px;
-            height: 12px;
-            width: 42px;
-            min-width: 32px;
-            max-width: 50px;
+            padding: 1px 1px;
+            height: 10px;
+            width: 50px;
+            min-width: 38px;
+            max-width: 65px;
         }
         .schedule-table tr.separator-row td .separator-text {
-            font-size: clamp(6px, 1vw, 8px);
+            font-size: clamp(5px, 0.7vw, 7px);
             color: #8a7a4a;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             text-transform: uppercase;
             background: #1a1610;
-            padding: 1px 5px;
-            border-radius: 6px;
+            padding: 1px 3px;
+            border-radius: 4px;
             display: inline-block;
             border: 1px solid #3a3220;
         }
@@ -288,7 +289,7 @@
         }
         .schedule-table td.today-column.reserved::after {
             content: '📌';
-            font-size: 8px;
+            font-size: 7px;
             margin-left: 1px;
             opacity: 0.7;
         }
@@ -305,8 +306,8 @@
             border-right: 2px solid #6a5a20;
         }
         .schedule-table input[type="radio"] {
-            width: clamp(12px, 2.5vw, 16px);
-            height: clamp(12px, 2.5vw, 16px);
+            width: clamp(10px, 2vw, 14px);
+            height: clamp(10px, 2vw, 14px);
             accent-color: #666;
             cursor: pointer;
             transition: transform 0.15s;
@@ -331,7 +332,7 @@
         }
         .schedule-table td.reserved::after {
             content: '📌';
-            font-size: 8px;
+            font-size: 7px;
             margin-left: 1px;
             opacity: 0.5;
         }
@@ -471,48 +472,94 @@
             background: #2a2418;
             border-color: #c8a020;
         }
+
+        /* Scroll indicators */
+        .scroll-indicators {
+            display: none;
+            justify-content: space-between;
+            margin-top: 4px;
+            padding: 0 4px;
+        }
+        .scroll-indicators button {
+            background: rgba(42, 42, 42, 0.8);
+            color: #c0c0c0;
+            border: 1px solid #333;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+        .scroll-indicators button:hover {
+            background: #333;
+            border-color: #c8a020;
+        }
+        .scroll-indicators button:active {
+            transform: scale(0.9);
+        }
+        .scroll-indicators button:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 600px) {
+            .scroll-indicators {
+                display: flex;
+            }
+        }
+
         @media (max-width: 480px) {
             .container { padding: 6px 4px; border-radius: 10px; }
             .week-navigation { padding: 4px 6px; gap: 3px; }
             .week-nav-btn { padding: 3px 6px; font-size: 8px; }
             .today-btn { padding: 3px 8px; font-size: 8px; }
             .week-info { font-size: 9px; min-width: 60px; }
-            .schedule-table { min-width: 320px; font-size: 8px; }
-            .schedule-table th { padding: 3px 1px; font-size: 7px; width: 30px; min-width: 24px; max-width: 36px; }
+            .schedule-table { min-width: 380px; font-size: 7px; }
+            .schedule-table th { padding: 2px 1px; font-size: 6px; width: 40px; min-width: 30px; max-width: 50px; }
             .schedule-table th .day-date { font-size: 5px; }
-            .schedule-table td { padding: 2px 1px; width: 30px; min-width: 24px; max-width: 36px; }
-            .schedule-table .time-col { width: 26px; min-width: 20px; max-width: 30px; font-size: 7px; }
+            .schedule-table td { padding: 2px 1px; width: 40px; min-width: 30px; max-width: 50px; }
+            .schedule-table .time-col { width: 28px; min-width: 22px; max-width: 34px; font-size: 6px; }
             .schedule-table input[type="radio"] { width: 10px; height: 10px; }
-            .schedule-table tr.separator-row td { width: 30px; min-width: 24px; max-width: 36px; }
-            .schedule-table tr.separator-row td .separator-text { font-size: 5px; padding: 1px 4px; letter-spacing: 0.3px; }
+            .schedule-table tr.separator-row td { width: 40px; min-width: 30px; max-width: 50px; }
+            .schedule-table tr.separator-row td .separator-text { font-size: 4px; padding: 1px 3px; letter-spacing: 0.2px; }
             .reservation-form { padding: 8px 6px; gap: 6px; }
             .form-group input { padding: 5px 8px; font-size: 12px; }
             .btn-reserve { padding: 6px 12px; font-size: 12px; }
             .message { padding: 6px 10px; font-size: 10px; }
+            .scroll-indicators button { width: 22px; height: 22px; font-size: 11px; }
         }
+
         @media (max-width: 380px) {
-            .schedule-table { min-width: 260px; font-size: 7px; }
-            .schedule-table th { padding: 2px 1px; font-size: 6px; width: 24px; min-width: 18px; max-width: 28px; }
+            .schedule-table { min-width: 300px; font-size: 6px; }
+            .schedule-table th { padding: 2px 1px; font-size: 5px; width: 32px; min-width: 24px; max-width: 40px; }
             .schedule-table th .day-date { font-size: 4px; }
-            .schedule-table td { padding: 2px 1px; width: 24px; min-width: 18px; max-width: 28px; }
-            .schedule-table .time-col { width: 20px; min-width: 16px; max-width: 24px; font-size: 6px; }
+            .schedule-table td { padding: 2px 1px; width: 32px; min-width: 24px; max-width: 40px; }
+            .schedule-table .time-col { width: 22px; min-width: 18px; max-width: 28px; font-size: 5px; }
             .schedule-table input[type="radio"] { width: 8px; height: 8px; }
-            .schedule-table tr.separator-row td { width: 24px; min-width: 18px; max-width: 28px; }
-            .schedule-table tr.separator-row td .separator-text { font-size: 4px; padding: 1px 3px; }
+            .schedule-table tr.separator-row td { width: 32px; min-width: 24px; max-width: 40px; }
+            .schedule-table tr.separator-row td .separator-text { font-size: 3px; padding: 1px 2px; }
             .week-nav-btn { padding: 2px 5px; font-size: 7px; }
             .today-btn { padding: 2px 6px; font-size: 7px; }
             .week-info { font-size: 8px; min-width: 50px; }
             .container { padding: 4px 2px; }
             .cookie-notice p { font-size: 9px; }
+            .scroll-indicators button { width: 18px; height: 18px; font-size: 9px; }
         }
+
         @media (min-width: 769px) {
             .reservation-form { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
             .form-group { flex: 1 1 120px; min-width: 100px; }
             .btn-reserve { width: auto; margin-left: auto; min-width: 110px; }
             .cookie-notice { flex-direction: row; justify-content: space-between; text-align: left; }
             .schedule-table { min-width: 100%; }
-            .schedule-table th { width: 50px; min-width: 40px; max-width: 60px; }
-            .schedule-table td { width: 50px; min-width: 40px; max-width: 60px; }
+            .schedule-table th { width: 70px; min-width: 55px; max-width: 90px; }
+            .schedule-table td { width: 70px; min-width: 55px; max-width: 90px; }
+            .scroll-indicators { display: none !important; }
         }
     </style>
 </head>
@@ -544,7 +591,12 @@
         </div>
     </div>
 
-    <div class="table-wrapper">
+    <div class="scroll-indicators" id="scrollIndicators">
+        <button id="scrollLeft" title="Desplazar izquierda">◀</button>
+        <button id="scrollRight" title="Desplazar derecha">▶</button>
+    </div>
+
+    <div class="table-wrapper" id="tableWrapper">
         <table class="schedule-table" id="scheduleTable">
             <thead id="tableHead"></thead>
             <tbody id="tableBody"></tbody>
@@ -607,6 +659,43 @@
         const cookieNotice = document.getElementById('cookieNotice');
         const acceptBtn = document.getElementById('acceptCookies');
         const loadingOverlay = document.getElementById('loadingOverlay');
+        const tableWrapper = document.getElementById('tableWrapper');
+        const scrollLeft = document.getElementById('scrollLeft');
+        const scrollRight = document.getElementById('scrollRight');
+
+        // ============================================================
+        // SCROLL INDICATORS
+        // ============================================================
+        function updateScrollButtons() {
+            if (!tableWrapper) return;
+            const scrollLeftPos = tableWrapper.scrollLeft;
+            const maxScroll = tableWrapper.scrollWidth - tableWrapper.clientWidth;
+            
+            if (scrollLeft) scrollLeft.disabled = scrollLeftPos <= 2;
+            if (scrollRight) scrollRight.disabled = scrollLeftPos >= maxScroll - 2;
+        }
+
+        function scrollWrapper(direction) {
+            if (!tableWrapper) return;
+            const scrollAmount = tableWrapper.clientWidth * 0.5;
+            tableWrapper.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+            setTimeout(updateScrollButtons, 400);
+        }
+
+        if (scrollLeft) {
+            scrollLeft.addEventListener('click', () => scrollWrapper(-1));
+        }
+        if (scrollRight) {
+            scrollRight.addEventListener('click', () => scrollWrapper(1));
+        }
+
+        if (tableWrapper) {
+            tableWrapper.addEventListener('scroll', updateScrollButtons);
+            window.addEventListener('resize', updateScrollButtons);
+        }
 
         // ============================================================
         // UTILIDADES
@@ -784,12 +873,12 @@
             
             // Separador
             tbodyHTML += `<tr class="separator-row">`;
-            tbodyHTML += `<td class="time-col" style="background:#111; text-align:center; font-size:clamp(6px,1vw,9px); color:#8a7a4a; font-weight:600;">⏰</td>`;
+            tbodyHTML += `<td class="time-col" style="background:#111; text-align:center; font-size:clamp(5px,0.8vw,8px); color:#8a7a4a; font-weight:600;">⏰</td>`;
             for (let i = 0; i < 6; i++) {
                 const date = getDateForDay(startDate, i);
                 const isToday = isSameDate(date, today);
                 const todayClass = isToday ? 'today-column' : '';
-                tbodyHTML += `<td class="${todayClass}" style="background:#111; border-bottom: 3px solid #3a3220; text-align:center; font-size:clamp(5px,0.8vw,8px); color:#8a7a4a; font-weight:500; letter-spacing:0.3px;">
+                tbodyHTML += `<td class="${todayClass}" style="background:#111; border-bottom: 3px solid #3a3220; text-align:center; font-size:clamp(4px,0.6vw,7px); color:#8a7a4a; font-weight:500; letter-spacing:0.2px;">
                     <span class="separator-text">Tarde</span>
                 </td>`;
             }
@@ -816,6 +905,8 @@
 
             updateSubmitButton();
             attachRadioEvents();
+            
+            setTimeout(updateScrollButtons, 100);
         }
 
         function generarFilaHora(hora, startDate, today) {
@@ -896,6 +987,8 @@
             selectedSlot = null;
             renderTable(currentWeekStart);
             messageDiv.classList.remove('show');
+            if (tableWrapper) tableWrapper.scrollLeft = 0;
+            setTimeout(updateScrollButtons, 200);
         }
 
         function goToToday() {
@@ -905,6 +998,8 @@
             selectedSlot = null;
             renderTable(currentWeekStart);
             messageDiv.classList.remove('show');
+            if (tableWrapper) tableWrapper.scrollLeft = 0;
+            setTimeout(updateScrollButtons, 200);
         }
 
         function mostrarMensaje(texto, tipo = 'success') {
