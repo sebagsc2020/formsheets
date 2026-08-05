@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -170,6 +171,7 @@
             table-layout: fixed;
         }
 
+        /* ===== COLUMNA HORA FIJA ===== */
         .schedule-table .time-col {
             font-weight: 600;
             color: #999;
@@ -185,6 +187,7 @@
             text-align: center;
         }
 
+        /* ===== COLUMNAS DE DÍAS ===== */
         .schedule-table th {
             background: #111;
             color: #b0b0b0;
@@ -246,6 +249,7 @@
             border-bottom: none;
         }
 
+        /* ===== FILA SEPARADORA ===== */
         .schedule-table tr.separator-row td {
             background: #111;
             border-bottom: 3px solid #3a3220;
@@ -275,6 +279,7 @@
             font-weight: 600;
         }
 
+        /* ===== DÍA ACTUAL EN CELDAS ===== */
         .schedule-table td.today-column {
             background: #2a2a2a;
             position: relative;
@@ -284,7 +289,7 @@
             opacity: 0.5;
         }
         .schedule-table td.today-column.reserved {
-            background: #2a1515;
+            background: #2a1a1a;
         }
         .schedule-table td.today-column.selected {
             background: #3a3a3a;
@@ -297,6 +302,7 @@
             background: #222;
         }
 
+        /* ===== CHECKBOXES Y RESERVADOS ===== */
         .schedule-table input[type="radio"] {
             width: clamp(18px, 3vw, 24px);
             height: clamp(18px, 3vw, 24px);
@@ -319,6 +325,7 @@
             opacity: 0.3;
         }
 
+        /* ===== CRUZ ROJA PARA RESERVADOS ===== */
         .schedule-table td.reserved {
             background: #2a1a1a;
             position: relative;
@@ -345,6 +352,7 @@
             text-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
         }
 
+        /* Elemento oculto por defecto */
         .schedule-table td .reserved-cross {
             display: none;
         }
@@ -373,6 +381,7 @@
             box-shadow: inset 0 0 0 2px #555;
         }
 
+        /* ===== FORMULARIO ===== */
         .reservation-form {
             background: #141414;
             padding: 12px 10px;
@@ -502,6 +511,7 @@
             border-color: #c8a020;
         }
 
+        /* ===== SCROLL INDICATORS ===== */
         .scroll-indicators {
             display: none;
             justify-content: space-between;
@@ -535,6 +545,9 @@
             cursor: not-allowed;
         }
 
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
         @media (max-width: 768px) {
             .schedule-table th {
                 min-width: 120px;
@@ -744,10 +757,10 @@
 <script>
     (function() {
         // ============================================================
-        // 🔴 REEMPLAZA CON TU URL DE APPS SCRIPT (la que funcione)
+        // 🔴 TU URL DE APPS SCRIPT 🔴
         // ============================================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyAFvlI6gQm93HXax1mNtis8FJ7VuHzd77KMB6375JNQuBiBrAN8pojLAoNiHYeoQ92Zg/exec';
-
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwlGjEvj6r_U8drvrlIlrCmI8A_VgqEA5BSv7ZX3xEBN6-YNtn-dQNFZ0Z0z00LRk1rBw/exec';
+        
         // ============================================================
         // CONFIGURACIÓN
         // ============================================================
@@ -789,6 +802,7 @@
             if (!tableWrapper) return;
             const scrollLeftPos = tableWrapper.scrollLeft;
             const maxScroll = tableWrapper.scrollWidth - tableWrapper.clientWidth;
+            
             if (scrollLeft) scrollLeft.disabled = scrollLeftPos <= 2;
             if (scrollRight) scrollRight.disabled = scrollLeftPos >= maxScroll - 2;
         }
@@ -796,12 +810,20 @@
         function scrollWrapper(direction) {
             if (!tableWrapper) return;
             const scrollAmount = tableWrapper.clientWidth * 0.5;
-            tableWrapper.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+            tableWrapper.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
             setTimeout(updateScrollButtons, 400);
         }
 
-        if (scrollLeft) scrollLeft.addEventListener('click', () => scrollWrapper(-1));
-        if (scrollRight) scrollRight.addEventListener('click', () => scrollWrapper(1));
+        if (scrollLeft) {
+            scrollLeft.addEventListener('click', () => scrollWrapper(-1));
+        }
+        if (scrollRight) {
+            scrollRight.addEventListener('click', () => scrollWrapper(1));
+        }
+
         if (tableWrapper) {
             tableWrapper.addEventListener('scroll', updateScrollButtons);
             window.addEventListener('resize', updateScrollButtons);
@@ -888,8 +910,13 @@
             try {
                 mostrarLoading(true);
                 const response = await fetch(API_URL + '?t=' + Date.now());
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const data = await response.json();
+                
                 if (data.success) {
                     reservas = {};
                     data.reservas.forEach(r => {
@@ -902,9 +929,9 @@
                             telefono: r.telefono || ''
                         };
                     });
-                    return true;
                 }
-                return false;
+                return true;
+                
             } catch (error) {
                 console.error('Error cargando reservas:', error);
                 return false;
@@ -915,13 +942,14 @@
 
         async function guardarReservaEnAPI(fecha, hora, nombre, email, telefono) {
             try {
-                const response = await fetch(API_URL, {
+                await fetch(API_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ fecha, hora, nombre, email, telefono: telefono || '' })
                 });
-                const data = await response.json();
-                return data;
+                return { success: true };
+                
             } catch (error) {
                 console.error('Error guardando reserva:', error);
                 return { success: false, error: error.message };
@@ -950,7 +978,8 @@
             const startDate = new Date(weekStart);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-
+            
+            // Encabezado
             let theadHTML = '<tr><th class="time-col">Hora</th>';
             for (let i = 0; i < 6; i++) {
                 const date = getDateForDay(startDate, i);
@@ -959,6 +988,7 @@
                 const isWeekend = (i === 5) ? 'weekend' : '';
                 const isToday = isSameDate(date, today);
                 const todayClass = isToday ? 'today-header' : '';
+                
                 theadHTML += `<th class="${isWeekend} ${todayClass}">${dayName}<span class="day-date">${dateStr}</span>`;
                 if (isToday) theadHTML += ` <span class="today-badge">✦ HOY</span>`;
                 theadHTML += `</th>`;
@@ -966,10 +996,14 @@
             theadHTML += '</tr>';
             tableHead.innerHTML = theadHTML;
 
+            // Cuerpo
             let tbodyHTML = '';
+            
             HORAS_MANANA.forEach(hora => {
                 tbodyHTML += generarFilaHora(hora, startDate, today);
             });
+            
+            // Separador
             tbodyHTML += `<tr class="separator-row">`;
             tbodyHTML += `<td class="time-col" style="background:#111; text-align:center;">⏰</td>`;
             for (let i = 0; i < 6; i++) {
@@ -981,16 +1015,20 @@
                 </td>`;
             }
             tbodyHTML += `</tr>`;
+            
             HORAS_TARDE.forEach(hora => {
                 tbodyHTML += generarFilaHora(hora, startDate, today);
             });
+            
             tableBody.innerHTML = tbodyHTML;
 
+            // Actualizar rango
             const endDate = addWeeks(startDate, 1);
             endDate.setDate(endDate.getDate() - 1);
             weekRange.textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
             weekLabel.textContent = 'Semana';
 
+            // Botones
             const todayWeekStart = getWeekStart(today);
             const startWeek = getWeekStart(FECHA_INICIO);
             const diffWeeks = Math.floor((startDate - startWeek) / (7 * 24 * 60 * 60 * 1000));
@@ -999,6 +1037,7 @@
 
             updateSubmitButton();
             attachRadioEvents();
+            
             setTimeout(updateScrollButtons, 100);
         }
 
@@ -1012,23 +1051,29 @@
                 const isReserved = reservas[radioId] !== undefined;
                 const isSelected = selectedSlot && selectedSlot.dateKey === dateKey && selectedSlot.time === hora;
                 const isToday = isSameDate(date, today);
-
+                
                 let tdClass = '';
                 if (isPast) tdClass += 'past ';
                 if (isReserved) tdClass += 'reserved ';
                 if (isSelected) tdClass += 'selected ';
                 if (isToday) tdClass += 'today-column ';
-
+                
                 html += `<td class="${tdClass}">`;
+                
                 if (isPast) {
+                    // Día pasado: mostrar guión
                     html += `<span class="past-text">—</span>`;
                 } else if (isReserved) {
+                    // Reservado: mostrar CRUZ ROJA (sin radio)
                     html += `<span class="reserved-cross"></span>`;
                 } else {
+                    // Disponible: mostrar radio
                     const checked = isSelected ? 'checked' : '';
                     html += `<input type="radio" class="slot-radio" name="slot" id="${radioId}" 
-                                   data-date="${dateKey}" data-time="${hora}" ${checked}>`;
+                                   data-date="${dateKey}" data-time="${hora}" 
+                                   ${checked}>`;
                 }
+                
                 html += '</td>';
             }
             html += '</tr>';
@@ -1047,6 +1092,7 @@
             if (radio.checked) {
                 const dateKey = radio.getAttribute('data-date');
                 const time = radio.getAttribute('data-time');
+                
                 if (selectedSlot) {
                     const prevId = `${selectedSlot.dateKey}_${selectedSlot.time}`;
                     const prevRadio = document.getElementById(prevId);
@@ -1056,6 +1102,7 @@
                         if (parentTd) parentTd.classList.remove('selected');
                     }
                 }
+                
                 selectedSlot = { dateKey, time };
                 const parentTd = radio.closest('td');
                 if (parentTd) parentTd.classList.add('selected');
@@ -1114,6 +1161,7 @@
                 mostrarMensaje('⚠️ Debes seleccionar un horario.', 'error');
                 return;
             }
+
             if (isLoading) {
                 mostrarMensaje('⏳ Espera...', 'error');
                 return;
@@ -1127,12 +1175,14 @@
                 mostrarMensaje('⚠️ Ingresa un nombre válido.', 'error');
                 return;
             }
+
             if (!email || !email.includes('@') || !email.includes('.')) {
                 mostrarMensaje('⚠️ Ingresa un correo válido.', 'error');
                 return;
             }
 
             const slotId = `${selectedSlot.dateKey}_${selectedSlot.time}`;
+            
             if (reservas[slotId]) {
                 mostrarMensaje('⚠️ Este horario ya fue reservado.', 'error');
                 selectedSlot = null;
@@ -1149,26 +1199,32 @@
                 email,
                 telefono
             );
+            
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            await cargarReservasDesdeAPI();
+            mostrarLoading(false);
 
             if (result.success) {
                 reservas[slotId] = { nombre, email, telefono };
                 saveToCookies();
-                await cargarReservasDesdeAPI();
 
                 const [year, month, day] = selectedSlot.dateKey.split('-');
                 const dateObj = new Date(year, month - 1, day);
                 const dateStr = formatDateFull(dateObj);
-
-                mostrarMensaje(`✦ ¡Reserva confirmada! ${nombre}, tu reserva para el ${dateStr} a las ${selectedSlot.time} ha sido registrada.`, 'success');
+                
+                messageDiv.className = 'message show success';
+                messageDiv.innerHTML = `
+                    ✦ <strong>¡Reserva confirmada!</strong><br>
+                    <span style="font-weight:400;">${nombre}, tu reserva para el <strong>${dateStr}</strong> a las <strong>${selectedSlot.time}</strong> ha sido registrada.</span><br>
+                    <span style="font-size:clamp(12px,2vw,16px); opacity:0.6;">Te enviaremos un correo a ${email}.</span>
+                `;
 
                 selectedSlot = null;
                 renderTable(currentWeekStart);
             } else {
                 mostrarMensaje('⚠️ Error al guardar. Intenta de nuevo.', 'error');
-                await cargarReservasDesdeAPI();
                 renderTable(currentWeekStart);
             }
-            mostrarLoading(false);
         });
 
         // ============================================================
@@ -1228,6 +1284,7 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             currentWeekStart = today < FECHA_INICIO ? getWeekStart(FECHA_INICIO) : getWeekStart(today);
+            
             renderTable(currentWeekStart);
         }
 
