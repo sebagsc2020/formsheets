@@ -47,6 +47,34 @@
             font-size: clamp(12px, 2.5vw, 15px);
         }
 
+        .loading-overlay {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #e8c84a;
+            font-weight: 500;
+        }
+
+        .loading-overlay.show {
+            display: block;
+        }
+
+        .loading-overlay .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #2a2a2a;
+            border-top: 3px solid #d4a820;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* === NAVEGACIÓN SEMANAL === */
         .week-navigation {
             display: flex;
@@ -510,15 +538,6 @@
             border-color: #c8a020;
         }
 
-        /* === MEJORAS PARA TOCAR EN MÓVIL === */
-        .schedule-table td {
-            touch-action: manipulation;
-        }
-
-        .schedule-table input[type="radio"] {
-            touch-action: manipulation;
-        }
-
         /* === MEDIA QUERIES === */
         @media (max-width: 480px) {
             .container {
@@ -685,8 +704,14 @@
 
     <!-- AVISO DE COOKIES -->
     <div class="cookie-notice" id="cookieNotice">
-        <p>🍪 Usamos cookies para recordar tus datos y reservas.</p>
+        <p>🍪 Usamos cookies para recordar tus datos.</p>
         <button id="acceptCookies">Aceptar</button>
+    </div>
+
+    <!-- CARGANDO -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Cargando disponibilidad...</p>
     </div>
 
     <!-- NAVEGACIÓN SEMANAL -->
@@ -757,7 +782,49 @@
 
 <script>
     (function() {
-        // === UTILIDADES DE COOKIES ===
+        // ============================================================
+        // CONFIGURACIÓN
+        // ============================================================
+        // 🔴 REEMPLAZA ESTA URL CON LA DE TU APPS SCRIPT 🔴
+        const API_URL = 'https://script.google.com/macros/s/AKfycbz3bwmvYxuQierHehE8FGXqKL0HAI58WUo9DZ8sb_rFbgHhKqrYsQg7Y2UsnuvxautH/exec';
+        
+        // ============================================================
+        // CONFIGURACIÓN DE HORARIOS
+        // ============================================================
+        const HORAS_MANANA = ['9:00', '10:00', '11:00', '12:00'];
+        const HORAS_TARDE = ['16:00', '17:00', '18:00', '19:00', '20:00'];
+        const DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        const FECHA_INICIO = new Date(2026, 7, 1);
+
+        // ============================================================
+        // ESTADO
+        // ============================================================
+        let currentWeekStart = getWeekStart(FECHA_INICIO);
+        let reservas = {};
+        let selectedSlot = null;
+        let cookiesAccepted = false;
+        let isLoading = false;
+
+        // ============================================================
+        // ELEMENTOS DOM
+        // ============================================================
+        const tableHead = document.getElementById('tableHead');
+        const tableBody = document.getElementById('tableBody');
+        const weekRange = document.getElementById('weekRange');
+        const weekLabel = document.getElementById('weekLabel');
+        const prevBtn = document.getElementById('prevWeek');
+        const nextBtn = document.getElementById('nextWeek');
+        const todayBtn = document.getElementById('todayBtn');
+        const form = document.getElementById('reservationForm');
+        const messageDiv = document.getElementById('message');
+        const submitBtn = document.getElementById('submitBtn');
+        const cookieNotice = document.getElementById('cookieNotice');
+        const acceptBtn = document.getElementById('acceptCookies');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // ============================================================
+        // UTILIDADES DE COOKIES
+        // ============================================================
         function setCookie(name, value, days = 365) {
             const date = new Date();
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -782,34 +849,9 @@
             return null;
         }
 
-        // === CONFIGURACIÓN ===
-        const HORAS_MANANA = ['9:00', '10:00', '11:00', '12:00'];
-        const HORAS_TARDE = ['16:00', '17:00', '18:00', '19:00', '20:00'];
-        const DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-        
-        const FECHA_INICIO = new Date(2026, 7, 1);
-
-        // Estado
-        let currentWeekStart = getWeekStart(FECHA_INICIO);
-        let reservas = {};
-        let selectedSlot = null;
-        let cookiesAccepted = false;
-
-        // Elementos DOM
-        const tableHead = document.getElementById('tableHead');
-        const tableBody = document.getElementById('tableBody');
-        const weekRange = document.getElementById('weekRange');
-        const weekLabel = document.getElementById('weekLabel');
-        const prevBtn = document.getElementById('prevWeek');
-        const nextBtn = document.getElementById('nextWeek');
-        const todayBtn = document.getElementById('todayBtn');
-        const form = document.getElementById('reservationForm');
-        const messageDiv = document.getElementById('message');
-        const submitBtn = document.getElementById('submitBtn');
-        const cookieNotice = document.getElementById('cookieNotice');
-        const acceptBtn = document.getElementById('acceptCookies');
-
-        // === FUNCIONES DE FECHAS ===
+        // ============================================================
+        // FUNCIONES DE FECHAS
+        // ============================================================
         function getWeekStart(date) {
             const d = new Date(date);
             const day = d.getDay();
@@ -865,16 +907,93 @@
             return date < start;
         }
 
-        // === GESTIÓN DE COOKIES ===
+        // ============================================================
+        // API - GOOGLE SHEETS
+        // ============================================================
+        async function cargarReservasDesdeAPI() {
+            try {
+                mostrarLoading(true);
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Convertir array de reservas a objeto para acceso rápido
+                    reservas = {};
+                    data.reservas.forEach(r => {
+                        const key = `${r.fecha}_${r.hora}`;
+                        reservas[key] = {
+                            nombre: r.nombre,
+                            email: r.email,
+                            telefono: r.telefono
+                        };
+                    });
+                    return true;
+                } else {
+                    console.error('Error al cargar reservas:', data.error);
+                    mostrarMensaje('⚠️ Error al cargar disponibilidad. Intenta de nuevo.', 'error');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                mostrarMensaje('⚠️ Error de conexión. Verifica tu internet.', 'error');
+                return false;
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        async function guardarReservaEnAPI(fecha, hora, nombre, email, telefono) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        fecha: fecha,
+                        hora: hora,
+                        nombre: nombre,
+                        email: email,
+                        telefono: telefono || ''
+                    })
+                });
+
+                // Con no-cors no podemos leer la respuesta directamente
+                // Pero la petición se envió, confiamos en que el servidor la procesó
+                return { success: true };
+                
+            } catch (error) {
+                console.error('Error al guardar:', error);
+                return { success: false, error: error.toString() };
+            }
+        }
+
+        // ============================================================
+        // LOADING
+        // ============================================================
+        function mostrarLoading(show) {
+            isLoading = show;
+            if (show) {
+                loadingOverlay.classList.add('show');
+                document.querySelector('.table-wrapper').style.opacity = '0.3';
+                document.querySelector('.table-wrapper').style.pointerEvents = 'none';
+            } else {
+                loadingOverlay.classList.remove('show');
+                document.querySelector('.table-wrapper').style.opacity = '1';
+                document.querySelector('.table-wrapper').style.pointerEvents = 'auto';
+            }
+        }
+
+        // ============================================================
+        // GESTIÓN DE COOKIES
+        // ============================================================
         function loadFromCookies() {
             const savedData = getCookie('reservas_data');
-            if (savedData) {
-                reservas = savedData.reservas || {};
-                if (savedData.user) {
-                    document.getElementById('nombre').value = savedData.user.nombre || '';
-                    document.getElementById('email').value = savedData.user.email || '';
-                    document.getElementById('telefono').value = savedData.user.telefono || '';
-                }
+            if (savedData && savedData.user) {
+                document.getElementById('nombre').value = savedData.user.nombre || '';
+                document.getElementById('email').value = savedData.user.email || '';
+                document.getElementById('telefono').value = savedData.user.telefono || '';
                 return true;
             }
             return false;
@@ -884,7 +1003,6 @@
             if (!cookiesAccepted) return;
             
             const data = {
-                reservas: reservas,
                 user: {
                     nombre: document.getElementById('nombre').value.trim(),
                     email: document.getElementById('email').value.trim(),
@@ -906,7 +1024,9 @@
             });
         }
 
-        // === GENERAR TABLA ===
+        // ============================================================
+        // GENERAR TABLA
+        // ============================================================
         function renderTable(weekStart) {
             const startDate = new Date(weekStart);
             const today = new Date();
@@ -981,7 +1101,9 @@
             attachRadioEvents();
         }
 
-        // === FUNCIÓN PARA GENERAR FILA DE HORA ===
+        // ============================================================
+        // FUNCIÓN PARA GENERAR FILA DE HORA
+        // ============================================================
         function generarFilaHora(hora, startDate, today) {
             let html = `<tr><td class="time-col">${hora}</td>`;
             for (let i = 0; i < 6; i++) {
@@ -1020,7 +1142,9 @@
             return html;
         }
 
-        // === EVENTOS DE RADIO ===
+        // ============================================================
+        // EVENTOS DE RADIO
+        // ============================================================
         function attachRadioEvents() {
             document.querySelectorAll('input[name="slot"]').forEach(radio => {
                 radio.removeEventListener('change', handleRadioChange);
@@ -1054,7 +1178,9 @@
             }
         }
 
-        // === ACTUALIZAR BOTÓN DE SUBMIT ===
+        // ============================================================
+        // ACTUALIZAR BOTÓN DE SUBMIT
+        // ============================================================
         function updateSubmitButton() {
             if (selectedSlot) {
                 submitBtn.disabled = false;
@@ -1065,7 +1191,9 @@
             }
         }
 
-        // === NAVEGACIÓN ===
+        // ============================================================
+        // NAVEGACIÓN
+        // ============================================================
         function goToWeek(weeksOffset) {
             const newWeek = addWeeks(currentWeekStart, weeksOffset);
             currentWeekStart = newWeek;
@@ -1084,7 +1212,9 @@
             messageDiv.classList.remove('show');
         }
 
-        // === MENSAJES ===
+        // ============================================================
+        // MENSAJES
+        // ============================================================
         function mostrarMensaje(texto, tipo = 'success') {
             messageDiv.textContent = texto;
             messageDiv.className = 'message show';
@@ -1095,12 +1225,19 @@
             }
         }
 
-        // === ENVÍO DEL FORMULARIO ===
-        form.addEventListener('submit', function(e) {
+        // ============================================================
+        // ENVÍO DEL FORMULARIO
+        // ============================================================
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
             if (!selectedSlot) {
                 mostrarMensaje('⚠️ Debes seleccionar un horario.', 'error');
+                return;
+            }
+
+            if (isLoading) {
+                mostrarMensaje('⏳ Espera a que termine de cargar...', 'error');
                 return;
             }
 
@@ -1119,46 +1256,66 @@
             }
 
             const slotId = `${selectedSlot.dateKey}_${selectedSlot.time}`;
+            
+            // Verificar que el horario no haya sido reservado mientras tanto
             if (reservas[slotId]) {
                 mostrarMensaje('⚠️ Este horario ya fue reservado. Por favor, selecciona otro.', 'error');
                 selectedSlot = null;
+                // Recargar reservas
+                await cargarReservasDesdeAPI();
                 renderTable(currentWeekStart);
                 return;
             }
 
-            reservas[slotId] = {
+            // Guardar en Google Sheets
+            mostrarLoading(true);
+            const result = await guardarReservaEnAPI(
+                selectedSlot.dateKey,
+                selectedSlot.time,
                 nombre,
                 email,
                 telefono
-            };
+            );
+            mostrarLoading(false);
 
-            saveToCookies();
+            if (result.success) {
+                // Guardar localmente
+                reservas[slotId] = { nombre, email, telefono };
+                saveToCookies();
 
-            const [year, month, day] = selectedSlot.dateKey.split('-');
-            const dateObj = new Date(year, month - 1, day);
-            const dateStr = formatDate(dateObj);
-            
-            messageDiv.className = 'message show success';
-            messageDiv.innerHTML = `
-                ✦ <strong>¡Reserva confirmada!</strong><br>
-                <span style="font-weight:400;">${nombre}, tu reserva para el <strong>${dateStr}</strong> a las <strong>${selectedSlot.time}</strong> ha sido registrada.</span><br>
-                <span style="font-size:clamp(12px,2vw,14px); opacity:0.6;">Te enviaremos un correo a ${email} con los detalles.</span>
-            `;
+                const [year, month, day] = selectedSlot.dateKey.split('-');
+                const dateObj = new Date(year, month - 1, day);
+                const dateStr = formatDate(dateObj);
+                
+                messageDiv.className = 'message show success';
+                messageDiv.innerHTML = `
+                    ✦ <strong>¡Reserva confirmada!</strong><br>
+                    <span style="font-weight:400;">${nombre}, tu reserva para el <strong>${dateStr}</strong> a las <strong>${selectedSlot.time}</strong> ha sido registrada.</span><br>
+                    <span style="font-size:clamp(12px,2vw,14px); opacity:0.6;">Te enviaremos un correo a ${email} con los detalles.</span>
+                `;
 
-            console.log('Reserva confirmada:', {
-                nombre,
-                email,
-                telefono,
-                fecha: dateStr,
-                hora: selectedSlot.time,
-                dateKey: selectedSlot.dateKey
-            });
+                console.log('Reserva confirmada:', {
+                    nombre,
+                    email,
+                    telefono,
+                    fecha: dateStr,
+                    hora: selectedSlot.time,
+                    dateKey: selectedSlot.dateKey
+                });
 
-            selectedSlot = null;
-            renderTable(currentWeekStart);
+                selectedSlot = null;
+                renderTable(currentWeekStart);
+            } else {
+                mostrarMensaje('⚠️ Error al guardar la reserva. Intenta de nuevo.', 'error');
+                // Recargar reservas para asegurar consistencia
+                await cargarReservasDesdeAPI();
+                renderTable(currentWeekStart);
+            }
         });
 
-        // === COOKIES - ACEPTAR ===
+        // ============================================================
+        // COOKIES - ACEPTAR
+        // ============================================================
         acceptBtn.addEventListener('click', function() {
             cookiesAccepted = true;
             cookieNotice.style.display = 'none';
@@ -1166,8 +1323,11 @@
             autoSaveUserData();
         });
 
-        // === INICIALIZAR ===
-        function init() {
+        // ============================================================
+        // INICIALIZAR
+        // ============================================================
+        async function init() {
+            // Cargar datos de cookies
             const savedData = getCookie('reservas_data');
             if (savedData) {
                 cookiesAccepted = true;
@@ -1176,6 +1336,10 @@
                 autoSaveUserData();
             }
 
+            // Cargar reservas desde Google Sheets
+            await cargarReservasDesdeAPI();
+
+            // Configurar semana inicial
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const todayWeekStart = getWeekStart(today);
@@ -1187,19 +1351,18 @@
             }
             
             renderTable(currentWeekStart);
-
-            if (!savedData) {
-                reservas['2026-08-03_10:00'] = { nombre: 'Ana Pérez', email: 'ana@email.com', telefono: '600000000' };
-                reservas['2026-08-05_16:00'] = { nombre: 'Carlos Gómez', email: 'carlos@email.com', telefono: '611111111' };
-                renderTable(currentWeekStart);
-            }
         }
 
-        // === EVENTOS DE NAVEGACIÓN ===
+        // ============================================================
+        // EVENTOS DE NAVEGACIÓN
+        // ============================================================
         prevBtn.addEventListener('click', () => goToWeek(-1));
         nextBtn.addEventListener('click', () => goToWeek(1));
         todayBtn.addEventListener('click', goToToday);
 
+        // ============================================================
+        // INICIAR
+        // ============================================================
         init();
 
     })();
