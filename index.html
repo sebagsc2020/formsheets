@@ -212,7 +212,6 @@
         .schedule-table th.weekend {
             background: #0e0e0e;
         }
-        /* ===== DESTAQUE DEL DÍA ACTUAL EN BLANCO ===== */
         .schedule-table th.today-header {
             background: #ffffff;
             color: #1a1a1a;
@@ -279,7 +278,7 @@
             font-weight: 600;
         }
 
-        /* ===== DÍA ACTUAL EN CELDAS (fondo sutil) ===== */
+        /* ===== DÍA ACTUAL EN CELDAS ===== */
         .schedule-table td.today-column {
             background: #2a2a2a;
             position: relative;
@@ -289,13 +288,7 @@
             opacity: 0.5;
         }
         .schedule-table td.today-column.reserved {
-            background: #333;
-        }
-        .schedule-table td.today-column.reserved::after {
-            content: '📌';
-            font-size: 12px;
-            margin-left: 2px;
-            opacity: 0.7;
+            background: #2a1a1a;
         }
         .schedule-table td.today-column.selected {
             background: #3a3a3a;
@@ -308,7 +301,7 @@
             background: #222;
         }
 
-        /* ===== CHECKBOXES ===== */
+        /* ===== CHECKBOXES Y RESERVADOS ===== */
         .schedule-table input[type="radio"] {
             width: clamp(18px, 3vw, 24px);
             height: clamp(18px, 3vw, 24px);
@@ -331,20 +324,57 @@
             opacity: 0.3;
         }
 
+        /* ===== CRUZ ROJA PARA RESERVADOS ===== */
         .schedule-table td.reserved {
-            background: #2a2a2a;
+            background: #2a1a1a;
             position: relative;
         }
-        .schedule-table td.reserved::after {
-            content: '📌';
-            font-size: 12px;
-            margin-left: 2px;
-            opacity: 0.5;
+        .schedule-table td.reserved .slot-radio {
+            display: none;
         }
+        .schedule-table td.reserved .reserved-cross {
+            display: inline-block;
+            color: #cc0000;
+            font-size: clamp(20px, 3.5vw, 30px);
+            font-weight: 700;
+            line-height: 1;
+            text-shadow: 0 0 10px rgba(204, 0, 0, 0.2);
+        }
+        .schedule-table td.reserved .reserved-cross::before {
+            content: '✕';
+        }
+        .schedule-table td.today-column.reserved {
+            background: #2a1515;
+        }
+        .schedule-table td.today-column.reserved .reserved-cross {
+            color: #ff2222;
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+        }
+
+        /* Elemento oculto por defecto */
+        .schedule-table td .reserved-cross {
+            display: none;
+        }
+
         .schedule-table td.past {
             background: #161616;
             opacity: 0.4;
         }
+        .schedule-table td.past .slot-radio {
+            display: none;
+        }
+        .schedule-table td.past .reserved-cross {
+            display: none !important;
+        }
+        .schedule-table td.past .past-text {
+            display: inline-block;
+            color: #555;
+            font-size: clamp(14px, 2vw, 20px);
+        }
+        .schedule-table td .past-text {
+            display: none;
+        }
+
         .schedule-table td.selected {
             background: #333;
             box-shadow: inset 0 0 0 2px #555;
@@ -515,7 +545,7 @@
         }
 
         /* ============================================================
-           RESPONSIVE - MÓVILES
+           RESPONSIVE
            ============================================================ */
         @media (max-width: 768px) {
             .schedule-table th {
@@ -547,6 +577,9 @@
             .schedule-table input[type="radio"] {
                 width: clamp(24px, 3.85vw, 33px);
                 height: clamp(24px, 3.85vw, 33px);
+            }
+            .schedule-table td.reserved .reserved-cross {
+                font-size: clamp(26px, 4.5vw, 38px);
             }
             .scroll-indicators {
                 display: flex;
@@ -591,6 +624,9 @@
                 width: clamp(22px, 4.4vw, 30.8px);
                 height: clamp(22px, 4.4vw, 30.8px);
             }
+            .schedule-table td.reserved .reserved-cross {
+                font-size: clamp(24px, 5vw, 34px);
+            }
             .reservation-form { padding: 10px 8px; gap: 8px; }
             .form-group label { font-size: clamp(15.4px, 2.64vw, 19.8px); }
             .form-group input { padding: 8px 12px; font-size: 15.4px; }
@@ -632,6 +668,9 @@
             .schedule-table input[type="radio"] {
                 width: clamp(17.6px, 3.85vw, 24.2px);
                 height: clamp(17.6px, 3.85vw, 24.2px);
+            }
+            .schedule-table td.reserved .reserved-cross {
+                font-size: clamp(20px, 4.5vw, 28px);
             }
             .week-nav-btn { padding: 4px 8px; font-size: 12.1px; }
             .today-btn { padding: 4px 8px; font-size: 12.1px; }
@@ -1019,10 +1058,21 @@
                 if (isToday) tdClass += 'today-column ';
                 
                 html += `<td class="${tdClass}">`;
-                html += `<input type="radio" class="slot-radio" name="slot" id="${radioId}" 
-                               data-date="${dateKey}" data-time="${hora}" 
-                               ${isSelected ? 'checked' : ''} 
-                               ${(isPast || isReserved) ? 'disabled' : ''}>`;
+                
+                if (isPast) {
+                    // Día pasado: mostrar guión
+                    html += `<span class="past-text">—</span>`;
+                } else if (isReserved) {
+                    // Reservado: mostrar CRUZ ROJA (sin radio)
+                    html += `<span class="reserved-cross"></span>`;
+                } else {
+                    // Disponible: mostrar radio
+                    const checked = isSelected ? 'checked' : '';
+                    html += `<input type="radio" class="slot-radio" name="slot" id="${radioId}" 
+                                   data-date="${dateKey}" data-time="${hora}" 
+                                   ${checked}>`;
+                }
+                
                 html += '</td>';
             }
             html += '</tr>';
