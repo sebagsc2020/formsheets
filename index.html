@@ -394,16 +394,6 @@
             margin-top: 2px;
         }
 
-        .field-group input[list]::-webkit-calendar-picker-indicator {
-            opacity: 0.5;
-            filter: invert(1);
-            cursor: pointer;
-        }
-
-        .field-group input[list]::-webkit-calendar-picker-indicator:hover {
-            opacity: 0.8;
-        }
-
         .btn-wrapper {
             display: flex;
             align-items: flex-end;
@@ -534,57 +524,17 @@
             <div class="form-grid">
                 <div class="field-group">
                     <label for="nombre"><i class="far fa-user"></i> Nombre</label>
-                    <input type="text" id="nombre" list="nombresList" placeholder="Ej: Ana Pérez" autocomplete="off">
-                    <datalist id="nombresList">
-                        <option value="Ana Pérez">
-                        <option value="Carlos Gómez">
-                        <option value="María López">
-                        <option value="Juan Martínez">
-                        <option value="Laura Rodríguez">
-                        <option value="Pedro Sánchez">
-                        <option value="Elena Díaz">
-                        <option value="Miguel Fernández">
-                        <option value="Sofía Torres">
-                        <option value="David Ruiz">
-                    </datalist>
+                    <input type="text" id="nombre" placeholder="Ej: Ana Pérez" autocomplete="off">
                     <span class="hint">Nombre completo</span>
                 </div>
                 <div class="field-group">
                     <label for="email"><i class="far fa-envelope"></i> Email</label>
-                    <input type="email" id="email" list="emailsList" placeholder="ejemplo@email.com" autocomplete="off">
-                    <datalist id="emailsList">
-                        <option value="ana@email.com">
-                        <option value="carlos@email.com">
-                        <option value="maria@email.com">
-                        <option value="juan@email.com">
-                        <option value="laura@email.com">
-                        <option value="pedro@email.com">
-                        <option value="elena@email.com">
-                        <option value="miguel@email.com">
-                        <option value="sofia@email.com">
-                        <option value="david@email.com">
-                        <option value="info@empresa.com">
-                        <option value="contacto@dominio.com">
-                    </datalist>
+                    <input type="email" id="email" placeholder="ejemplo@email.com" autocomplete="off">
                     <span class="hint">Correo electrónico</span>
                 </div>
                 <div class="field-group">
                     <label for="telefono"><i class="fas fa-phone-alt"></i> Teléfono</label>
-                    <input type="tel" id="telefono" list="telefonosList" placeholder="+34 600 000 000" autocomplete="off">
-                    <datalist id="telefonosList">
-                        <option value="+34 600 000 000">
-                        <option value="+34 611 222 333">
-                        <option value="+34 622 333 444">
-                        <option value="+34 633 444 555">
-                        <option value="+34 644 555 666">
-                        <option value="+34 655 666 777">
-                        <option value="+34 666 777 888">
-                        <option value="+34 677 888 999">
-                        <option value="+34 688 999 000">
-                        <option value="+34 699 111 222">
-                        <option value="+34 600 123 456">
-                        <option value="+34 611 987 654">
-                    </datalist>
+                    <input type="tel" id="telefono" placeholder="+34 600 000 000" autocomplete="off">
                     <span class="hint">Incluye código de país</span>
                 </div>
                 <div class="field-group btn-wrapper">
