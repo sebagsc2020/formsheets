@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reservas de Turnos</title>
+    <style>
+        /* ---------- ESTILOS NEGRO MATE + DORADO ---------- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0b0b0b;
+            background-image: radial-gradient(circle at 20% 30%, #1a1a1a 0%, #0a0a0a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: #141414;
+            border-radius: 24px;
+            padding: 30px 25px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 0 1px #b8860b33;
+            border: 1px solid #b8860b55;
+        }
+        h1 {
+            text-align: center;
+            color: #d4af37;
+            font-weight: 600;
+            font-size: 28px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px #d4af3740;
+            margin-bottom: 6px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #a0a0a0;
+            font-size: 14px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #b8860b33;
+            padding-bottom: 12px;
+        }
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #1e1e1e;
+            padding: 10px 18px;
+            border-radius: 14px;
+            border: 1px solid #b8860b44;
+        }
+        .month-nav button {
+            background: #2a2a2a;
+            border: 1px solid #b8860b66;
+            color: #d4af37;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+        }
+        .month-nav button:hover {
+            background: #b8860b;
+            color: #0b0b0b;
+            border-color: #d4af37;
+        }
+        .month-nav .month-label {
+            font-size: 22px;
+            font-weight: 600;
+            color: #d4af37;
+            letter-spacing: 1px;
+        }
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #b8860b;
+            text-align: center;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        .day-cell {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 6px 4px 8px;
+            min-height: 85px;
+            border: 1px solid #2a2a2a;
+            transition: 0.15s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .day-cell.other-month {
+            opacity: 0.25;
+            pointer-events: none;
+        }
+        .day-cell .day-number {
+            font-weight: 600;
+            color: #d4af37;
+            font-size: 14px;
+            padding-bottom: 4px;
+            width: 100%;
+            text-align: center;
+            border-bottom: 1px solid #2a2a2a;
+            margin-bottom: 5px;
+        }
+        .day-cell .day-number.weekend {
+            color: #e6b800;
+        }
+        .day-cell .slot-select {
+            width: 100%;
+            background: #0d0d0d;
+            color: #d4af37;
+            border: 1px solid #b8860b66;
+            border-radius: 8px;
+            padding: 5px 2px;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.15s;
+            margin: 2px 0;
+        }
+        .day-cell .slot-select:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 8px #d4af3740;
+        }
+        .day-cell .slot-select option {
+            background: #1a1a1a;
+            color: #d4af37;
+        }
+        .day-cell .slot-select option:disabled {
+            color: #555;
+        }
+        .day-cell .btn-reservar {
+            background: #b8860b;
+            color: #0b0b0b;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-top: 4px;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .day-cell .btn-reservar:hover {
+            background: #d4af37;
+            transform: scale(1.02);
+        }
+        .day-cell .no-slots {
+            color: #555;
+            font-size: 10px;
+            padding: 6px 0;
+            text-align: center;
+        }
+        .day-cell .full-day {
+            color: #777;
+            font-size: 10px;
+            background: #1a1a1a;
+            padding: 4px 0;
+            border-radius: 6px;
+            border: 1px solid #2a2a2a;
+            width: 100%;
+            text-align: center;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: #141414;
+            border-radius: 24px;
+            padding: 30px 28px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px #b8860b66;
+            border: 1px solid #b8860b88;
+            animation: modalFade 0.25s ease-out;
+        }
+        @keyframes modalFade {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal h2 {
+            font-size: 22px;
+            color: #d4af37;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        .modal .selected-info {
+            color: #ccc;
+            background: #1e1e1e;
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #b8860b44;
+            text-align: center;
+            font-size: 15px;
+        }
+        .modal .form-group {
+            margin-bottom: 16px;
+        }
+        .modal label {
+            display: block;
+            font-weight: 500;
+            font-size: 13px;
+            color: #d4af37;
+            margin-bottom: 4px;
+        }
+        .modal input, .modal textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: #0d0d0d;
+            border: 1px solid #b8860b66;
+            border-radius: 12px;
+            font-size: 15px;
+            color: #f0f0f0;
+            transition: 0.2s;
+        }
+        .modal input:focus, .modal textarea:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 12px #d4af3740;
+        }
+        .modal textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+        .modal .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .modal .actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .modal .btn-cancel {
+            background: #2a2a2a;
+            color: #aaa;
+            border: 1px solid #444;
+        }
+        .modal .btn-cancel:hover {
+            background: #3a3a3a;
+            color: #fff;
+        }
+        .modal .btn-confirm {
+            background: #b8860b;
+            color: #0b0b0b;
+        }
+        .modal .btn-confirm:hover {
+            background: #d4af37;
+            transform: scale(1.02);
+        }
+        .modal .btn-confirm:disabled {
+            background: #333;
+            color: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #modalResponse {
+            margin-top: 14px;
+            font-weight: 500;
+            text-align: center;
+            color: #d4af37;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 15px; }
+            .day-cell { min-height: 70px; padding: 4px 2px; }
+            .day-cell .day-number { font-size: 12px; }
+            .day-cell .slot-select { font-size: 10px; padding: 3px 0; }
+            .day-cell .btn-reservar { font-size: 10px; padding: 3px 0; }
+            .month-nav .month-label { font-size: 18px; }
+            .weekdays { font-size: 11px; }
+        }
+        @media (max-width: 480px) {
+            .calendar-grid { gap: 4px; }
+            .day-cell { min-height: 60px; border-radius: 8px; }
+            .day-cell .slot-select { font-size: 9px; }
+            .day-cell .btn-reservar { font-size: 9px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>✦ RESERVAS ✦</h1>
+    <p class="subtitle">Seleccioná un día y horario disponible</p>
+
+    <div class="month-nav">
+        <button id="prevMonth">‹</button>
+        <span class="month-label" id="monthLabel">Enero 2026</span>
+        <button id="nextMonth">›</button>
+    </div>
+
+    <div class="weekdays">
+        <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+    </div>
+
+    <div class="calendar-grid" id="calendarGrid"></div>
+</div>
+
+<!-- MODAL con campos autocompletables -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <h2>📝 Confirmar reserva</h2>
+        <div class="selected-info" id="selectedInfo">Fecha: — | Hora: —</div>
+        <form id="reservaForm" autocomplete="on">
+            <div class="form-group">
+                <label for="modalCliente">👤 Cliente</label>
+                <input type="text" id="modalCliente" name="cliente" placeholder="Nombre completo" required autocomplete="name" />
+            </div>
+            <div class="form-group">
+                <label for="modalTelefono">📱 Teléfono</label>
+                <input type="tel" id="modalTelefono" name="telefono" placeholder="3518692251" required autocomplete="tel" />
+                <small style="color:#888; font-size:12px;">Solo números, sin código de país</small>
+            </div>
+            <div class="form-group">
+                <label for="modalNotas">📝 Notas (opcional)</label>
+                <textarea id="modalNotas" name="notas" placeholder="Comentarios..." autocomplete="off"></textarea>
+            </div>
+            <div class="actions">
+                <button type="button" class="btn-cancel" id="btnCancelar">Cancelar</button>
+                <button type="submit" class="btn-confirm" id="btnConfirmar">Enviar</button>
+            </div>
+        </form>
+        <div id="modalResponse"></div>
+    </div>
+</div>
+
+<script>
+    // ==============================================================
+    // CONFIGURACIÓN
+    // ==============================================================
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwWSzapxQdBVJI6XwK6jzHaaa4LFXznyH92QpvS8yIKiARf0Czw_PZbfi5uu__7lRza/exec';
+
+    const SLOTS_MAÑANA = ['09:00', '10:00', '11:00', '12:00', '13:00'];
+    const SLOTS_TARDE  = ['16:00', '17:00', '18:00', '19:00', '20:00', '21:00'];
+    const ALL_SLOTS = [...SLOTS_MAÑANA, ...SLOTS_TARDE];
+    const DIAS_SEMANA = [1,2,3,4,5,6];
+
+    let currentYear, currentMonth;
+    let reservedSlots = {};
+
+    // DOM
+    const grid = document.getElementById('calendarGrid');
+    const monthLabel = document.getElementById('monthLabel');
+    const prevBtn = document.getElementById('prevMonth');
+    const nextBtn = document.getElementById('nextMonth');
+
+    const modalOverlay = document.getElementById('modalOverlay');
+    const selectedInfo = document.getElementById('selectedInfo');
+    const modalCliente = document.getElementById('modalCliente');
+    const modalTelefono = document.getElementById('modalTelefono');
+    const modalNotas = document.getElementById('modalNotas');
+    const btnCancelar = document.getElementById('btnCancelar');
+    const btnConfirmar = document.getElementById('btnConfirmar');
+    const modalResponse = document.getElementById('modalResponse');
+    const reservaForm = document.getElementById('reservaForm');
+
+    let selectedDate = '';
+    let selectedHour = '';
+
+    // ==============================================================
+    // FUNCIONES DE FECHAS
+    // ==============================================================
+    function formatDate(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    function parseDate(str) {
+        const p = str.split('-').map(Number);
+        return new Date(p[0], p[1]-1, p[2]);
+    }
+
+    function isPastDate(d) {
+        const hoy = new Date();
+        hoy.setHours(0,0,0,0);
+        return d < hoy;
+    }
+
+    function getDayOfWeek(d) {
+        return d.getDay();
+    }
+
+    // ==============================================================
+    // CARGAR RESERVAS
+    // ==============================================================
+    async function cargarReservas() {
+        try {
+            const inicio = new Date(currentYear, currentMonth, 1);
+            const fin = new Date(currentYear, currentMonth + 1, 0);
+            const fechaIni = formatDate(inicio);
+            const fechaFin = formatDate(fin);
+
+            const url = `${SCRIPT_URL}?action=getReservas&fechaIni=${fechaIni}&fechaFin=${fechaFin}`;
+            console.log('🔍 Cargando reservas desde:', url);
+            const resp = await fetch(url);
+            const data = await resp.json();
+            console.log('📦 Datos recibidos:', data);
+
+            if (data.status === 'ok') {
+                reservedSlots = data.reservas || {};
+                console.log('✅ Reservas cargadas:', reservedSlots);
+            } else {
+                console.warn('⚠️ Error al cargar reservas:', data.mensaje);
+                reservedSlots = {};
+            }
+        } catch (e) {
+            console.error('❌ Error en fetch:', e);
+            reservedSlots = {};
+        }
+        renderCalendar();
+    }
+
+    // ==============================================================
+    // VALIDAR DISPONIBILIDAD
+    // ==============================================================
+    function isSlotAvailable(dateStr, hourStr) {
+        const fecha = parseDate(dateStr);
+        if (isPastDate(fecha)) return false;
+
+        const ahora = new Date();
+        const [h, m] = hourStr.split(':').map(Number);
+        const fechaHora = new Date(fecha);
+        fechaHora.setHours(h, m, 0, 0);
+        const diffHoras = (fechaHora - ahora) / (1000 * 60 * 60);
+        if (diffHoras < 3) return false;
+
+        const reservados = reservedSlots[dateStr] || [];
+        if (reservados.includes(hourStr)) return false;
+
+        const dia = getDayOfWeek(fecha);
+        if (!DIAS_SEMANA.includes(dia)) return false;
+
+        if (!ALL_SLOTS.includes(hourStr)) return false;
+
+        return true;
+    }
+
+    function getAvailableSlots(dateStr) {
+        const disponibles = ALL_SLOTS.filter(h => isSlotAvailable(dateStr, h));
+        console.log(`📋 Horarios disponibles para ${dateStr}:`, disponibles);
+        return disponibles;
+    }
+
+    // ==============================================================
+    // RENDERIZAR CALENDARIO
+    // ==============================================================
+    function renderCalendar() {
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const startDayOfWeek = firstDay.getDay();
+        let startOffset = (startDayOfWeek === 0) ? 6 : startDayOfWeek - 1;
+        const daysInMonth = lastDay.getDate();
+
+        let html = '';
+        for (let i = 0; i < 42; i++) {
+            const dayNum = i - startOffset + 1;
+            const dateObj = new Date(currentYear, currentMonth, dayNum);
+            const isCurrentMonth = (dayNum >= 1 && dayNum <= daysInMonth);
+            const dateStr = formatDate(dateObj);
+
+            let cellClass = 'day-cell';
+            if (!isCurrentMonth) cellClass += ' other-month';
+
+            html += `<div class="${cellClass}" data-date="${dateStr}">`;
+
+            const dayOfWeek = dateObj.getDay();
+            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+            const numClass = isWeekend ? 'day-number weekend' : 'day-number';
+            html += `<div class="${numClass}">${isCurrentMonth ? dayNum : ''}</div>`;
+
+            if (isCurrentMonth && !isPastDate(dateObj)) {
+                const disponibles = getAvailableSlots(dateStr);
+                const reservados = reservedSlots[dateStr] || [];
+
+                if (disponibles.length === 0 && reservados.length === 0) {
+                    html += `<div class="no-slots">Sin turnos</div>`;
+                } else if (disponibles.length === 0 && reservados.length > 0) {
+                    html += `<div class="full-day">Completo</div>`;
+                } else {
+                    html += `<select class="slot-select" data-date="${dateStr}">`;
+                    html += `<option value="">Elegir hora</option>`;
+                    disponibles.forEach(h => {
+                        html += `<option value="${h}">${h}</option>`;
+                    });
+                    html += `</select>`;
+                    html += `<button class="btn-reservar" data-date="${dateStr}">Reservar</button>`;
+                }
+            } else if (isCurrentMonth && isPastDate(dateObj)) {
+                html += `<div class="no-slots">📅</div>`;
+            }
+
+            html += '</div>';
+        }
+
+        grid.innerHTML = html;
+
+        const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+        monthLabel.textContent = `${meses[currentMonth]} ${currentYear}`;
+
+        // Delegación de eventos: Click en botón "Reservar"
+        grid.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-reservar');
+            if (!btn) return;
+            const date = btn.dataset.date;
+            const cell = btn.closest('.day-cell');
+            const select = cell.querySelector('.slot-select');
+            const hour = select ? select.value : '';
+            if (!hour) {
+                alert('Por favor, seleccioná un horario primero.');
+                return;
+            }
+            abrirModal(date, hour);
+        });
+    }
+
+    // ==============================================================
+    // MODAL
+    // ==============================================================
+    function abrirModal(date, hour) {
+        selectedDate = date;
+        selectedHour = hour;
+        const fechaObj = parseDate(date);
+        const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const fechaLegible = fechaObj.toLocaleDateString('es-ES', opciones);
+        selectedInfo.textContent = `📆 ${fechaLegible} · 🕒 ${hour} hs.`;
+        // Los campos se limpian, pero el navegador recordará valores previos
+        modalCliente.value = '';
+        modalTelefono.value = '';
+        modalNotas.value = '';
+        modalResponse.textContent = '';
+        modalResponse.style.color = '';
+        btnConfirmar.disabled = false;
+        btnConfirmar.textContent = 'Enviar';
+        modalOverlay.classList.add('active');
+    }
+
+    function cerrarModal() {
+        modalOverlay.classList.remove('active');
+    }
+
+    btnCancelar.addEventListener('click', cerrarModal);
+    modalOverlay.addEventListener('click', function(e) {
+        if (e.target === this) cerrarModal();
+    });
+
+    // ==============================================================
+    // ENVIAR RESERVA
+    // ==============================================================
+    reservaForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const cliente = modalCliente.value.trim();
+        const telefono = modalTelefono.value.trim();
+        const notas = modalNotas.value.trim();
+
+        if (!cliente || !telefono) {
+            modalResponse.textContent = '⚠️ Completá nombre y teléfono.';
+            modalResponse.style.color = '#dc2626';
+            return;
+        }
+        if (!/^\d{8,15}$/.test(telefono)) {
+            modalResponse.textContent = '⚠️ Teléfono inválido (solo números).';
+            modalResponse.style.color = '#dc2626';
+            return;
+        }
+
+        btnConfirmar.disabled = true;
+        btnConfirmar.textContent = 'Enviando...';
+        modalResponse.textContent = '';
+        modalResponse.style.color = '';
+
+        const data = {
+            fecha: selectedDate,
+            hora: selectedHour,
+            cliente: cliente,
+            telefono: telefono,
+            notas: notas,
+            action: 'nuevaReserva'
+        };
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            modalResponse.textContent = '✅ ¡Reserva confirmada!';
+            modalResponse.style.color = '#d4af37';
+            btnConfirmar.disabled = false;
+            btnConfirmar.textContent = 'Enviar';
+
+            setTimeout(() => {
+                cerrarModal();
+                cargarReservas();
+            }, 1500);
+
+        } catch (error) {
+            console.error('Error:', error);
+            modalResponse.textContent = '❌ Error al enviar. Intentá de nuevo.';
+            modalResponse.style.color = '#dc2626';
+            btnConfirmar.disabled = false;
+            btnConfirmar.textContent = 'Enviar';
+        }
+    });
+
+    // ==============================================================
+    // NAVEGACIÓN MESES
+    // ==============================================================
+    prevBtn.addEventListener('click', function() {
+        currentMonth--;
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        cargarReservas();
+    });
+    nextBtn.addEventListener('click', function() {
+        currentMonth++;
+        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+        cargarReservas();
+    });
+
+    // ==============================================================
+    // INICIALIZAR
+    // ==============================================================
+    const hoy = new Date();
+    currentYear = hoy.getFullYear();
+    currentMonth = hoy.getMonth();
+    cargarReservas();
+</script>
+</body>
+</html>
