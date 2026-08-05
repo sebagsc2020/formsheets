@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reservas de Turnos</title>
     <style>
-        /* ---------- ESTILOS NEGRO MATE + DORADO ---------- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -334,7 +333,7 @@
     <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
-<!-- MODAL con campos autocompletables -->
+<!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <h2>📝 Confirmar reserva</h2>
@@ -366,7 +365,7 @@
     // ==============================================================
     // CONFIGURACIÓN
     // ==============================================================
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwWSzapxQdBVJI6XwK6jzHaaa4LFXznyH92QpvS8yIKiARf0Czw_PZbfi5uu__7lRza/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwWSzapxQdBVJI6XwK6jzHaaa4LFXznyH92QpvS8yIKiARf0Czw_PZbfi5uu__7lRza/exec'; // ⚠️ REEMPLAZA CON TU URL
 
     const SLOTS_MAÑANA = ['09:00', '10:00', '11:00', '12:00', '13:00'];
     const SLOTS_TARDE  = ['16:00', '17:00', '18:00', '19:00', '20:00', '21:00'];
@@ -421,7 +420,7 @@
     }
 
     // ==============================================================
-    // CARGAR RESERVAS
+    // CARGAR RESERVAS (AHORA CON FETCH NORMAL)
     // ==============================================================
     async function cargarReservas() {
         try {
@@ -432,7 +431,7 @@
 
             const url = `${SCRIPT_URL}?action=getReservas&fechaIni=${fechaIni}&fechaFin=${fechaFin}`;
             console.log('🔍 Cargando reservas desde:', url);
-            const resp = await fetch(url);
+            const resp = await fetch(url); // ✅ SIN mode: 'no-cors'
             const data = await resp.json();
             console.log('📦 Datos recibidos:', data);
 
@@ -563,7 +562,6 @@
         const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const fechaLegible = fechaObj.toLocaleDateString('es-ES', opciones);
         selectedInfo.textContent = `📆 ${fechaLegible} · 🕒 ${hour} hs.`;
-        // Los campos se limpian, pero el navegador recordará valores previos
         modalCliente.value = '';
         modalTelefono.value = '';
         modalNotas.value = '';
@@ -584,7 +582,7 @@
     });
 
     // ==============================================================
-    // ENVIAR RESERVA
+    // ENVIAR RESERVA (POST)
     // ==============================================================
     reservaForm.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -621,7 +619,7 @@
         try {
             await fetch(SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors',
+                mode: 'no-cors', // ✅ Mantenemos no-cors para POST (no necesitamos respuesta)
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
@@ -633,7 +631,7 @@
 
             setTimeout(() => {
                 cerrarModal();
-                cargarReservas();
+                cargarReservas(); // 🔄 Recarga el calendario
             }, 1500);
 
         } catch (error) {
