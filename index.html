@@ -58,14 +58,41 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
+            min-height: 50px;
         }
 
-        .subhead span {
+        .subhead .info-text {
             background: #333333;
             padding: 0.2rem 1rem;
             border-radius: 40px;
             font-size: 0.9rem;
             color: #c0c0c0;
+        }
+
+        .subhead .selected-display {
+            background: #2a2a2a;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            border: 1px solid #444444;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .subhead .selected-display i {
+            color: #888888;
+            font-size: 0.8rem;
+        }
+
+        .subhead .selected-display.show {
+            display: inline-flex;
+        }
+
+        .subhead .selected-display .selected-text {
+            color: #e0e0e0;
+            font-weight: 500;
         }
 
         .cookie-notice {
@@ -540,6 +567,16 @@
             #clearCookiesBtn {
                 margin-left: 0 !important;
             }
+            .subhead {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+                min-height: auto;
+                padding-bottom: 0.5rem;
+            }
+            .subhead .selected-display {
+                justify-content: center;
+            }
         }
 
         @media (max-width: 480px) {
@@ -617,19 +654,21 @@
             h1 {
                 font-size: 1.2rem;
             }
-            .subhead span {
+            .subhead .info-text {
                 font-size: 0.75rem;
                 padding: 0.15rem 0.6rem;
+                text-align: center;
+            }
+            .subhead .selected-display {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.8rem;
+                justify-content: center;
             }
             .week-label {
                 font-size: 0.75rem;
                 padding: 0.2rem 0.8rem;
             }
             .week-nav-buttons button {
-                font-size: 0.75rem;
-                padding: 0.3rem 0.8rem;
-            }
-            .selected-feedback {
                 font-size: 0.75rem;
                 padding: 0.3rem 0.8rem;
             }
@@ -640,7 +679,12 @@
     <div class="card">
         <h1><i class="fas fa-calendar-check"></i>Reserva tu Horario</h1>
         <div class="subhead">
-            <span>Selecciona un único día y hora para tu reserva</span>
+            <span class="info-text" id="infoText"><i class="fas fa-info-circle"></i> Selecciona un único día y hora para tu reserva</span>
+            <span class="selected-display" id="selectedDisplay">
+                <i class="fas fa-check-circle"></i>
+                <span>Horario seleccionado: </span>
+                <span class="selected-text" id="selectedText">—</span>
+            </span>
         </div>
 
         <!-- Aviso de cookies -->
@@ -698,11 +742,6 @@
                     </button>
                 </div>
             </div>
-
-            <!-- Feedback de selección -->
-            <div id="feedback" class="selected-feedback hidden">
-                <i class="fas fa-check-circle"></i> Horario seleccionado: <span id="selectedSlotText">—</span>
-            </div>
         </form>
     </div>
 
@@ -721,8 +760,9 @@
             const tbody = document.getElementById('tablaHorarios');
             const headerRow = document.getElementById('headerRow');
             const weekLabel = document.getElementById('weekLabel');
-            const feedback = document.getElementById('feedback');
-            const selectedSlotText = document.getElementById('selectedSlotText');
+            const infoText = document.getElementById('infoText');
+            const selectedDisplay = document.getElementById('selectedDisplay');
+            const selectedText = document.getElementById('selectedText');
             const nombreInput = document.getElementById('nombre');
             const emailInput = document.getElementById('email');
             const telefonoInput = document.getElementById('telefono');
@@ -852,6 +892,20 @@
                     date.getDate() === today.getDate();
             }
 
+            // ---------- Actualizar feedback visual ----------
+            function updateFeedback() {
+                const checked = document.querySelector('input[name="slot"]:checked');
+                if (checked) {
+                    // Mostrar en el subtítulo
+                    infoText.style.display = 'none';
+                    selectedDisplay.classList.add('show');
+                    selectedText.textContent = checked.value;
+                } else {
+                    infoText.style.display = 'inline';
+                    selectedDisplay.classList.remove('show');
+                }
+            }
+
             // ---------- Renderizar tabla ----------
             function renderTable() {
                 const today = getToday();
@@ -968,17 +1022,6 @@
                 updateFeedback();
             }
 
-            // ---------- Feedback de selección ----------
-            function updateFeedback() {
-                const checked = document.querySelector('input[name="slot"]:checked');
-                if (checked) {
-                    feedback.classList.remove('hidden');
-                    selectedSlotText.textContent = checked.value;
-                } else {
-                    feedback.classList.add('hidden');
-                }
-            }
-
             // ---------- Eventos ----------
             nombreInput.addEventListener('input', saveFormDataToCookies);
             emailInput.addEventListener('input', saveFormDataToCookies);
@@ -987,13 +1030,12 @@
             document.getElementById('prevWeekBtn').addEventListener('click', function() {
                 currentWeekStart.setDate(currentWeekStart.getDate() - 7);
                 renderTable();
-                feedback.classList.add('hidden');
+                // El feedback se actualiza automáticamente
             });
 
             document.getElementById('nextWeekBtn').addEventListener('click', function() {
                 currentWeekStart.setDate(currentWeekStart.getDate() + 7);
                 renderTable();
-                feedback.classList.add('hidden');
             });
 
             document.getElementById('acceptCookiesBtn').addEventListener('click', function() {
@@ -1013,7 +1055,7 @@
                 
                 const radios = document.querySelectorAll('input[name="slot"]');
                 radios.forEach(radio => radio.checked = false);
-                feedback.classList.add('hidden');
+                updateFeedback();
                 
                 alert('🗑️ Cookies eliminadas. Los datos han sido borrados.');
             });
