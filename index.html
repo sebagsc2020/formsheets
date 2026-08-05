@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>Reservas - Calendario Semanal</title>
     <style>
-        /* ===== TODOS LOS ESTILOS (MISMO QUE ANTES) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -488,10 +487,6 @@
         .debug-info .debug-item .key {
             color: #e8c84a;
         }
-        .debug-info .debug-error {
-            color: #ff6b6b;
-            padding: 4px 0;
-        }
         @media (max-width: 480px) {
             .container { padding: 10px 8px; border-radius: 12px; }
             .week-navigation { padding: 8px 10px; gap: 6px; }
@@ -708,7 +703,7 @@
         }
 
         // ============================================================
-        // API - GOOGLE SHEETS CON no-cors
+        // API - GOOGLE SHEETS
         // ============================================================
         async function cargarReservasDesdeAPI() {
             try {
@@ -717,114 +712,42 @@
                 actualizarDebug('🔄 Cargando reservas desde Google Sheets...', 'info');
                 actualizarDebug(`📡 URL: ${API_URL}`, 'info');
                 
-                // Usamos mode: 'no-cors' para evitar problemas de CORS
-                const response = await fetch(API_URL, {
-                    method: 'GET',
-                    mode: 'no-cors'
-                });
+                // Primero intentamos con fetch directo
+                const resultado = await cargarReservasConFetch();
                 
-                // Con no-cors no podemos leer la respuesta directamente
-                // Pero podemos usar un enfoque alternativo: JSONP o proxy
-                // Como solución, haremos una petición GET normal y esperaremos
-                // que el servidor responda con el texto JSON
-                
-                // Para evitar el error de CORS, usamos una técnica diferente
-                // Hacemos la petición con 'no-cors' y usamos un iframe o script
-                // Pero la forma más simple es usar un servicio proxy o JSONP
-                
-                // Como esto es complejo, usamos un enfoque con script
-                // Cargamos los datos mediante un <script> con callback
-                
-                actualizarDebug('⚠️ Usando método alternativo para cargar datos...', 'warning');
-                
-                // Vamos a intentar cargar usando un proxy o directamente con fetch
-                // con el modo correcto. El problema es que el servidor no devuelve
-                // los headers CORS.
-                
-                // Intentamos con un método alternativo
-                await cargarReservasAlternativo();
+                if (!resultado) {
+                    actualizarDebug('⚠️ Intentando método alternativo...', 'warning');
+                    await cargarReservasAlternativo();
+                }
                 
                 return true;
                 
             } catch (error) {
-                actualizarDebug(`❌ Error de conexión: ${error.message}`, 'error');
+                actualizarDebug(`❌ Error: ${error.message}`, 'error');
                 return false;
             } finally {
                 mostrarLoading(false);
             }
         }
 
-        // Función alternativa para cargar reservas usando JSONP
-        function cargarReservasAlternativo() {
-            return new Promise((resolve, reject) => {
-                // Crear un script para cargar los datos
-                const script = document.createElement('script');
-                const callbackName = 'callback_' + Date.now();
-                
-                // Definir la función callback
-                window[callbackName] = function(data) {
-                    try {
-                        if (data.success) {
-                            reservas = {};
-                            data.reservas.forEach(r => {
-                                const key = `${r.fecha}_${r.hora}`;
-                                reservas[key] = {
-                                    nombre: r.nombre || '',
-                                    email: r.email || '',
-                                    telefono: r.telefono || ''
-                                };
-                                actualizarDebug(`📌 ${key} → ${r.nombre}`, 'success');
-                            });
-                            actualizarDebug(`📊 Total de reservas cargadas: ${Object.keys(reservas).length}`, 'success');
-                            resolve(true);
-                        } else {
-                            actualizarDebug(`❌ Error: ${data.error || 'Error desconocido'}`, 'error');
-                            resolve(false);
-                        }
-                    } catch (error) {
-                        actualizarDebug(`❌ Error al procesar datos: ${error.message}`, 'error');
-                        resolve(false);
-                    }
-                    // Limpiar
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                };
-                
-                // Configurar el script con el callback
-                const url = `${API_URL}?callback=${callbackName}`;
-                script.src = url;
-                script.onerror = function() {
-                    actualizarDebug('❌ Error al cargar el script JSONP', 'error');
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    // Intentar con fetch normal
-                    cargarReservasConFetch().then(resolve);
-                };
-                document.body.appendChild(script);
-                
-                // Timeout por si no responde
-                setTimeout(() => {
-                    if (window[callbackName]) {
-                        actualizarDebug('⚠️ Timeout en la carga JSONP, intentando con fetch...', 'warning');
-                        delete window[callbackName];
-                        document.body.removeChild(script);
-                        cargarReservasConFetch().then(resolve);
-                    }
-                }, 10000);
-            });
-        }
-
-        // Función de respaldo con fetch
         async function cargarReservasConFetch() {
             try {
                 actualizarDebug('🔄 Intentando con fetch directo...', 'info');
                 const response = await fetch(API_URL + '?t=' + Date.now());
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.success) {
                     reservas = {};
                     data.reservas.forEach(r => {
-                        const key = `${r.fecha}_${r.hora}`;
+                        // Limpiar fecha y hora
+                        const fecha = String(r.fecha).trim();
+                        const hora = String(r.hora).trim();
+                        const key = `${fecha}_${hora}`;
                         reservas[key] = {
                             nombre: r.nombre || '',
                             email: r.email || '',
@@ -839,16 +762,69 @@
                     return false;
                 }
             } catch (error) {
-                actualizarDebug(`❌ Error en fetch: ${error.message}`, 'error');
+                actualizarDebug(`❌ Fetch falló: ${error.message}`, 'error');
                 return false;
             }
+        }
+
+        function cargarReservasAlternativo() {
+            return new Promise((resolve) => {
+                const script = document.createElement('script');
+                const callbackName = 'callback_' + Date.now();
+                
+                window[callbackName] = function(data) {
+                    try {
+                        if (data.success) {
+                            reservas = {};
+                            data.reservas.forEach(r => {
+                                const fecha = String(r.fecha).trim();
+                                const hora = String(r.hora).trim();
+                                const key = `${fecha}_${hora}`;
+                                reservas[key] = {
+                                    nombre: r.nombre || '',
+                                    email: r.email || '',
+                                    telefono: r.telefono || ''
+                                };
+                                actualizarDebug(`📌 ${key} → ${r.nombre}`, 'success');
+                            });
+                            actualizarDebug(`📊 Total de reservas cargadas: ${Object.keys(reservas).length}`, 'success');
+                            resolve(true);
+                        } else {
+                            actualizarDebug(`❌ Error: ${data.error || 'Error desconocido'}`, 'error');
+                            resolve(false);
+                        }
+                    } catch (error) {
+                        actualizarDebug(`❌ Error procesando: ${error.message}`, 'error');
+                        resolve(false);
+                    }
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                };
+                
+                script.src = API_URL + '?callback=' + callbackName + '&t=' + Date.now();
+                script.onerror = function() {
+                    actualizarDebug('❌ Error en JSONP', 'error');
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    resolve(false);
+                };
+                document.body.appendChild(script);
+                
+                setTimeout(() => {
+                    if (window[callbackName]) {
+                        actualizarDebug('⚠️ Timeout JSONP', 'warning');
+                        delete window[callbackName];
+                        document.body.removeChild(script);
+                        resolve(false);
+                    }
+                }, 10000);
+            });
         }
 
         async function guardarReservaEnAPI(fecha, hora, nombre, email, telefono) {
             try {
                 actualizarDebug(`📤 Enviando reserva: ${fecha} ${hora} - ${nombre}`, 'info');
                 
-                // Usamos mode: 'no-cors' para el POST
                 await fetch(API_URL, {
                     method: 'POST',
                     mode: 'no-cors',
