@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>Reservas - Calendario Semanal</title>
     <style>
+        /* ===== ESTILOS (MISMO QUE ANTES) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -75,7 +76,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* === NAVEGACIÓN SEMANAL === */
         .week-navigation {
             display: flex;
             justify-content: space-between;
@@ -156,7 +156,6 @@
             cursor: not-allowed;
         }
 
-        /* === CONTENEDOR TABLA CON SCROLL === */
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -184,7 +183,6 @@
             background: #5a4a2a;
         }
 
-        /* === TABLA DE HORARIOS === */
         .schedule-table {
             width: 100%;
             min-width: 620px;
@@ -270,7 +268,6 @@
             z-index: 5;
         }
 
-        /* Fila separadora */
         .schedule-table tr.separator-row td {
             background: #111;
             border-bottom: 3px solid #3a3220;
@@ -291,7 +288,6 @@
             border: 1px solid #3a3220;
         }
 
-        /* Columna del día actual */
         .schedule-table td.today-column {
             background: #1f1a0e;
             position: relative;
@@ -390,7 +386,6 @@
             box-shadow: inset 0 0 0 2px #555;
         }
 
-        /* === FORMULARIO === */
         .reservation-form {
             background: #141414;
             padding: 16px 14px;
@@ -538,161 +533,78 @@
             border-color: #c8a020;
         }
 
-        /* === MEDIA QUERIES === */
+        /* DEBUG - Mostrar estado de reservas */
+        .debug-info {
+            background: #111;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 10px;
+            font-size: 11px;
+            color: #666;
+            display: none;
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        .debug-info.show {
+            display: block;
+        }
+
+        .debug-info .debug-title {
+            color: #8a7a4a;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .debug-info .debug-item {
+            padding: 2px 0;
+            border-bottom: 1px solid #1a1a1a;
+            color: #999;
+        }
+
+        .debug-info .debug-item .key {
+            color: #e8c84a;
+        }
+
         @media (max-width: 480px) {
-            .container {
-                padding: 10px 8px;
-                border-radius: 12px;
-            }
-
-            .week-navigation {
-                padding: 8px 10px;
-                gap: 6px;
-            }
-
-            .week-nav-btn {
-                padding: 5px 10px;
-                font-size: 10px;
-            }
-
-            .today-btn {
-                padding: 5px 12px;
-                font-size: 10px;
-            }
-
-            .week-info {
-                font-size: 11px;
-                min-width: 80px;
-            }
-
-            .schedule-table {
-                min-width: 480px;
-                font-size: 10px;
-            }
-
-            .schedule-table th {
-                padding: 6px 2px;
-                font-size: 9px;
-                min-width: 40px;
-            }
-
-            .schedule-table th .day-date {
-                font-size: 7px;
-            }
-
-            .schedule-table td {
-                padding: 4px 2px;
-                min-width: 32px;
-            }
-
-            .schedule-table .time-col {
-                width: 36px;
-                min-width: 32px;
-                font-size: 9px;
-            }
-
-            .schedule-table input[type="radio"] {
-                width: 14px;
-                height: 14px;
-            }
-
-            .schedule-table tr.separator-row td .separator-text {
-                font-size: 7px;
-                padding: 1px 8px;
-                letter-spacing: 1px;
-            }
-
-            .reservation-form {
-                padding: 12px 10px;
-                gap: 10px;
-            }
-
-            .form-group input {
-                padding: 8px 12px;
-                font-size: 14px;
-            }
-
-            .btn-reserve {
-                padding: 10px 16px;
-                font-size: 14px;
-            }
-
-            .message {
-                padding: 10px 14px;
-                font-size: 12px;
-            }
+            .container { padding: 10px 8px; border-radius: 12px; }
+            .week-navigation { padding: 8px 10px; gap: 6px; }
+            .week-nav-btn { padding: 5px 10px; font-size: 10px; }
+            .today-btn { padding: 5px 12px; font-size: 10px; }
+            .week-info { font-size: 11px; min-width: 80px; }
+            .schedule-table { min-width: 480px; font-size: 10px; }
+            .schedule-table th { padding: 6px 2px; font-size: 9px; min-width: 40px; }
+            .schedule-table th .day-date { font-size: 7px; }
+            .schedule-table td { padding: 4px 2px; min-width: 32px; }
+            .schedule-table .time-col { width: 36px; min-width: 32px; font-size: 9px; }
+            .schedule-table input[type="radio"] { width: 14px; height: 14px; }
+            .schedule-table tr.separator-row td .separator-text { font-size: 7px; padding: 1px 8px; letter-spacing: 1px; }
+            .reservation-form { padding: 12px 10px; gap: 10px; }
+            .form-group input { padding: 8px 12px; font-size: 14px; }
+            .btn-reserve { padding: 10px 16px; font-size: 14px; }
+            .message { padding: 10px 14px; font-size: 12px; }
         }
 
         @media (max-width: 380px) {
-            .schedule-table {
-                min-width: 400px;
-                font-size: 9px;
-            }
-
-            .schedule-table th {
-                padding: 4px 1px;
-                font-size: 8px;
-                min-width: 30px;
-            }
-
-            .schedule-table th .day-date {
-                font-size: 6px;
-            }
-
-            .schedule-table td {
-                padding: 3px 1px;
-                min-width: 26px;
-            }
-
-            .schedule-table .time-col {
-                width: 30px;
-                min-width: 26px;
-                font-size: 8px;
-            }
-
-            .schedule-table input[type="radio"] {
-                width: 12px;
-                height: 12px;
-            }
-
-            .week-nav-btn {
-                padding: 4px 8px;
-                font-size: 9px;
-            }
-
-            .today-btn {
-                padding: 4px 10px;
-                font-size: 9px;
-            }
-
-            .week-info {
-                font-size: 10px;
-            }
+            .schedule-table { min-width: 400px; font-size: 9px; }
+            .schedule-table th { padding: 4px 1px; font-size: 8px; min-width: 30px; }
+            .schedule-table th .day-date { font-size: 6px; }
+            .schedule-table td { padding: 3px 1px; min-width: 26px; }
+            .schedule-table .time-col { width: 30px; min-width: 26px; font-size: 8px; }
+            .schedule-table input[type="radio"] { width: 12px; height: 12px; }
+            .week-nav-btn { padding: 4px 8px; font-size: 9px; }
+            .today-btn { padding: 4px 10px; font-size: 9px; }
+            .week-info { font-size: 10px; }
         }
 
         @media (min-width: 769px) {
-            .reservation-form {
-                flex-direction: row;
-                flex-wrap: wrap;
-                align-items: flex-end;
-            }
-
-            .form-group {
-                flex: 1 1 160px;
-                min-width: 140px;
-            }
-
-            .btn-reserve {
-                width: auto;
-                margin-left: auto;
-                min-width: 130px;
-            }
-
-            .cookie-notice {
-                flex-direction: row;
-                justify-content: space-between;
-                text-align: left;
-            }
+            .reservation-form { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
+            .form-group { flex: 1 1 160px; min-width: 140px; }
+            .btn-reserve { width: auto; margin-left: auto; min-width: 130px; }
+            .cookie-notice { flex-direction: row; justify-content: space-between; text-align: left; }
         }
     </style>
 </head>
@@ -778,6 +690,12 @@
     </form>
 
     <div id="message" class="message"></div>
+
+    <!-- PANEL DE DEPURACIÓN (oculto por defecto) -->
+    <div class="debug-info" id="debugInfo">
+        <div class="debug-title">🔍 DEPURACIÓN - Reservas cargadas:</div>
+        <div id="debugContent"></div>
+    </div>
 </div>
 
 <script>
@@ -787,6 +705,9 @@
         // ============================================================
         // 🔴 REEMPLAZA ESTA URL CON LA DE TU APPS SCRIPT 🔴
         const API_URL = 'https://script.google.com/macros/s/AKfycbz3bwmvYxuQierHehE8FGXqKL0HAI58WUo9DZ8sb_rFbgHhKqrYsQg7Y2UsnuvxautH/exec';
+        
+        // Modo debug - muestra información de depuración
+        const DEBUG_MODE = true;
         
         // ============================================================
         // CONFIGURACIÓN DE HORARIOS
@@ -821,6 +742,8 @@
         const cookieNotice = document.getElementById('cookieNotice');
         const acceptBtn = document.getElementById('acceptCookies');
         const loadingOverlay = document.getElementById('loadingOverlay');
+        const debugInfo = document.getElementById('debugInfo');
+        const debugContent = document.getElementById('debugContent');
 
         // ============================================================
         // UTILIDADES DE COOKIES
@@ -913,28 +836,42 @@
         async function cargarReservasDesdeAPI() {
             try {
                 mostrarLoading(true);
+                console.log('🔄 Cargando reservas desde API...');
+                
                 const response = await fetch(API_URL);
                 const data = await response.json();
                 
+                console.log('📦 Respuesta de la API:', data);
+                
                 if (data.success) {
-                    // Convertir array de reservas a objeto para acceso rápido
+                    // Limpiar reservas anteriores
                     reservas = {};
+                    
+                    // Convertir array de reservas a objeto para acceso rápido
                     data.reservas.forEach(r => {
                         const key = `${r.fecha}_${r.hora}`;
                         reservas[key] = {
-                            nombre: r.nombre,
-                            email: r.email,
-                            telefono: r.telefono
+                            nombre: r.nombre || '',
+                            email: r.email || '',
+                            telefono: r.telefono || ''
                         };
+                        console.log(`✅ Reserva cargada: ${key} - ${r.nombre}`);
                     });
+                    
+                    // Mostrar depuración
+                    if (DEBUG_MODE) {
+                        mostrarDebug(reservas);
+                    }
+                    
+                    console.log(`📊 Total de reservas cargadas: ${Object.keys(reservas).length}`);
                     return true;
                 } else {
-                    console.error('Error al cargar reservas:', data.error);
+                    console.error('❌ Error al cargar reservas:', data.error);
                     mostrarMensaje('⚠️ Error al cargar disponibilidad. Intenta de nuevo.', 'error');
                     return false;
                 }
             } catch (error) {
-                console.error('Error de conexión:', error);
+                console.error('❌ Error de conexión:', error);
                 mostrarMensaje('⚠️ Error de conexión. Verifica tu internet.', 'error');
                 return false;
             } finally {
@@ -944,6 +881,8 @@
 
         async function guardarReservaEnAPI(fecha, hora, nombre, email, telefono) {
             try {
+                console.log('📤 Enviando reserva:', { fecha, hora, nombre, email, telefono });
+                
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -960,13 +899,32 @@
                 });
 
                 // Con no-cors no podemos leer la respuesta directamente
-                // Pero la petición se envió, confiamos en que el servidor la procesó
+                console.log('📤 Reserva enviada (no-cors)');
                 return { success: true };
                 
             } catch (error) {
-                console.error('Error al guardar:', error);
+                console.error('❌ Error al guardar:', error);
                 return { success: false, error: error.toString() };
             }
+        }
+
+        // ============================================================
+        // DEPURACIÓN
+        // ============================================================
+        function mostrarDebug(reservasObj) {
+            debugInfo.classList.add('show');
+            let html = '';
+            const keys = Object.keys(reservasObj);
+            if (keys.length === 0) {
+                html = '<div class="debug-item">No hay reservas cargadas</div>';
+            } else {
+                keys.forEach(key => {
+                    const r = reservasObj[key];
+                    html += `<div class="debug-item"><span class="key">${key}</span> → ${r.nombre} (${r.email})</div>`;
+                });
+                html += `<div class="debug-item" style="color:#8a7a4a; margin-top:5px; border-top:1px solid #2a2a2a; padding-top:5px;">Total: ${keys.length} reservas</div>`;
+            }
+            debugContent.innerHTML = html;
         }
 
         // ============================================================
@@ -976,12 +934,18 @@
             isLoading = show;
             if (show) {
                 loadingOverlay.classList.add('show');
-                document.querySelector('.table-wrapper').style.opacity = '0.3';
-                document.querySelector('.table-wrapper').style.pointerEvents = 'none';
+                const wrapper = document.querySelector('.table-wrapper');
+                if (wrapper) {
+                    wrapper.style.opacity = '0.3';
+                    wrapper.style.pointerEvents = 'none';
+                }
             } else {
                 loadingOverlay.classList.remove('show');
-                document.querySelector('.table-wrapper').style.opacity = '1';
-                document.querySelector('.table-wrapper').style.pointerEvents = 'auto';
+                const wrapper = document.querySelector('.table-wrapper');
+                if (wrapper) {
+                    wrapper.style.opacity = '1';
+                    wrapper.style.pointerEvents = 'auto';
+                }
             }
         }
 
@@ -1031,6 +995,9 @@
             const startDate = new Date(weekStart);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
+            
+            console.log('🎨 Renderizando tabla para semana:', formatDate(startDate));
+            console.log('📊 Reservas disponibles:', Object.keys(reservas).length);
             
             // Generar encabezado
             let theadHTML = '<tr><th>Hora</th>';
@@ -1111,9 +1078,16 @@
                 const dateKey = formatDateKey(date);
                 const radioId = `${dateKey}_${hora}`;
                 const isPast = isPastDate(date) || isBeforeSiteStart(date);
+                
+                // Verificar si está reservado
                 const isReserved = reservas[radioId] !== undefined;
                 const isSelected = selectedSlot && selectedSlot.dateKey === dateKey && selectedSlot.time === hora;
                 const isToday = isSameDate(date, today);
+                
+                // DEBUG: Mostrar estado de cada celda
+                if (isReserved && DEBUG_MODE) {
+                    console.log(`🔒 ${radioId} → RESERVADO por ${reservas[radioId].nombre}`);
+                }
                 
                 let tdClass = '';
                 if (isPast) tdClass += 'past ';
@@ -1261,7 +1235,6 @@
             if (reservas[slotId]) {
                 mostrarMensaje('⚠️ Este horario ya fue reservado. Por favor, selecciona otro.', 'error');
                 selectedSlot = null;
-                // Recargar reservas
                 await cargarReservasDesdeAPI();
                 renderTable(currentWeekStart);
                 return;
@@ -1276,10 +1249,16 @@
                 email,
                 telefono
             );
+            
+            // Esperar un momento para que se procese en el servidor
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Recargar reservas desde la API para confirmar
+            await cargarReservasDesdeAPI();
             mostrarLoading(false);
 
             if (result.success) {
-                // Guardar localmente
+                // Guardar localmente también
                 reservas[slotId] = { nombre, email, telefono };
                 saveToCookies();
 
@@ -1294,7 +1273,7 @@
                     <span style="font-size:clamp(12px,2vw,14px); opacity:0.6;">Te enviaremos un correo a ${email} con los detalles.</span>
                 `;
 
-                console.log('Reserva confirmada:', {
+                console.log('✅ Reserva confirmada:', {
                     nombre,
                     email,
                     telefono,
@@ -1307,8 +1286,6 @@
                 renderTable(currentWeekStart);
             } else {
                 mostrarMensaje('⚠️ Error al guardar la reserva. Intenta de nuevo.', 'error');
-                // Recargar reservas para asegurar consistencia
-                await cargarReservasDesdeAPI();
                 renderTable(currentWeekStart);
             }
         });
@@ -1327,6 +1304,8 @@
         // INICIALIZAR
         // ============================================================
         async function init() {
+            console.log('🚀 Iniciando aplicación...');
+            
             // Cargar datos de cookies
             const savedData = getCookie('reservas_data');
             if (savedData) {
@@ -1334,9 +1313,11 @@
                 cookieNotice.style.display = 'none';
                 loadFromCookies();
                 autoSaveUserData();
+                console.log('🍪 Datos de cookies cargados');
             }
 
             // Cargar reservas desde Google Sheets
+            console.log('📥 Cargando reservas desde Google Sheets...');
             await cargarReservasDesdeAPI();
 
             // Configurar semana inicial
@@ -1350,7 +1331,10 @@
                 currentWeekStart = todayWeekStart;
             }
             
+            console.log('📅 Semana inicial:', formatDate(currentWeekStart));
             renderTable(currentWeekStart);
+            
+            console.log('✅ Aplicación iniciada correctamente');
         }
 
         // ============================================================
