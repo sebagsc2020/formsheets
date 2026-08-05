@@ -535,6 +535,36 @@
             cursor: not-allowed;
         }
 
+        .debug-panel {
+            background: #111;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 11px;
+            color: #888;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+        }
+        .debug-panel.show {
+            display: block;
+        }
+        .debug-panel .debug-line {
+            padding: 2px 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .debug-panel .debug-line.error {
+            color: #ff6b6b;
+        }
+        .debug-panel .debug-line.success {
+            color: #4caf50;
+        }
+        .debug-panel .debug-line.info {
+            color: #64b5f6;
+        }
+
         @media (max-width: 768px) {
             .schedule-table th {
                 min-width: 120px;
@@ -739,14 +769,19 @@
     </form>
 
     <div id="message" class="message"></div>
+
+    <!-- Panel de depuración -->
+    <div class="debug-panel" id="debugPanel">
+        <div id="debugContent"></div>
+    </div>
 </div>
 
 <script>
     (function() {
         // ============================================================
-        // 🔴 TU URL DE APPS SCRIPT 🔴
+        // 🔴 REEMPLAZA CON TU URL DE APPS SCRIPT 🔴
         // ============================================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwlGjEvj6r_U8drvrlIlrCmI8A_VgqEA5BSv7ZX3xEBN6-YNtn-dQNFZ0Z0z00LRk1rBw/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxIIJB3Ul_ybsD5WtiS5TWvzg7tCBUMCroBWFkWNjXkghPS8OmLt7GEHDZs5XXd26Kj7Q/exec';
         
         // ============================================================
         // CONFIGURACIÓN
@@ -781,6 +816,38 @@
         const tableWrapper = document.getElementById('tableWrapper');
         const scrollLeft = document.getElementById('scrollLeft');
         const scrollRight = document.getElementById('scrollRight');
+        const debugPanel = document.getElementById('debugPanel');
+        const debugContent = document.getElementById('debugContent');
+
+        // ============================================================
+        // DEPURACIÓN
+        // ============================================================
+        function addDebug(message, type = 'info') {
+            debugPanel.classList.add('show');
+            const colors = {
+                info: '#64b5f6',
+                success: '#4caf50',
+                error: '#ff6b6b',
+                warning: '#ffa726'
+            };
+            const icons = {
+                info: 'ℹ️',
+                success: '✅',
+                error: '❌',
+                warning: '⚠️'
+            };
+            const line = document.createElement('div');
+            line.className = `debug-line ${type}`;
+            line.textContent = `${icons[type] || '•'} ${message}`;
+            debugContent.appendChild(line);
+            debugContent.scrollTop = debugContent.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearDebug() {
+            debugContent.innerHTML = '';
+            debugPanel.classList.remove('show');
+        }
 
         // ============================================================
         // SCROLL INDICATORS
@@ -895,14 +962,19 @@
         // ============================================================
         async function cargarReservasDesdeAPI() {
             try {
+                clearDebug();
+                addDebug('🔄 Cargando reservas desde Google Sheets...', 'info');
+                addDebug(`📡 URL: ${API_URL}`, 'info');
+                
                 mostrarLoading(true);
                 const response = await fetch(API_URL + '?t=' + Date.now());
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const data = await response.json();
+                addDebug(`📦 Respuesta recibida (${Object.keys(data).length} campos)`, 'info');
                 
                 if (data.success) {
                     reservas = {};
@@ -915,14 +987,18 @@
                             email: r.email || '',
                             telefono: r.telefono || ''
                         };
+                        addDebug(`📌 ${key} → ${r.nombre}`, 'success');
                     });
+                    addDebug(`📊 Total: ${Object.keys(reservas).length} reservas`, 'success');
                     return true;
                 } else {
-                    console.error('Error en API:', data.error);
+                    addDebug(`❌ Error en API: ${data.error || 'Error desconocido'}`, 'error');
                     return false;
                 }
             } catch (error) {
-                console.error('Error cargando reservas:', error);
+                addDebug(`❌ Error de conexión: ${error.message}`, 'error');
+                addDebug('💡 Verifica que la URL del Apps Script sea correcta', 'warning');
+                addDebug('💡 La URL debe terminar en /exec', 'warning');
                 return false;
             } finally {
                 mostrarLoading(false);
@@ -931,17 +1007,24 @@
 
         async function guardarReservaEnAPI(fecha, hora, nombre, email, telefono) {
             try {
+                addDebug(`📤 Enviando reserva: ${fecha} ${hora} - ${nombre}`, 'info');
+                
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ fecha, hora, nombre, email, telefono: telefono || '' })
                 });
                 
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
+                addDebug(`📦 Respuesta: ${data.success ? 'OK' : 'ERROR'}`, data.success ? 'success' : 'error');
                 return data;
                 
             } catch (error) {
-                console.error('Error guardando reserva:', error);
+                addDebug(`❌ Error al guardar: ${error.message}`, 'error');
                 return { success: false, error: error.message };
             }
         }
@@ -969,7 +1052,6 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            // Encabezado
             let theadHTML = '<tr><th class="time-col">Hora</th>';
             for (let i = 0; i < 6; i++) {
                 const date = getDateForDay(startDate, i);
@@ -986,14 +1068,12 @@
             theadHTML += '</tr>';
             tableHead.innerHTML = theadHTML;
 
-            // Cuerpo
             let tbodyHTML = '';
             
             HORAS_MANANA.forEach(hora => {
                 tbodyHTML += generarFilaHora(hora, startDate, today);
             });
             
-            // Separador
             tbodyHTML += `<tr class="separator-row">`;
             tbodyHTML += `<td class="time-col" style="background:#111; text-align:center;">⏰</td>`;
             for (let i = 0; i < 6; i++) {
@@ -1012,13 +1092,11 @@
             
             tableBody.innerHTML = tbodyHTML;
 
-            // Actualizar rango
             const endDate = addWeeks(startDate, 1);
             endDate.setDate(endDate.getDate() - 1);
             weekRange.textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
             weekLabel.textContent = 'Semana';
 
-            // Botones
             const todayWeekStart = getWeekStart(today);
             const startWeek = getWeekStart(FECHA_INICIO);
             const diffWeeks = Math.floor((startDate - startWeek) / (7 * 24 * 60 * 60 * 1000));
@@ -1188,12 +1266,10 @@
                 telefono
             );
             
-            if (result.success) {
-                // Agregar la reserva localmente
+            if (result && result.success) {
                 reservas[slotId] = { nombre, email, telefono };
                 saveToCookies();
                 
-                // Recargar reservas desde la API para confirmar
                 await cargarReservasDesdeAPI();
                 
                 const [year, month, day] = selectedSlot.dateKey.split('-');
@@ -1205,8 +1281,10 @@
                 selectedSlot = null;
                 renderTable(currentWeekStart);
             } else {
-                mostrarMensaje('⚠️ Error al guardar. Intenta de nuevo.', 'error');
-                // Recargar para asegurar consistencia
+                const errorMsg = result?.error || 'Error desconocido';
+                mostrarMensaje(`⚠️ Error al guardar: ${errorMsg}`, 'error');
+                addDebug(`❌ Error en respuesta: ${errorMsg}`, 'error');
+                
                 await cargarReservasDesdeAPI();
                 renderTable(currentWeekStart);
             }
@@ -1258,12 +1336,16 @@
         // INICIALIZAR
         // ============================================================
         async function init() {
+            addDebug('🚀 Iniciando aplicación...', 'info');
+            addDebug(`📡 Conectando a: ${API_URL}`, 'info');
+            
             const savedData = getCookie('reservas_data');
             if (savedData) {
                 cookiesAccepted = true;
                 cookieNotice.style.display = 'none';
                 loadFromCookies();
                 autoSaveUserData();
+                addDebug('🍪 Datos de cookies cargados', 'success');
             }
 
             await cargarReservasDesdeAPI();
@@ -1273,6 +1355,7 @@
             currentWeekStart = today < FECHA_INICIO ? getWeekStart(FECHA_INICIO) : getWeekStart(today);
             
             renderTable(currentWeekStart);
+            addDebug('✅ Aplicación lista', 'success');
         }
 
         // ============================================================
