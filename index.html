@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva</title>
+    <title>Reserva tu Horario</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ... (mismos estilos que antes) ... */
+        /* ... (todos los estilos iguales que antes) ... */
         * {
             margin: 0;
             padding: 0;
@@ -1087,8 +1087,7 @@
     <script>
         (function() {
             // ---------- CONFIGURACIÓN ----------
-            // ⚠️ REEMPLAZA ESTA URL CON LA DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT
-            const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzVay45A2R0fUXBSejOlWNdRtO9hw6U3PVlFNFYVaz9_oMyiE_PG0Ulh6n1S7XTTUy4Rw/exec';
+            const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzU5FD0hxaug_Z6GlsgaRwcRNwmhYPx8texDWMMbrWA2hyaqt-BwUf_tz1rh6wg7-kl/exec';
             
             const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
             const morningHours = [9, 10, 11, 12];
@@ -1151,7 +1150,6 @@
                         body: JSON.stringify(data)
                     });
                     
-                    // Con no-cors no podemos leer la respuesta, pero el envío funciona
                     return { success: true };
                 } catch (error) {
                     console.error('Error al guardar en Google Sheets:', error);
@@ -1478,7 +1476,7 @@
                 }
             });
 
-            // ---------- SUBMIT DEL FORMULARIO ----------
+            // ---------- SUBMIT DEL FORMULARIO (CORREGIDO) ----------
             document.getElementById('reservationForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
@@ -1498,15 +1496,18 @@
                     return;
                 }
 
-                // Deshabilitar botón
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
                 try {
-                    // Preparar datos para Google Sheets
-                    const [dia, hora] = selected.value.split(' ');
+                    // Extraer fecha y hora del valor seleccionado
+                    // Ejemplo: "Lun 03 10:00" -> fecha: "Lun 03", hora: "10:00"
+                    const parts = selected.value.split(' ');
+                    const fecha = parts[0] + ' ' + parts[1]; // "Lun 03"
+                    const hora = parts[2]; // "10:00"
+                    
                     const data = {
-                        fecha: dia,
+                        fecha: fecha,
                         hora: hora,
                         nombre: nombre,
                         email: email,
@@ -1517,13 +1518,8 @@
                     const result = await saveToGoogleSheets(data);
                     
                     if (result.success) {
-                        // Guardar en cookies
                         saveFormDataToCookies();
-                        
-                        // Enviar WhatsApp
                         sendWhatsAppMessage(nombre, email, telefono, selected.value);
-                        
-                        // Mostrar popup
                         showConfirmationPopup(nombre, email, telefono, selected.value);
                     } else {
                         alert('❌ Error al guardar la reserva. Por favor, intenta nuevamente.');
