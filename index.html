@@ -17,12 +17,12 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 10px;
+            padding: 6px;
         }
         .container {
             background: #1a1a1a;
-            padding: 15px 12px;
-            border-radius: 16px;
+            padding: 10px 8px;
+            border-radius: 14px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             max-width: 1100px;
             width: 100%;
@@ -32,20 +32,20 @@
             text-align: center;
             color: #d0d0d0;
             font-weight: 600;
-            font-size: clamp(20px, 5vw, 28px);
+            font-size: clamp(18px, 4.5vw, 26px);
             letter-spacing: 1px;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         .subtitle {
             text-align: center;
             color: #777;
-            margin-bottom: 15px;
-            font-size: clamp(12px, 2.5vw, 15px);
+            margin-bottom: 12px;
+            font-size: clamp(11px, 2vw, 14px);
         }
         .loading-overlay {
             display: none;
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             color: #e8c84a;
             font-weight: 500;
         }
@@ -54,13 +54,13 @@
         }
         .loading-overlay .spinner {
             display: inline-block;
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             border: 3px solid #2a2a2a;
             border-top: 3px solid #d4a820;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -71,26 +71,26 @@
             justify-content: space-between;
             align-items: center;
             background: #141414;
-            padding: 10px 12px;
-            border-radius: 12px;
-            margin-bottom: 15px;
+            padding: 6px 8px;
+            border-radius: 10px;
+            margin-bottom: 10px;
             border: 1px solid #2a2a2a;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 4px;
         }
         .week-nav-btn {
             background: #222;
             color: #c0c0c0;
             border: 1px solid #333;
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 4px 8px;
+            border-radius: 14px;
             font-weight: 600;
-            font-size: clamp(11px, 2vw, 14px);
+            font-size: clamp(10px, 1.6vw, 13px);
             cursor: pointer;
             transition: background 0.25s, transform 0.1s, border-color 0.25s;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             white-space: nowrap;
         }
         .week-nav-btn:hover:not(:disabled) {
@@ -106,12 +106,12 @@
             transform: none;
         }
         .week-info {
-            font-size: clamp(13px, 2.5vw, 18px);
+            font-size: clamp(10px, 2vw, 14px);
             font-weight: 600;
             color: #d0d0d0;
             text-align: center;
             flex: 1;
-            min-width: 120px;
+            min-width: 70px;
         }
         .week-info span {
             color: #e8c84a;
@@ -120,10 +120,10 @@
             background: #222;
             color: #c0c0c0;
             border: 1px solid #333;
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 4px 10px;
+            border-radius: 14px;
             font-weight: 600;
-            font-size: clamp(11px, 2vw, 13px);
+            font-size: clamp(9px, 1.5vw, 12px);
             cursor: pointer;
             transition: all 0.25s;
             white-space: nowrap;
@@ -139,51 +139,55 @@
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            margin-bottom: 20px;
-            border-radius: 12px;
+            margin-bottom: 12px;
+            border-radius: 10px;
             background: #111;
             padding: 2px;
         }
         .table-wrapper::-webkit-scrollbar {
-            height: 6px;
+            height: 4px;
         }
         .table-wrapper::-webkit-scrollbar-track {
             background: #1a1a1a;
-            border-radius: 10px;
+            border-radius: 8px;
         }
         .table-wrapper::-webkit-scrollbar-thumb {
             background: #3a3220;
-            border-radius: 10px;
+            border-radius: 8px;
         }
         .table-wrapper::-webkit-scrollbar-thumb:hover {
             background: #5a4a2a;
         }
         .schedule-table {
             width: 100%;
-            min-width: 620px;
+            min-width: 400px;
             border-collapse: collapse;
-            font-size: clamp(11px, 2.2vw, 14px);
-            border-radius: 12px;
+            font-size: clamp(9px, 1.6vw, 12px);
+            border-radius: 10px;
             overflow: hidden;
+            table-layout: fixed;
         }
         .schedule-table th {
             background: #111;
             color: #b0b0b0;
-            padding: 8px 4px;
+            padding: 4px 2px;
             font-weight: 600;
-            font-size: clamp(10px, 2vw, 14px);
+            font-size: clamp(8px, 1.3vw, 11px);
             border-bottom: 2px solid #2a2a2a;
             position: sticky;
             top: 0;
             z-index: 10;
-            min-width: 60px;
+            text-align: center;
+            width: 42px;
+            min-width: 32px;
+            max-width: 50px;
         }
         .schedule-table th .day-date {
             display: block;
-            font-size: clamp(8px, 1.5vw, 12px);
+            font-size: clamp(6px, 1vw, 9px);
             font-weight: 400;
             opacity: 0.6;
-            margin-top: 2px;
+            margin-top: 1px;
         }
         .schedule-table th.weekend {
             background: #0e0e0e;
@@ -192,7 +196,7 @@
             background: #1f1a0e;
             color: #e8d48a;
             border-bottom: 3px solid #d4a820;
-            box-shadow: 0 0 30px rgba(212, 168, 32, 0.06);
+            box-shadow: 0 0 20px rgba(212, 168, 32, 0.05);
         }
         .schedule-table th.today-header .day-date {
             color: #aa9a66;
@@ -201,22 +205,24 @@
         .schedule-table th.today-header .today-badge {
             background: #d4a820;
             color: #1a1a1a;
-            font-size: 8px;
-            padding: 1px 8px;
-            border-radius: 10px;
+            font-size: 6px;
+            padding: 1px 4px;
+            border-radius: 6px;
             display: inline-block;
-            margin-top: 2px;
+            margin-top: 1px;
             font-weight: 700;
             letter-spacing: 0.3px;
-            box-shadow: 0 0 20px rgba(212, 168, 32, 0.15);
+            box-shadow: 0 0 15px rgba(212, 168, 32, 0.12);
         }
         .schedule-table td {
-            padding: 6px 3px;
+            padding: 3px 1px;
             text-align: center;
             border-bottom: 1px solid #2a2a2a;
             background: #1a1a1a;
             transition: background 0.2s;
-            min-width: 44px;
+            width: 42px;
+            min-width: 32px;
+            max-width: 50px;
         }
         .schedule-table tr:last-child td {
             border-bottom: none;
@@ -225,9 +231,10 @@
             font-weight: 600;
             color: #999;
             background: #141414;
-            width: 50px;
-            min-width: 44px;
-            font-size: clamp(10px, 1.8vw, 13px);
+            width: 36px;
+            min-width: 28px;
+            max-width: 40px;
+            font-size: clamp(8px, 1.3vw, 11px);
             border-right: 1px solid #2a2a2a;
             position: sticky;
             left: 0;
@@ -236,18 +243,21 @@
         .schedule-table tr.separator-row td {
             background: #111;
             border-bottom: 3px solid #3a3220;
-            padding: 3px 3px;
-            height: 16px;
+            padding: 2px 1px;
+            height: 12px;
+            width: 42px;
+            min-width: 32px;
+            max-width: 50px;
         }
         .schedule-table tr.separator-row td .separator-text {
-            font-size: clamp(8px, 1.5vw, 11px);
+            font-size: clamp(6px, 1vw, 8px);
             color: #8a7a4a;
             font-weight: 600;
-            letter-spacing: 1.5px;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
             background: #1a1610;
-            padding: 1px 12px;
-            border-radius: 10px;
+            padding: 1px 5px;
+            border-radius: 6px;
             display: inline-block;
             border: 1px solid #3a3220;
         }
@@ -278,13 +288,13 @@
         }
         .schedule-table td.today-column.reserved::after {
             content: '📌';
-            font-size: 10px;
-            margin-left: 2px;
+            font-size: 8px;
+            margin-left: 1px;
             opacity: 0.7;
         }
         .schedule-table td.today-column.selected {
             background: #2a2214;
-            box-shadow: inset 0 0 0 2px #d4a820, 0 0 25px rgba(212, 168, 32, 0.06);
+            box-shadow: inset 0 0 0 2px #d4a820, 0 0 20px rgba(212, 168, 32, 0.05);
         }
         .schedule-table td.today-column .slot-radio:checked {
             accent-color: #d4a820;
@@ -295,8 +305,8 @@
             border-right: 2px solid #6a5a20;
         }
         .schedule-table input[type="radio"] {
-            width: clamp(16px, 3.5vw, 20px);
-            height: clamp(16px, 3.5vw, 20px);
+            width: clamp(12px, 2.5vw, 16px);
+            height: clamp(12px, 2.5vw, 16px);
             accent-color: #666;
             cursor: pointer;
             transition: transform 0.15s;
@@ -321,8 +331,8 @@
         }
         .schedule-table td.reserved::after {
             content: '📌';
-            font-size: 10px;
-            margin-left: 2px;
+            font-size: 8px;
+            margin-left: 1px;
             opacity: 0.5;
         }
         .schedule-table td.past {
@@ -335,13 +345,13 @@
         }
         .reservation-form {
             background: #141414;
-            padding: 16px 14px;
-            border-radius: 14px;
+            padding: 10px 8px;
+            border-radius: 10px;
             border: 1px solid #2a2a2a;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-top: 8px;
         }
         .form-group {
             display: flex;
@@ -349,17 +359,17 @@
             width: 100%;
         }
         .form-group label {
-            font-size: clamp(12px, 2.2vw, 14px);
+            font-size: clamp(10px, 1.8vw, 12px);
             font-weight: 600;
             color: #999;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             letter-spacing: 0.3px;
         }
         .form-group input {
-            padding: 10px 14px;
+            padding: 6px 10px;
             border: 1.5px solid #2a2a2a;
-            border-radius: 10px;
-            font-size: clamp(14px, 2.5vw, 16px);
+            border-radius: 8px;
+            font-size: clamp(12px, 2vw, 14px);
             background: #111;
             color: #d0d0d0;
             transition: border 0.2s, box-shadow 0.2s;
@@ -383,10 +393,10 @@
             background: #222;
             color: #d0d0d0;
             border: 1px solid #333;
-            padding: 12px 20px;
-            border-radius: 30px;
+            padding: 8px 14px;
+            border-radius: 22px;
             font-weight: 600;
-            font-size: clamp(15px, 2.8vw, 18px);
+            font-size: clamp(13px, 2.2vw, 16px);
             cursor: pointer;
             transition: background 0.25s, transform 0.1s, border-color 0.25s;
             width: 100%;
@@ -405,15 +415,15 @@
             cursor: not-allowed;
         }
         .message {
-            margin-top: 15px;
-            padding: 12px 16px;
+            margin-top: 10px;
+            padding: 8px 12px;
             background: #141414;
-            border-left: 5px solid #333;
+            border-left: 4px solid #333;
             color: #c0c0c0;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: 500;
             display: none;
-            font-size: clamp(13px, 2.2vw, 15px);
+            font-size: clamp(11px, 1.8vw, 13px);
         }
         .message.show {
             display: block;
@@ -431,29 +441,29 @@
         .cookie-notice {
             background: #111;
             border: 1px solid #2a2a2a;
-            border-radius: 10px;
-            padding: 10px 14px;
-            margin-bottom: 15px;
+            border-radius: 8px;
+            padding: 6px 10px;
+            margin-bottom: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
             text-align: center;
         }
         .cookie-notice p {
             margin: 0;
-            font-size: clamp(12px, 2vw, 14px);
+            font-size: clamp(10px, 1.6vw, 12px);
             color: #888;
         }
         .cookie-notice button {
             background: #222;
             color: #d0d0d0;
             border: 1px solid #333;
-            padding: 6px 20px;
-            border-radius: 20px;
+            padding: 4px 14px;
+            border-radius: 14px;
             cursor: pointer;
             font-weight: 600;
-            font-size: clamp(12px, 2vw, 13px);
+            font-size: clamp(10px, 1.6vw, 11px);
             transition: all 0.25s;
             touch-action: manipulation;
         }
@@ -462,39 +472,47 @@
             border-color: #c8a020;
         }
         @media (max-width: 480px) {
-            .container { padding: 10px 8px; border-radius: 12px; }
-            .week-navigation { padding: 8px 10px; gap: 6px; }
-            .week-nav-btn { padding: 5px 10px; font-size: 10px; }
-            .today-btn { padding: 5px 12px; font-size: 10px; }
-            .week-info { font-size: 11px; min-width: 80px; }
-            .schedule-table { min-width: 480px; font-size: 10px; }
-            .schedule-table th { padding: 6px 2px; font-size: 9px; min-width: 40px; }
-            .schedule-table th .day-date { font-size: 7px; }
-            .schedule-table td { padding: 4px 2px; min-width: 32px; }
-            .schedule-table .time-col { width: 36px; min-width: 32px; font-size: 9px; }
-            .schedule-table input[type="radio"] { width: 14px; height: 14px; }
-            .schedule-table tr.separator-row td .separator-text { font-size: 7px; padding: 1px 8px; letter-spacing: 1px; }
-            .reservation-form { padding: 12px 10px; gap: 10px; }
-            .form-group input { padding: 8px 12px; font-size: 14px; }
-            .btn-reserve { padding: 10px 16px; font-size: 14px; }
-            .message { padding: 10px 14px; font-size: 12px; }
+            .container { padding: 6px 4px; border-radius: 10px; }
+            .week-navigation { padding: 4px 6px; gap: 3px; }
+            .week-nav-btn { padding: 3px 6px; font-size: 8px; }
+            .today-btn { padding: 3px 8px; font-size: 8px; }
+            .week-info { font-size: 9px; min-width: 60px; }
+            .schedule-table { min-width: 320px; font-size: 8px; }
+            .schedule-table th { padding: 3px 1px; font-size: 7px; width: 30px; min-width: 24px; max-width: 36px; }
+            .schedule-table th .day-date { font-size: 5px; }
+            .schedule-table td { padding: 2px 1px; width: 30px; min-width: 24px; max-width: 36px; }
+            .schedule-table .time-col { width: 26px; min-width: 20px; max-width: 30px; font-size: 7px; }
+            .schedule-table input[type="radio"] { width: 10px; height: 10px; }
+            .schedule-table tr.separator-row td { width: 30px; min-width: 24px; max-width: 36px; }
+            .schedule-table tr.separator-row td .separator-text { font-size: 5px; padding: 1px 4px; letter-spacing: 0.3px; }
+            .reservation-form { padding: 8px 6px; gap: 6px; }
+            .form-group input { padding: 5px 8px; font-size: 12px; }
+            .btn-reserve { padding: 6px 12px; font-size: 12px; }
+            .message { padding: 6px 10px; font-size: 10px; }
         }
         @media (max-width: 380px) {
-            .schedule-table { min-width: 400px; font-size: 9px; }
-            .schedule-table th { padding: 4px 1px; font-size: 8px; min-width: 30px; }
-            .schedule-table th .day-date { font-size: 6px; }
-            .schedule-table td { padding: 3px 1px; min-width: 26px; }
-            .schedule-table .time-col { width: 30px; min-width: 26px; font-size: 8px; }
-            .schedule-table input[type="radio"] { width: 12px; height: 12px; }
-            .week-nav-btn { padding: 4px 8px; font-size: 9px; }
-            .today-btn { padding: 4px 10px; font-size: 9px; }
-            .week-info { font-size: 10px; }
+            .schedule-table { min-width: 260px; font-size: 7px; }
+            .schedule-table th { padding: 2px 1px; font-size: 6px; width: 24px; min-width: 18px; max-width: 28px; }
+            .schedule-table th .day-date { font-size: 4px; }
+            .schedule-table td { padding: 2px 1px; width: 24px; min-width: 18px; max-width: 28px; }
+            .schedule-table .time-col { width: 20px; min-width: 16px; max-width: 24px; font-size: 6px; }
+            .schedule-table input[type="radio"] { width: 8px; height: 8px; }
+            .schedule-table tr.separator-row td { width: 24px; min-width: 18px; max-width: 28px; }
+            .schedule-table tr.separator-row td .separator-text { font-size: 4px; padding: 1px 3px; }
+            .week-nav-btn { padding: 2px 5px; font-size: 7px; }
+            .today-btn { padding: 2px 6px; font-size: 7px; }
+            .week-info { font-size: 8px; min-width: 50px; }
+            .container { padding: 4px 2px; }
+            .cookie-notice p { font-size: 9px; }
         }
         @media (min-width: 769px) {
             .reservation-form { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
-            .form-group { flex: 1 1 160px; min-width: 140px; }
-            .btn-reserve { width: auto; margin-left: auto; min-width: 130px; }
+            .form-group { flex: 1 1 120px; min-width: 100px; }
+            .btn-reserve { width: auto; margin-left: auto; min-width: 110px; }
             .cookie-notice { flex-direction: row; justify-content: space-between; text-align: left; }
+            .schedule-table { min-width: 100%; }
+            .schedule-table th { width: 50px; min-width: 40px; max-width: 60px; }
+            .schedule-table td { width: 50px; min-width: 40px; max-width: 60px; }
         }
     </style>
 </head>
@@ -515,14 +533,14 @@
     </div>
 
     <div class="week-navigation">
-        <button class="week-nav-btn" id="prevWeek">◀ Semana anterior</button>
+        <button class="week-nav-btn" id="prevWeek">◀</button>
         <div class="week-info">
-            <span id="weekLabel">Semana del</span>
-            <span id="weekRange">01/08/2026 - 07/08/2026</span>
+            <span id="weekLabel">Semana</span>
+            <span id="weekRange">01/08 - 07/08</span>
         </div>
-        <div style="display: flex; gap: 6px;">
+        <div style="display: flex; gap: 3px;">
             <button class="today-btn" id="todayBtn">📌 Hoy</button>
-            <button class="week-nav-btn" id="nextWeek">Semana siguiente ▶</button>
+            <button class="week-nav-btn" id="nextWeek">▶</button>
         </div>
     </div>
 
@@ -535,11 +553,11 @@
 
     <form id="reservationForm" class="reservation-form">
         <div class="form-group">
-            <label for="nombre">Nombre completo</label>
+            <label for="nombre">Nombre</label>
             <input type="text" id="nombre" name="nombre" placeholder="Ej: Ana Pérez" autocomplete="name" required>
         </div>
         <div class="form-group">
-            <label for="email">Correo electrónico</label>
+            <label for="email">Email</label>
             <input type="email" id="email" name="email" placeholder="ana@email.com" autocomplete="email" required>
         </div>
         <div class="form-group">
@@ -564,7 +582,7 @@
         // ============================================================
         const HORAS_MANANA = ['9:00', '10:00', '11:00', '12:00'];
         const HORAS_TARDE = ['16:00', '17:00', '18:00', '19:00', '20:00'];
-        const DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
         const FECHA_INICIO = new Date(2026, 7, 1);
 
         let currentWeekStart = getWeekStart(FECHA_INICIO);
@@ -628,6 +646,11 @@
         }
 
         function formatDate(date) {
+            const d = new Date(date);
+            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        function formatDateFull(date) {
             const d = new Date(date);
             return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
         }
@@ -746,7 +769,7 @@
                 const todayClass = isToday ? 'today-header' : '';
                 
                 theadHTML += `<th class="${isWeekend} ${todayClass}">${dayName}<span class="day-date">${dateStr}</span>`;
-                if (isToday) theadHTML += ` <span class="today-badge">✦ HOY</span>`;
+                if (isToday) theadHTML += ` <span class="today-badge">✦</span>`;
                 theadHTML += `</th>`;
             }
             theadHTML += '</tr>';
@@ -761,13 +784,13 @@
             
             // Separador
             tbodyHTML += `<tr class="separator-row">`;
-            tbodyHTML += `<td class="time-col" style="background:#111; text-align:center; font-size:clamp(8px,1.5vw,11px); color:#8a7a4a; font-weight:600;">⏰</td>`;
+            tbodyHTML += `<td class="time-col" style="background:#111; text-align:center; font-size:clamp(6px,1vw,9px); color:#8a7a4a; font-weight:600;">⏰</td>`;
             for (let i = 0; i < 6; i++) {
                 const date = getDateForDay(startDate, i);
                 const isToday = isSameDate(date, today);
                 const todayClass = isToday ? 'today-column' : '';
-                tbodyHTML += `<td class="${todayClass}" style="background:#111; border-bottom: 3px solid #3a3220; text-align:center; font-size:clamp(7px,1.2vw,10px); color:#8a7a4a; font-weight:500; letter-spacing:1px;">
-                    <span class="separator-text">⏳ TARDE</span>
+                tbodyHTML += `<td class="${todayClass}" style="background:#111; border-bottom: 3px solid #3a3220; text-align:center; font-size:clamp(5px,0.8vw,8px); color:#8a7a4a; font-weight:500; letter-spacing:0.3px;">
+                    <span class="separator-text">Tarde</span>
                 </td>`;
             }
             tbodyHTML += `</tr>`;
@@ -782,7 +805,7 @@
             const endDate = addWeeks(startDate, 1);
             endDate.setDate(endDate.getDate() - 1);
             weekRange.textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
-            weekLabel.textContent = 'Semana del';
+            weekLabel.textContent = 'Semana';
 
             // Botones
             const todayWeekStart = getWeekStart(today);
@@ -857,10 +880,10 @@
         function updateSubmitButton() {
             if (selectedSlot) {
                 submitBtn.disabled = false;
-                submitBtn.textContent = '✦ Confirmar Reserva';
+                submitBtn.textContent = '✦ Confirmar';
             } else {
                 submitBtn.disabled = true;
-                submitBtn.textContent = 'Selecciona un horario';
+                submitBtn.textContent = 'Selecciona';
             }
         }
 
@@ -902,7 +925,7 @@
             }
 
             if (isLoading) {
-                mostrarMensaje('⏳ Espera a que termine de cargar...', 'error');
+                mostrarMensaje('⏳ Espera...', 'error');
                 return;
             }
 
@@ -949,19 +972,19 @@
 
                 const [year, month, day] = selectedSlot.dateKey.split('-');
                 const dateObj = new Date(year, month - 1, day);
-                const dateStr = formatDate(dateObj);
+                const dateStr = formatDateFull(dateObj);
                 
                 messageDiv.className = 'message show success';
                 messageDiv.innerHTML = `
                     ✦ <strong>¡Reserva confirmada!</strong><br>
                     <span style="font-weight:400;">${nombre}, tu reserva para el <strong>${dateStr}</strong> a las <strong>${selectedSlot.time}</strong> ha sido registrada.</span><br>
-                    <span style="font-size:clamp(12px,2vw,14px); opacity:0.6;">Te enviaremos un correo a ${email} con los detalles.</span>
+                    <span style="font-size:clamp(10px,1.6vw,12px); opacity:0.6;">Te enviaremos un correo a ${email}.</span>
                 `;
 
                 selectedSlot = null;
                 renderTable(currentWeekStart);
             } else {
-                mostrarMensaje('⚠️ Error al guardar la reserva. Intenta de nuevo.', 'error');
+                mostrarMensaje('⚠️ Error al guardar. Intenta de nuevo.', 'error');
                 renderTable(currentWeekStart);
             }
         });
