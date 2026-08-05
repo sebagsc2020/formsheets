@@ -1,1247 +1,950 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>Reservas - Calendario Semanal</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva tu Horario</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
         }
+
         body {
-            background: #0d0d0d;
+            background: #1a1a1a;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            padding: 6px;
+            align-items: center;
+            padding: 2rem 1rem;
         }
-        .container {
-            background: #1a1a1a;
-            padding: 10px 8px;
-            border-radius: 14px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+
+        .card {
             max-width: 1100px;
             width: 100%;
-            border: 1px solid #2a2a2a;
+            background: #2a2a2a;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 8px 20px rgba(0, 0, 0, 0.4);
+            padding: 2rem 2rem 2.5rem;
+            transition: all 0.2s;
+            border: 1px solid #3a3a3a;
         }
+
         h1 {
-            text-align: center;
-            color: #d0d0d0;
+            font-size: 1.9rem;
             font-weight: 600;
-            font-size: clamp(28px, 6vw, 36px);
-            letter-spacing: 1px;
-            margin-bottom: 3px;
+            color: #e8e8e8;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.3rem;
         }
-        .subtitle {
-            text-align: center;
-            color: #777;
-            margin-bottom: 12px;
-            font-size: clamp(16px, 2.8vw, 20px);
+
+        h1 i {
+            color: #888888;
+            margin-right: 12px;
         }
-        .loading-overlay {
-            display: none;
-            text-align: center;
-            padding: 15px;
-            color: #e8c84a;
-            font-weight: 500;
+
+        .subhead {
+            color: #9a9a9a;
+            font-size: 1rem;
+            font-weight: 400;
+            margin-bottom: 1.8rem;
+            border-bottom: 1px solid #3a3a3a;
+            padding-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
         }
-        .loading-overlay.show {
-            display: block;
+
+        .subhead span {
+            background: #333333;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #c0c0c0;
         }
-        .loading-overlay .spinner {
-            display: inline-block;
-            width: 35px;
-            height: 35px;
-            border: 3px solid #2a2a2a;
-            border-top: 3px solid #d4a820;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 8px;
+
+        .cookie-notice {
+            background: #333333;
+            border: 1px solid #444444;
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        .cookie-notice p {
+            color: #c0c0c0;
+            font-size: 0.9rem;
+            margin: 0;
         }
+
+        .cookie-notice p i {
+            color: #888888;
+            margin-right: 8px;
+        }
+
+        .cookie-notice .cookie-btn {
+            background: #444444;
+            border: 1px solid #555555;
+            color: #e0e0e0;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.15s;
+        }
+
+        .cookie-notice .cookie-btn:hover {
+            background: #555555;
+            border-color: #666666;
+        }
+
         .week-navigation {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            background: #141414;
-            padding: 8px 10px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #2a2a2a;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
             flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .week-nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .week-nav-buttons button {
+            background: #333333;
+            border: 1px solid #444444;
+            border-radius: 40px;
+            padding: 0.4rem 1.2rem;
+            font-weight: 500;
+            color: #d0d0d0;
+            cursor: pointer;
+            transition: 0.15s;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
             gap: 6px;
         }
-        .week-nav-btn {
-            background: #222;
-            color: #c0c0c0;
-            border: 1px solid #333;
-            padding: 8px 14px;
+
+        .week-nav-buttons button:hover {
+            background: #3d3d3d;
+            border-color: #555555;
+        }
+
+        .week-nav-buttons button i {
+            font-size: 0.8rem;
+            color: #888888;
+        }
+
+        .week-label {
+            font-weight: 600;
+            color: #e0e0e0;
+            background: #333333;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            border: 1px solid #444444;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 2rem;
             border-radius: 20px;
-            font-weight: 600;
-            font-size: clamp(16px, 2.8vw, 22px);
-            cursor: pointer;
-            transition: background 0.25s, transform 0.1s, border-color 0.25s;
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            white-space: nowrap;
+            border: 1px solid #3a3a3a;
+            background: #222222;
         }
-        .week-nav-btn:hover:not(:disabled) {
-            background: #333;
-            border-color: #c8a020;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            min-width: 700px;
+            background: #222222;
         }
-        .week-nav-btn:active:not(:disabled) {
-            transform: scale(0.95);
-        }
-        .week-nav-btn:disabled {
-            opacity: 0.25;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .week-info {
-            font-size: clamp(16px, 3vw, 22px);
-            font-weight: 600;
+
+        th {
+            background: #2a2a2a;
             color: #d0d0d0;
+            font-weight: 600;
+            padding: 1rem 0.4rem;
             text-align: center;
-            flex: 1;
+            border-bottom: 2px solid #3a3a3a;
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
+        }
+
+        th:first-child {
+            text-align: center;
             min-width: 70px;
         }
-        .week-info span {
-            color: #e8c84a;
-        }
-        .today-btn {
-            background: #222;
-            color: #c0c0c0;
-            border: 1px solid #333;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: clamp(15px, 2.5vw, 20px);
-            cursor: pointer;
-            transition: all 0.25s;
-            white-space: nowrap;
-        }
-        .today-btn:hover:not(:disabled) {
-            background: #333;
-            border-color: #c8a020;
-        }
-        .today-btn:disabled {
-            opacity: 0.25;
-            cursor: not-allowed;
-        }
-        .table-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin-bottom: 12px;
-            border-radius: 10px;
-            background: #111;
-            padding: 2px;
-            scroll-behavior: smooth;
+
+        th.today-header {
+            background: #3d3d3d;
             position: relative;
         }
-        .table-wrapper::-webkit-scrollbar {
-            height: 6px;
-        }
-        .table-wrapper::-webkit-scrollbar-track {
-            background: #1a1a1a;
-            border-radius: 8px;
-        }
-        .table-wrapper::-webkit-scrollbar-thumb {
-            background: #3a3220;
-            border-radius: 8px;
-        }
-        .table-wrapper::-webkit-scrollbar-thumb:hover {
-            background: #5a4a2a;
-        }
-        .schedule-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            font-size: clamp(13px, 2.2vw, 18px);
-            border-radius: 10px;
-            overflow: hidden;
-            table-layout: fixed;
+
+        th.today-header::after {
+            content: '●';
+            color: #aaaaaa;
+            font-size: 0.5rem;
+            margin-left: 4px;
+            vertical-align: super;
         }
 
-        .schedule-table .time-col {
-            font-weight: 600;
-            color: #999;
-            background: #141414;
-            width: 60px;
-            min-width: 60px;
-            max-width: 60px;
-            font-size: clamp(13px, 2vw, 17px);
-            border-right: 1px solid #2a2a2a;
-            position: sticky;
-            left: 0;
-            z-index: 20;
+        td {
+            padding: 0.5rem 0.2rem;
             text-align: center;
+            border-bottom: 1px solid #333333;
+            vertical-align: middle;
         }
 
-        .schedule-table th {
-            background: #111;
-            color: #b0b0b0;
-            padding: 6px 2px;
-            font-weight: 600;
-            font-size: clamp(13px, 2vw, 17px);
-            border-bottom: 2px solid #2a2a2a;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            text-align: center;
-            width: 14.285%;
-            min-width: 80px;
-            max-width: 120px;
+        td.today-cell {
+            background: #383838;
         }
-        .schedule-table th .day-date {
-            display: block;
-            font-size: clamp(10px, 1.4vw, 14px);
-            font-weight: 400;
+
+        td.available-cell {
+            background: #2d2d2d;
+        }
+
+        td.disabled-cell {
+            background: #222222;
             opacity: 0.6;
-            margin-top: 1px;
-        }
-        .schedule-table th.weekend {
-            background: #0e0e0e;
-        }
-        .schedule-table th.today-header {
-            background: #ffffff;
-            color: #1a1a1a;
-            border-bottom: 2px solid #2a2a2a;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
-        }
-        .schedule-table th.today-header .day-date {
-            color: #666;
-            opacity: 1;
-        }
-        .schedule-table th.today-header .today-badge {
-            background: #1a1a1a;
-            color: #ffffff;
-            font-size: 8px;
-            padding: 1px 8px;
-            border-radius: 10px;
-            display: inline-block;
-            margin-top: 1px;
-            font-weight: 700;
-            letter-spacing: 0.3px;
         }
 
-        .schedule-table td {
-            padding: 6px 2px;
-            text-align: center;
-            border-bottom: 1px solid #2a2a2a;
-            background: #1a1a1a;
-            transition: background 0.2s;
-            width: 14.285%;
-            min-width: 80px;
-            max-width: 120px;
-        }
-        .schedule-table tr:last-child td {
-            border-bottom: none;
+        .afternoon-row td.today-cell {
+            background: #353535;
         }
 
-        .schedule-table tr.separator-row td {
-            background: #111;
-            border-bottom: 3px solid #3a3220;
-            padding: 4px 2px;
-            height: 18px;
-            width: 14.285%;
-            min-width: 80px;
-            max-width: 120px;
-        }
-        .schedule-table tr.separator-row td .separator-text {
-            font-size: clamp(10px, 1.5vw, 14px);
-            color: #8a7a4a;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            background: #1a1610;
-            padding: 2px 8px;
-            border-radius: 6px;
-            display: inline-block;
-            border: 1px solid #3a3220;
-        }
-        .schedule-table tr.separator-row td.time-col {
-            background: #111;
-            border-bottom: 3px solid #3a3220;
-            font-size: clamp(11px, 1.6vw, 15px);
-            color: #8a7a4a;
-            font-weight: 600;
-        }
-
-        .schedule-table td.today-column {
+        .afternoon-row td.available-cell {
             background: #2a2a2a;
-            position: relative;
-        }
-        .schedule-table td.today-column.past {
-            background: #222;
-            opacity: 0.5;
-        }
-        .schedule-table td.today-column.reserved {
-            background: #2a1515;
-        }
-        .schedule-table td.today-column.selected {
-            background: #3a3a3a;
-            box-shadow: inset 0 0 0 2px #888;
-        }
-        .schedule-table td.today-column .slot-radio:checked {
-            accent-color: #888;
-        }
-        .schedule-table tr.separator-row td.today-column {
-            background: #222;
         }
 
-        .schedule-table input[type="radio"] {
-            width: clamp(18px, 3vw, 24px);
-            height: clamp(18px, 3vw, 24px);
-            accent-color: #666;
-            cursor: pointer;
-            transition: transform 0.15s;
-            position: relative;
-            z-index: 1;
-            touch-action: manipulation;
-        }
-        .schedule-table input[type="radio"]:hover:not(:disabled) {
-            transform: scale(1.15);
-        }
-        .schedule-table input[type="radio"]:active:not(:disabled) {
-            transform: scale(0.9);
-        }
-        .schedule-table input[type="radio"]:disabled {
-            accent-color: #333;
-            cursor: not-allowed;
-            opacity: 0.3;
+        .afternoon-row td.disabled-cell {
+            background: #1f1f1f;
+            opacity: 0.6;
         }
 
-        .schedule-table td.reserved {
-            background: #2a1a1a;
-            position: relative;
-        }
-        .schedule-table td.reserved .slot-radio {
-            display: none;
-        }
-        .schedule-table td.reserved .reserved-cross {
-            display: inline-block;
-            color: #cc0000;
-            font-size: clamp(20px, 3.5vw, 30px);
-            font-weight: 700;
-            line-height: 1;
-            text-shadow: 0 0 10px rgba(204, 0, 0, 0.2);
-        }
-        .schedule-table td.reserved .reserved-cross::before {
-            content: '✕';
-        }
-        .schedule-table td.today-column.reserved {
-            background: #2a1515;
-        }
-        .schedule-table td.today-column.reserved .reserved-cross {
-            color: #ff2222;
-            text-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
-        }
-
-        .schedule-table td .reserved-cross {
-            display: none;
-        }
-
-        .schedule-table td.past {
-            background: #161616;
-            opacity: 0.4;
-        }
-        .schedule-table td.past .slot-radio {
-            display: none;
-        }
-        .schedule-table td.past .reserved-cross {
-            display: none !important;
-        }
-        .schedule-table td.past .past-text {
-            display: inline-block;
-            color: #555;
-            font-size: clamp(14px, 2vw, 20px);
-        }
-        .schedule-table td .past-text {
-            display: none;
-        }
-
-        .schedule-table td.selected {
-            background: #333;
-            box-shadow: inset 0 0 0 2px #555;
-        }
-
-        .reservation-form {
-            background: #141414;
-            padding: 12px 10px;
-            border-radius: 10px;
-            border: 1px solid #2a2a2a;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 8px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-        }
-        .form-group label {
-            font-size: clamp(14px, 2.4vw, 18px);
-            font-weight: 600;
-            color: #999;
-            margin-bottom: 3px;
-            letter-spacing: 0.3px;
-        }
-        .form-group input {
-            padding: 10px 14px;
-            border: 1.5px solid #2a2a2a;
-            border-radius: 8px;
-            font-size: clamp(15px, 2.6vw, 20px);
-            background: #111;
-            color: #d0d0d0;
-            transition: border 0.2s, box-shadow 0.2s;
-            outline: none;
-            width: 100%;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-        .form-group input::placeholder {
-            color: #555;
-        }
-        .form-group input:focus {
-            border-color: #c8a020;
-            box-shadow: 0 0 0 3px rgba(200, 160, 32, 0.05);
-        }
-        .form-group input:-webkit-autofill {
-            -webkit-box-shadow: 0 0 0 30px #111 inset !important;
-            -webkit-text-fill-color: #d0d0d0 !important;
-        }
-        .btn-reserve {
-            background: #222;
-            color: #d0d0d0;
-            border: 1px solid #333;
-            padding: 12px 18px;
-            border-radius: 25px;
-            font-weight: 600;
-            font-size: clamp(16px, 2.8vw, 22px);
-            cursor: pointer;
-            transition: background 0.25s, transform 0.1s, border-color 0.25s;
-            width: 100%;
-            letter-spacing: 0.5px;
-            touch-action: manipulation;
-        }
-        .btn-reserve:hover:not(:disabled) {
-            background: #2a2418;
-            border-color: #c8a020;
-        }
-        .btn-reserve:active:not(:disabled) {
-            transform: scale(0.97);
-        }
-        .btn-reserve:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-        .message {
-            margin-top: 10px;
-            padding: 10px 14px;
-            background: #141414;
-            border-left: 4px solid #333;
-            color: #c0c0c0;
-            border-radius: 8px;
+        .time-slot {
             font-weight: 500;
-            display: none;
-            font-size: clamp(14px, 2.4vw, 18px);
-        }
-        .message.show {
-            display: block;
-        }
-        .message.error {
-            border-left-color: #cc3333;
-            background: #1a0e0e;
-            color: #ff6b6b;
-        }
-        .message.success {
-            border-left-color: #c8a020;
-            background: #1a1610;
-            color: #d4c88a;
-        }
-        .cookie-notice {
-            background: #111;
-            border: 1px solid #2a2a2a;
-            border-radius: 8px;
-            padding: 8px 12px;
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            text-align: center;
-        }
-        .cookie-notice p {
-            margin: 0;
-            font-size: clamp(14px, 2.4vw, 18px);
-            color: #888;
-        }
-        .cookie-notice button {
-            background: #222;
-            color: #d0d0d0;
-            border: 1px solid #333;
-            padding: 6px 18px;
-            border-radius: 18px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: clamp(14px, 2.4vw, 18px);
-            transition: all 0.25s;
-            touch-action: manipulation;
-        }
-        .cookie-notice button:hover {
-            background: #2a2418;
-            border-color: #c8a020;
+            color: #c0c0c0;
+            background: #262626;
+            font-size: 0.9rem;
         }
 
-        .scroll-indicators {
-            display: none;
-            justify-content: space-between;
-            margin-top: 4px;
-            padding: 0 4px;
+        .time-slot i {
+            margin-right: 4px;
+            color: #777777;
+            font-size: 0.8rem;
         }
-        .scroll-indicators button {
-            background: rgba(42, 42, 42, 0.8);
-            color: #c0c0c0;
-            border: 1px solid #333;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.25s;
+
+        .slot-cell {
+            position: relative;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
-            touch-action: manipulation;
         }
-        .scroll-indicators button:hover {
-            background: #333;
-            border-color: #c8a020;
+
+        .slot-cell input[type="radio"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #555555;
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: #2a2a2a;
+            position: relative;
+            margin: 0;
+            flex-shrink: 0;
         }
-        .scroll-indicators button:active {
-            transform: scale(0.9);
+
+        .slot-cell input[type="radio"]:not(:disabled) {
+            border-color: #666666;
+            background: #333333;
         }
-        .scroll-indicators button:disabled {
-            opacity: 0.2;
+
+        .slot-cell input[type="radio"]:not(:disabled):hover {
+            border-color: #999999;
+            background: #3d3d3d;
+        }
+
+        .slot-cell input[type="radio"]:checked {
+            border-color: #aaaaaa;
+            background-color: #aaaaaa;
+            box-shadow: 0 0 0 3px rgba(170, 170, 170, 0.2);
+        }
+
+        .slot-cell input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 6px;
+            height: 10px;
+            border: solid #1a1a1a;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .slot-cell input[type="radio"]:disabled {
+            opacity: 0.3;
             cursor: not-allowed;
+            border-color: #3a3a3a;
+            background: #1a1a1a;
         }
 
-        @media (max-width: 768px) {
-            .schedule-table th {
-                min-width: 120px;
-                max-width: 160px;
-                font-size: clamp(16.5px, 2.75vw, 22px);
-                padding: 6px 2px;
-            }
-            .schedule-table th .day-date {
-                font-size: clamp(13.2px, 2vw, 17.6px);
-            }
-            .schedule-table td {
-                min-width: 120px;
-                max-width: 160px;
-                padding: 8px 4px;
-            }
-            .schedule-table .time-col {
-                min-width: 66px;
-                max-width: 66px;
-                font-size: clamp(16.5px, 2.75vw, 22px);
-            }
-            .schedule-table tr.separator-row td {
-                min-width: 120px;
-                max-width: 160px;
-            }
-            .schedule-table tr.separator-row td .separator-text {
-                font-size: clamp(13.2px, 2vw, 17.6px);
-            }
-            .schedule-table input[type="radio"] {
-                width: clamp(24px, 3.85vw, 33px);
-                height: clamp(24px, 3.85vw, 33px);
-            }
-            .schedule-table td.reserved .reserved-cross {
-                font-size: clamp(26px, 4.5vw, 38px);
-            }
-            .scroll-indicators {
-                display: flex;
-            }
+        .slot-cell input[type="radio"]:disabled:hover {
+            border-color: #3a3a3a;
+            background: #1a1a1a;
         }
 
-        @media (max-width: 480px) {
-            .container { padding: 8px 5px; border-radius: 10px; }
-            .week-navigation { padding: 6px 8px; gap: 4px; }
-            .week-nav-btn { padding: 6px 10px; font-size: 15.4px; }
-            .today-btn { padding: 6px 10px; font-size: 14.3px; }
-            .week-info { font-size: 15.4px; min-width: 60px; }
-
-            .schedule-table th {
-                min-width: 110px;
-                max-width: 143px;
-                font-size: clamp(15.4px, 3.3vw, 19.8px);
-                padding: 6px 2px;
-            }
-            .schedule-table th .day-date {
-                font-size: clamp(12.1px, 2.42vw, 15.4px);
-            }
-            .schedule-table td {
-                min-width: 110px;
-                max-width: 143px;
-                padding: 6px 2px;
-            }
-            .schedule-table .time-col {
-                min-width: 60px;
-                max-width: 60px;
-                font-size: clamp(15.4px, 3.08vw, 19.8px);
-            }
-            .schedule-table tr.separator-row td {
-                min-width: 110px;
-                max-width: 143px;
-            }
-            .schedule-table tr.separator-row td .separator-text {
-                font-size: clamp(11px, 2.2vw, 15.4px);
-                padding: 2px 6px;
-            }
-            .schedule-table input[type="radio"] {
-                width: clamp(22px, 4.4vw, 30.8px);
-                height: clamp(22px, 4.4vw, 30.8px);
-            }
-            .schedule-table td.reserved .reserved-cross {
-                font-size: clamp(24px, 5vw, 34px);
-            }
-            .reservation-form { padding: 10px 8px; gap: 8px; }
-            .form-group label { font-size: clamp(15.4px, 2.64vw, 19.8px); }
-            .form-group input { padding: 8px 12px; font-size: 15.4px; }
-            .btn-reserve { padding: 10px 14px; font-size: 16.5px; }
-            .message { padding: 8px 12px; font-size: 14.3px; }
-            .scroll-indicators button { width: 30px; height: 30px; font-size: 15px; }
-            .cookie-notice p { font-size: 14.3px; }
-            .cookie-notice button { font-size: 14.3px; padding: 5px 14px; }
+        .afternoon-row td {
+            background: #282828;
+            font-weight: 500;
+            color: #b0b0b0;
+            letter-spacing: 0.5px;
+            padding: 0.6rem 0.2rem;
+            border-bottom: 2px solid #3a3a3a;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            background: #282828;
         }
 
-        @media (max-width: 380px) {
-            .schedule-table th {
-                min-width: 95px;
-                max-width: 120px;
-                font-size: clamp(13.2px, 3.08vw, 17.6px);
-                padding: 4px 1px;
-            }
-            .schedule-table th .day-date {
-                font-size: clamp(9.9px, 2.2vw, 13.2px);
-            }
-            .schedule-table td {
-                min-width: 95px;
-                max-width: 120px;
-                padding: 4px 1px;
-            }
-            .schedule-table .time-col {
-                min-width: 52px;
-                max-width: 52px;
-                font-size: clamp(13.2px, 2.75vw, 17.6px);
-            }
-            .schedule-table tr.separator-row td {
-                min-width: 95px;
-                max-width: 120px;
-            }
-            .schedule-table tr.separator-row td .separator-text {
-                font-size: clamp(8.8px, 1.98vw, 13.2px);
-                padding: 1px 4px;
-            }
-            .schedule-table input[type="radio"] {
-                width: clamp(17.6px, 3.85vw, 24.2px);
-                height: clamp(17.6px, 3.85vw, 24.2px);
-            }
-            .schedule-table td.reserved .reserved-cross {
-                font-size: clamp(20px, 4.5vw, 28px);
-            }
-            .week-nav-btn { padding: 4px 8px; font-size: 12.1px; }
-            .today-btn { padding: 4px 8px; font-size: 12.1px; }
-            .week-info { font-size: 12.1px; min-width: 50px; }
-            .container { padding: 5px 3px; }
-            .scroll-indicators button { width: 24px; height: 24px; font-size: 12px; }
-            .cookie-notice p { font-size: 12.1px; }
-            .cookie-notice button { font-size: 12.1px; padding: 4px 12px; }
+        .afternoon-row td:first-child {
+            text-align: right;
+            padding-right: 12px;
+            font-weight: 600;
         }
 
-        @media (min-width: 769px) {
-            .reservation-form { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
-            .form-group { flex: 1 1 140px; min-width: 120px; }
-            .btn-reserve { width: auto; margin-left: auto; min-width: 130px; }
-            .cookie-notice { flex-direction: row; justify-content: space-between; text-align: left; }
-            .schedule-table { min-width: 100%; }
-            .schedule-table th { min-width: 90px; max-width: 140px; }
-            .schedule-table td { min-width: 90px; max-width: 140px; }
-            .schedule-table tr.separator-row td { min-width: 90px; max-width: 140px; }
-            .scroll-indicators { display: none !important; }
+        .afternoon-row td:not(:first-child) {
+            background: #282828;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.2rem 1.8rem;
+            background: #262626;
+            padding: 1.8rem 1.8rem 2rem;
+            border-radius: 28px;
+            margin-top: 0.5rem;
+            border: 1px solid #353535;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            position: relative;
+        }
+
+        .field-group label {
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #999999;
+        }
+
+        .field-group label i {
+            color: #777777;
+            margin-right: 4px;
+        }
+
+        .field-group input,
+        .field-group select {
+            padding: 0.7rem 0.9rem;
+            border: 1px solid #3d3d3d;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            background: #1e1e1e;
+            transition: 0.2s;
+            outline: none;
+            width: 100%;
+            color: #e0e0e0;
+        }
+
+        .field-group input::placeholder {
+            color: #666666;
+            font-weight: 300;
+        }
+
+        .field-group input:focus,
+        .field-group select:focus {
+            border-color: #888888;
+            box-shadow: 0 0 0 3px rgba(136, 136, 136, 0.12);
+        }
+
+        .field-group .hint {
+            font-size: 0.7rem;
+            color: #666666;
+            margin-top: 2px;
+        }
+
+        .field-group input[list]::-webkit-calendar-picker-indicator {
+            opacity: 0.5;
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        .field-group input[list]::-webkit-calendar-picker-indicator:hover {
+            opacity: 0.8;
+        }
+
+        .btn-wrapper {
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+        }
+
+        .btn-submit {
+            background: #444444;
+            border: 1px solid #555555;
+            color: #e8e8e8;
+            padding: 0.7rem 2.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-submit:hover {
+            background: #555555;
+            border-color: #666666;
+            transform: scale(1.02);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-submit i {
+            font-size: 0.9rem;
+            color: #aaaaaa;
+        }
+
+        .selected-feedback {
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            background: #2a2a2a;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            display: inline-block;
+            border: 1px solid #3a3a3a;
+        }
+
+        .selected-feedback i {
+            color: #888888;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 1.2rem;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .week-navigation {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.6rem;
+            }
+            .week-nav-buttons {
+                justify-content: center;
+            }
+            .btn-wrapper {
+                justify-content: stretch;
+            }
+            .btn-submit {
+                width: 100%;
+            }
+            .cookie-notice {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="card">
+        <h1><i class="fas fa-calendar-check"></i>Reserva tu Horario</h1>
+        <div class="subhead">
+            <span>Selecciona un único día y hora para tu reserva</span>
+        </div>
 
-<div class="container">
-    <h1>📅 Reserva tu Horario</h1>
-    <p class="subtitle">Selecciona un único día y hora para tu reserva</p>
+        <!-- Aviso de cookies -->
+        <div class="cookie-notice" id="cookieNotice">
+            <p><i class="fas fa-cookie-bite"></i> Este sitio utiliza cookies para recordar tus datos y preferencias.</p>
+            <div>
+                <button class="cookie-btn" id="acceptCookiesBtn"><i class="fas fa-check"></i> Aceptar cookies</button>
+                <button class="cookie-btn" id="clearCookiesBtn" style="margin-left: 8px;"><i class="fas fa-trash"></i> Borrar cookies</button>
+            </div>
+        </div>
 
-    <div class="cookie-notice" id="cookieNotice">
-        <p>🍪 Usamos cookies para recordar tus datos.</p>
-        <button id="acceptCookies">Aceptar</button>
+        <!-- Navegación semanal -->
+        <div class="week-navigation">
+            <div class="week-nav-buttons">
+                <button id="prevWeekBtn"><i class="fas fa-chevron-left"></i> Semana anterior</button>
+                <button id="nextWeekBtn">Semana siguiente <i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="week-label" id="weekLabel">Septiembre 2026</div>
+        </div>
+
+        <!-- Tabla de horarios -->
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr id="headerRow">
+                        <th>Hora</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaHorarios">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Formulario de datos -->
+        <form id="reservationForm">
+            <div class="form-grid">
+                <div class="field-group">
+                    <label for="nombre"><i class="far fa-user"></i> Nombre</label>
+                    <input type="text" id="nombre" list="nombresList" placeholder="Ej: Ana Pérez" autocomplete="off">
+                    <datalist id="nombresList">
+                        <option value="Ana Pérez">
+                        <option value="Carlos Gómez">
+                        <option value="María López">
+                        <option value="Juan Martínez">
+                        <option value="Laura Rodríguez">
+                        <option value="Pedro Sánchez">
+                        <option value="Elena Díaz">
+                        <option value="Miguel Fernández">
+                        <option value="Sofía Torres">
+                        <option value="David Ruiz">
+                    </datalist>
+                    <span class="hint">Nombre completo</span>
+                </div>
+                <div class="field-group">
+                    <label for="email"><i class="far fa-envelope"></i> Email</label>
+                    <input type="email" id="email" list="emailsList" placeholder="ejemplo@email.com" autocomplete="off">
+                    <datalist id="emailsList">
+                        <option value="ana@email.com">
+                        <option value="carlos@email.com">
+                        <option value="maria@email.com">
+                        <option value="juan@email.com">
+                        <option value="laura@email.com">
+                        <option value="pedro@email.com">
+                        <option value="elena@email.com">
+                        <option value="miguel@email.com">
+                        <option value="sofia@email.com">
+                        <option value="david@email.com">
+                        <option value="info@empresa.com">
+                        <option value="contacto@dominio.com">
+                    </datalist>
+                    <span class="hint">Correo electrónico</span>
+                </div>
+                <div class="field-group">
+                    <label for="telefono"><i class="fas fa-phone-alt"></i> Teléfono</label>
+                    <input type="tel" id="telefono" list="telefonosList" placeholder="+34 600 000 000" autocomplete="off">
+                    <datalist id="telefonosList">
+                        <option value="+34 600 000 000">
+                        <option value="+34 611 222 333">
+                        <option value="+34 622 333 444">
+                        <option value="+34 633 444 555">
+                        <option value="+34 644 555 666">
+                        <option value="+34 655 666 777">
+                        <option value="+34 666 777 888">
+                        <option value="+34 677 888 999">
+                        <option value="+34 688 999 000">
+                        <option value="+34 699 111 222">
+                        <option value="+34 600 123 456">
+                        <option value="+34 611 987 654">
+                    </datalist>
+                    <span class="hint">Incluye código de país</span>
+                </div>
+                <div class="field-group btn-wrapper">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i> Enviar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Feedback de selección -->
+            <div id="feedback" class="selected-feedback hidden">
+                <i class="fas fa-check-circle"></i> Horario seleccionado: <span id="selectedSlotText">—</span>
+            </div>
+        </form>
     </div>
 
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
-        <p>Cargando disponibilidad...</p>
-    </div>
+    <script>
+        (function() {
+            // ---------- Configuración ----------
+            const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            const morningHours = [9, 10, 11, 12];
+            const afternoonHours = [16, 17, 18, 19, 20];
+            const COOKIE_EXPIRY_DAYS = 30;
 
-    <div class="week-navigation">
-        <button class="week-nav-btn" id="prevWeek">◀</button>
-        <div class="week-info">
-            <span id="weekLabel">Semana</span>
-            <span id="weekRange">01/08 - 07/08</span>
-        </div>
-        <div style="display: flex; gap: 4px;">
-            <button class="today-btn" id="todayBtn">📌 Hoy</button>
-            <button class="week-nav-btn" id="nextWeek">▶</button>
-        </div>
-    </div>
+            // Estado: fecha de inicio de la semana (lunes)
+            let currentWeekStart = getMonday(new Date(2026, 7, 3));
 
-    <div class="scroll-indicators" id="scrollIndicators">
-        <button id="scrollLeft" title="Desplazar izquierda">◀</button>
-        <button id="scrollRight" title="Desplazar derecha">▶</button>
-    </div>
+            // Elementos DOM
+            const tbody = document.getElementById('tablaHorarios');
+            const headerRow = document.getElementById('headerRow');
+            const weekLabel = document.getElementById('weekLabel');
+            const feedback = document.getElementById('feedback');
+            const selectedSlotText = document.getElementById('selectedSlotText');
+            const nombreInput = document.getElementById('nombre');
+            const emailInput = document.getElementById('email');
+            const telefonoInput = document.getElementById('telefono');
 
-    <div class="table-wrapper" id="tableWrapper">
-        <table class="schedule-table" id="scheduleTable">
-            <thead id="tableHead"></thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
-
-    <form id="reservationForm" class="reservation-form">
-        <div class="form-group">
-            <label for="nombre">Nombre</label>
-            <input type="text" id="nombre" name="nombre" placeholder="Ej: Ana Pérez" autocomplete="name" required>
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" placeholder="ana@email.com" autocomplete="email" required>
-        </div>
-        <div class="form-group">
-            <label for="telefono">Teléfono</label>
-            <input type="tel" id="telefono" name="telefono" placeholder="+34 600 000 000" autocomplete="tel">
-        </div>
-        <button type="submit" class="btn-reserve" id="submitBtn" disabled>Selecciona un horario</button>
-    </form>
-
-    <div id="message" class="message"></div>
-</div>
-
-<script>
-    (function() {
-        // ============================================================
-        // 🔴 URL DE TU APPS SCRIPT (YA ACTUALIZADA CON TU URL)
-        // ============================================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbw11yrXg25UrVMIQTWYyaElOZveFIU9hwGVCw-0jU-oboEl1zirxA_fpNEbKtB8lRtajQ/exec';
-
-        // ============================================================
-        // CONFIGURACIÓN
-        // ============================================================
-        const HORAS_MANANA = ['9:00', '10:00', '11:00', '12:00'];
-        const HORAS_TARDE = ['16:00', '17:00', '18:00', '19:00', '20:00'];
-        const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-        const FECHA_INICIO = new Date(2026, 7, 1);
-
-        let currentWeekStart = getWeekStart(FECHA_INICIO);
-        let reservas = {};
-        let selectedSlot = null;
-        let cookiesAccepted = false;
-        let isLoading = false;
-
-        // ============================================================
-        // ELEMENTOS DOM
-        // ============================================================
-        const tableHead = document.getElementById('tableHead');
-        const tableBody = document.getElementById('tableBody');
-        const weekRange = document.getElementById('weekRange');
-        const weekLabel = document.getElementById('weekLabel');
-        const prevBtn = document.getElementById('prevWeek');
-        const nextBtn = document.getElementById('nextWeek');
-        const todayBtn = document.getElementById('todayBtn');
-        const form = document.getElementById('reservationForm');
-        const messageDiv = document.getElementById('message');
-        const submitBtn = document.getElementById('submitBtn');
-        const cookieNotice = document.getElementById('cookieNotice');
-        const acceptBtn = document.getElementById('acceptCookies');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const tableWrapper = document.getElementById('tableWrapper');
-        const scrollLeft = document.getElementById('scrollLeft');
-        const scrollRight = document.getElementById('scrollRight');
-
-        // ============================================================
-        // SCROLL INDICATORS
-        // ============================================================
-        function updateScrollButtons() {
-            if (!tableWrapper) return;
-            const scrollLeftPos = tableWrapper.scrollLeft;
-            const maxScroll = tableWrapper.scrollWidth - tableWrapper.clientWidth;
-            if (scrollLeft) scrollLeft.disabled = scrollLeftPos <= 2;
-            if (scrollRight) scrollRight.disabled = scrollLeftPos >= maxScroll - 2;
-        }
-
-        function scrollWrapper(direction) {
-            if (!tableWrapper) return;
-            const scrollAmount = tableWrapper.clientWidth * 0.5;
-            tableWrapper.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-            setTimeout(updateScrollButtons, 400);
-        }
-
-        if (scrollLeft) scrollLeft.addEventListener('click', () => scrollWrapper(-1));
-        if (scrollRight) scrollRight.addEventListener('click', () => scrollWrapper(1));
-        if (tableWrapper) {
-            tableWrapper.addEventListener('scroll', updateScrollButtons);
-            window.addEventListener('resize', updateScrollButtons);
-        }
-
-        // ============================================================
-        // UTILIDADES
-        // ============================================================
-        function setCookie(name, value, days = 365) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))}; expires=${date.toUTCString()}; path=/; SameSite=Lax`;
-        }
-
-        function getCookie(name) {
-            const cookieName = `${name}=`;
-            const cookies = document.cookie.split(';');
-            for (let cookie of cookies) {
-                cookie = cookie.trim();
-                if (cookie.indexOf(cookieName) === 0) {
-                    try { return JSON.parse(decodeURIComponent(cookie.substring(cookieName.length))); }
-                    catch (e) { return null; }
-                }
+            // ---------- Funciones de cookies ----------
+            function setCookie(name, value, days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                const expires = "expires=" + date.toUTCString();
+                document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/";
             }
-            return null;
-        }
 
-        function getWeekStart(date) {
-            const d = new Date(date);
-            const day = d.getDay();
-            const diff = (day === 0) ? 6 : day - 1;
-            d.setDate(d.getDate() - diff);
-            d.setHours(0, 0, 0, 0);
-            return d;
-        }
-
-        function addWeeks(date, weeks) {
-            const d = new Date(date);
-            d.setDate(d.getDate() + (weeks * 7));
-            return d;
-        }
-
-        function formatDate(date) {
-            const d = new Date(date);
-            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
-        }
-
-        function formatDateFull(date) {
-            const d = new Date(date);
-            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-        }
-
-        function formatDateKey(date) {
-            const d = new Date(date);
-            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        }
-
-        function getDateForDay(weekStart, dayIndex) {
-            const d = new Date(weekStart);
-            d.setDate(d.getDate() + dayIndex);
-            return d;
-        }
-
-        function isSameDate(d1, d2) {
-            return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
-        }
-
-        function isPastDate(date) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            return date < today;
-        }
-
-        function isBeforeSiteStart(date) {
-            const start = new Date(FECHA_INICIO);
-            start.setHours(0, 0, 0, 0);
-            return date < start;
-        }
-
-        // ============================================================
-        // API - GOOGLE SHEETS
-        // ============================================================
-        async function cargarReservasDesdeAPI() {
-            try {
-                mostrarLoading(true);
-                const response = await fetch(API_URL + '?t=' + Date.now());
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                if (data.success) {
-                    reservas = {};
-                    data.reservas.forEach(r => {
-                        const fecha = String(r.fecha).trim();
-                        const hora = String(r.hora).trim();
-                        const key = `${fecha}_${hora}`;
-                        reservas[key] = {
-                            nombre: r.nombre || '',
-                            email: r.email || '',
-                            telefono: r.telefono || ''
-                        };
-                    });
-                    return true;
-                }
-                return false;
-            } catch (error) {
-                console.error('Error cargando reservas:', error);
-                return false;
-            } finally {
-                mostrarLoading(false);
-            }
-        }
-
-        async function guardarReservaEnAPI(fecha, hora, nombre, email, telefono) {
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fecha, hora, nombre, email, telefono: telefono || '' })
-                });
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Error guardando reserva:', error);
-                return { success: false, error: error.message };
-            }
-        }
-
-        // ============================================================
-        // LOADING
-        // ============================================================
-        function mostrarLoading(show) {
-            isLoading = show;
-            const wrapper = document.querySelector('.table-wrapper');
-            if (show) {
-                loadingOverlay.classList.add('show');
-                if (wrapper) { wrapper.style.opacity = '0.3'; wrapper.style.pointerEvents = 'none'; }
-            } else {
-                loadingOverlay.classList.remove('show');
-                if (wrapper) { wrapper.style.opacity = '1'; wrapper.style.pointerEvents = 'auto'; }
-            }
-        }
-
-        // ============================================================
-        // GENERAR TABLA
-        // ============================================================
-        function renderTable(weekStart) {
-            const startDate = new Date(weekStart);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            let theadHTML = '<tr><th class="time-col">Hora</th>';
-            for (let i = 0; i < 6; i++) {
-                const date = getDateForDay(startDate, i);
-                const dayName = DIAS_SEMANA[i];
-                const dateStr = formatDate(date);
-                const isWeekend = (i === 5) ? 'weekend' : '';
-                const isToday = isSameDate(date, today);
-                const todayClass = isToday ? 'today-header' : '';
-                theadHTML += `<th class="${isWeekend} ${todayClass}">${dayName}<span class="day-date">${dateStr}</span>`;
-                if (isToday) theadHTML += ` <span class="today-badge">✦ HOY</span>`;
-                theadHTML += `</th>`;
-            }
-            theadHTML += '</tr>';
-            tableHead.innerHTML = theadHTML;
-
-            let tbodyHTML = '';
-            HORAS_MANANA.forEach(hora => {
-                tbodyHTML += generarFilaHora(hora, startDate, today);
-            });
-            tbodyHTML += `<tr class="separator-row">`;
-            tbodyHTML += `<td class="time-col" style="background:#111; text-align:center;">⏰</td>`;
-            for (let i = 0; i < 6; i++) {
-                const date = getDateForDay(startDate, i);
-                const isToday = isSameDate(date, today);
-                const todayClass = isToday ? 'today-column' : '';
-                tbodyHTML += `<td class="${todayClass}" style="background:#111; border-bottom: 3px solid #3a3220; text-align:center;">
-                    <span class="separator-text">Tarde</span>
-                </td>`;
-            }
-            tbodyHTML += `</tr>`;
-            HORAS_TARDE.forEach(hora => {
-                tbodyHTML += generarFilaHora(hora, startDate, today);
-            });
-            tableBody.innerHTML = tbodyHTML;
-
-            const endDate = addWeeks(startDate, 1);
-            endDate.setDate(endDate.getDate() - 1);
-            weekRange.textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
-            weekLabel.textContent = 'Semana';
-
-            const todayWeekStart = getWeekStart(today);
-            const startWeek = getWeekStart(FECHA_INICIO);
-            const diffWeeks = Math.floor((startDate - startWeek) / (7 * 24 * 60 * 60 * 1000));
-            prevBtn.disabled = (diffWeeks <= 0);
-            todayBtn.disabled = isSameDate(startDate, todayWeekStart);
-
-            updateSubmitButton();
-            attachRadioEvents();
-            setTimeout(updateScrollButtons, 100);
-        }
-
-        function generarFilaHora(hora, startDate, today) {
-            let html = `<tr><td class="time-col">${hora}</td>`;
-            for (let i = 0; i < 6; i++) {
-                const date = getDateForDay(startDate, i);
-                const dateKey = formatDateKey(date);
-                const radioId = `${dateKey}_${hora}`;
-                const isPast = isPastDate(date) || isBeforeSiteStart(date);
-                const isReserved = reservas[radioId] !== undefined;
-                const isSelected = selectedSlot && selectedSlot.dateKey === dateKey && selectedSlot.time === hora;
-                const isToday = isSameDate(date, today);
-
-                let tdClass = '';
-                if (isPast) tdClass += 'past ';
-                if (isReserved) tdClass += 'reserved ';
-                if (isSelected) tdClass += 'selected ';
-                if (isToday) tdClass += 'today-column ';
-
-                html += `<td class="${tdClass}">`;
-                if (isPast) {
-                    html += `<span class="past-text">—</span>`;
-                } else if (isReserved) {
-                    html += `<span class="reserved-cross"></span>`;
-                } else {
-                    const checked = isSelected ? 'checked' : '';
-                    html += `<input type="radio" class="slot-radio" name="slot" id="${radioId}" 
-                                   data-date="${dateKey}" data-time="${hora}" ${checked}>`;
-                }
-                html += '</td>';
-            }
-            html += '</tr>';
-            return html;
-        }
-
-        function attachRadioEvents() {
-            document.querySelectorAll('input[name="slot"]').forEach(radio => {
-                radio.removeEventListener('change', handleRadioChange);
-                radio.addEventListener('change', handleRadioChange);
-            });
-        }
-
-        function handleRadioChange(e) {
-            const radio = e.target;
-            if (radio.checked) {
-                const dateKey = radio.getAttribute('data-date');
-                const time = radio.getAttribute('data-time');
-                if (selectedSlot) {
-                    const prevId = `${selectedSlot.dateKey}_${selectedSlot.time}`;
-                    const prevRadio = document.getElementById(prevId);
-                    if (prevRadio) {
-                        prevRadio.checked = false;
-                        const parentTd = prevRadio.closest('td');
-                        if (parentTd) parentTd.classList.remove('selected');
+            function getCookie(name) {
+                const nameEQ = name + "=";
+                const ca = document.cookie.split(';');
+                for (let i = 0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) === 0) {
+                        return decodeURIComponent(c.substring(nameEQ.length, c.length));
                     }
                 }
-                selectedSlot = { dateKey, time };
-                const parentTd = radio.closest('td');
-                if (parentTd) parentTd.classList.add('selected');
-                updateSubmitButton();
-                messageDiv.classList.remove('show');
-            }
-        }
-
-        function updateSubmitButton() {
-            if (selectedSlot) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '✦ Confirmar';
-            } else {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Selecciona';
-            }
-        }
-
-        // ============================================================
-        // NAVEGACIÓN
-        // ============================================================
-        function goToWeek(weeksOffset) {
-            const newWeek = addWeeks(currentWeekStart, weeksOffset);
-            currentWeekStart = newWeek;
-            selectedSlot = null;
-            renderTable(currentWeekStart);
-            messageDiv.classList.remove('show');
-            if (tableWrapper) tableWrapper.scrollLeft = 0;
-            setTimeout(updateScrollButtons, 200);
-        }
-
-        function goToToday() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            currentWeekStart = getWeekStart(today);
-            selectedSlot = null;
-            renderTable(currentWeekStart);
-            messageDiv.classList.remove('show');
-            if (tableWrapper) tableWrapper.scrollLeft = 0;
-            setTimeout(updateScrollButtons, 200);
-        }
-
-        function mostrarMensaje(texto, tipo = 'success') {
-            messageDiv.textContent = texto;
-            messageDiv.className = 'message show';
-            messageDiv.classList.add(tipo === 'error' ? 'error' : 'success');
-        }
-
-        // ============================================================
-        // ENVÍO DEL FORMULARIO
-        // ============================================================
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            if (!selectedSlot) {
-                mostrarMensaje('⚠️ Debes seleccionar un horario.', 'error');
-                return;
-            }
-            if (isLoading) {
-                mostrarMensaje('⏳ Espera...', 'error');
-                return;
+                return null;
             }
 
-            const nombre = document.getElementById('nombre').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const telefono = document.getElementById('telefono').value.trim();
-
-            if (!nombre || nombre.length < 2) {
-                mostrarMensaje('⚠️ Ingresa un nombre válido.', 'error');
-                return;
-            }
-            if (!email || !email.includes('@') || !email.includes('.')) {
-                mostrarMensaje('⚠️ Ingresa un correo válido.', 'error');
-                return;
+            function deleteCookie(name) {
+                document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             }
 
-            const slotId = `${selectedSlot.dateKey}_${selectedSlot.time}`;
-            if (reservas[slotId]) {
-                mostrarMensaje('⚠️ Este horario ya fue reservado.', 'error');
-                selectedSlot = null;
-                await cargarReservasDesdeAPI();
-                renderTable(currentWeekStart);
-                return;
-            }
+            // ---------- Guardar datos en cookies ----------
+            function saveFormDataToCookies() {
+                const nombre = nombreInput.value.trim();
+                const email = emailInput.value.trim();
+                const telefono = telefonoInput.value.trim();
+                const selected = document.querySelector('input[name="slot"]:checked');
 
-            mostrarLoading(true);
-            const result = await guardarReservaEnAPI(
-                selectedSlot.dateKey,
-                selectedSlot.time,
-                nombre,
-                email,
-                telefono
-            );
+                if (nombre) setCookie('reserva_nombre', nombre, COOKIE_EXPIRY_DAYS);
+                else deleteCookie('reserva_nombre');
+                
+                if (email) setCookie('reserva_email', email, COOKIE_EXPIRY_DAYS);
+                else deleteCookie('reserva_email');
+                
+                if (telefono) setCookie('reserva_telefono', telefono, COOKIE_EXPIRY_DAYS);
+                else deleteCookie('reserva_telefono');
 
-            if (result.success) {
-                reservas[slotId] = { nombre, email, telefono };
-                saveToCookies();
-                await cargarReservasDesdeAPI();
-
-                const [year, month, day] = selectedSlot.dateKey.split('-');
-                const dateObj = new Date(year, month - 1, day);
-                const dateStr = formatDateFull(dateObj);
-
-                mostrarMensaje(`✦ ¡Reserva confirmada! ${nombre}, tu reserva para el ${dateStr} a las ${selectedSlot.time} ha sido registrada.`, 'success');
-
-                selectedSlot = null;
-                renderTable(currentWeekStart);
-            } else {
-                mostrarMensaje('⚠️ Error al guardar. Intenta de nuevo.', 'error');
-                await cargarReservasDesdeAPI();
-                renderTable(currentWeekStart);
-            }
-            mostrarLoading(false);
-        });
-
-        // ============================================================
-        // COOKIES
-        // ============================================================
-        function loadFromCookies() {
-            const savedData = getCookie('reservas_data');
-            if (savedData && savedData.user) {
-                document.getElementById('nombre').value = savedData.user.nombre || '';
-                document.getElementById('email').value = savedData.user.email || '';
-                document.getElementById('telefono').value = savedData.user.telefono || '';
-                return true;
-            }
-            return false;
-        }
-
-        function saveToCookies() {
-            if (!cookiesAccepted) return;
-            setCookie('reservas_data', {
-                user: {
-                    nombre: document.getElementById('nombre').value.trim(),
-                    email: document.getElementById('email').value.trim(),
-                    telefono: document.getElementById('telefono').value.trim()
+                if (selected) {
+                    setCookie('reserva_horario', selected.value, COOKIE_EXPIRY_DAYS);
+                    const allRadios = document.querySelectorAll('input[name="slot"]');
+                    allRadios.forEach(radio => {
+                        if (radio.value === selected.value) {
+                            radio.checked = true;
+                        }
+                    });
+                } else {
+                    deleteCookie('reserva_horario');
                 }
-            });
-        }
-
-        function autoSaveUserData() {
-            ['nombre', 'email', 'telefono'].forEach(id => {
-                document.getElementById(id).addEventListener('input', () => {
-                    if (cookiesAccepted) saveToCookies();
-                });
-            });
-        }
-
-        acceptBtn.addEventListener('click', function() {
-            cookiesAccepted = true;
-            cookieNotice.style.display = 'none';
-            saveToCookies();
-            autoSaveUserData();
-        });
-
-        // ============================================================
-        // INICIALIZAR
-        // ============================================================
-        async function init() {
-            const savedData = getCookie('reservas_data');
-            if (savedData) {
-                cookiesAccepted = true;
-                cookieNotice.style.display = 'none';
-                loadFromCookies();
-                autoSaveUserData();
             }
 
-            await cargarReservasDesdeAPI();
+            // ---------- Cargar datos desde cookies ----------
+            function loadFormDataFromCookies() {
+                const nombre = getCookie('reserva_nombre');
+                const email = getCookie('reserva_email');
+                const telefono = getCookie('reserva_telefono');
+                const horario = getCookie('reserva_horario');
 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            currentWeekStart = today < FECHA_INICIO ? getWeekStart(FECHA_INICIO) : getWeekStart(today);
-            renderTable(currentWeekStart);
-        }
+                if (nombre) nombreInput.value = nombre;
+                if (email) emailInput.value = email;
+                if (telefono) telefonoInput.value = telefono;
 
-        // ============================================================
-        // EVENTOS
-        // ============================================================
-        prevBtn.addEventListener('click', () => goToWeek(-1));
-        nextBtn.addEventListener('click', () => goToWeek(1));
-        todayBtn.addEventListener('click', goToToday);
+                if (horario) {
+                    setTimeout(() => {
+                        const radios = document.querySelectorAll('input[name="slot"]');
+                        radios.forEach(radio => {
+                            if (radio.value === horario) {
+                                radio.checked = true;
+                                updateFeedback();
+                            }
+                        });
+                    }, 50);
+                }
+            }
 
-        init();
+            // ---------- Funciones del calendario ----------
+            function getToday() {
+                const now = new Date();
+                return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            }
 
-    })();
-</script>
+            function getMonday(date) {
+                const d = new Date(date);
+                const day = d.getDay();
+                const diff = (day === 0 ? 6 : day - 1);
+                d.setDate(d.getDate() - diff);
+                d.setHours(0, 0, 0, 0);
+                return d;
+            }
 
+            function formatDate(date) {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                return `${day}/${month}`;
+            }
+
+            function getMonthName(monthIndex) {
+                const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                ];
+                return months[monthIndex];
+            }
+
+            function getDateForWeekday(weekStart, weekdayIndex) {
+                const d = new Date(weekStart);
+                d.setDate(d.getDate() + weekdayIndex);
+                return d;
+            }
+
+            function isPastOrCurrentSlot(weekStart, weekdayIndex, hour) {
+                const slotDate = getDateForWeekday(weekStart, weekdayIndex);
+                slotDate.setHours(hour, 0, 0, 0);
+                const now = new Date();
+                return slotDate <= now;
+            }
+
+            function isToday(date) {
+                const today = getToday();
+                return date.getFullYear() === today.getFullYear() &&
+                    date.getMonth() === today.getMonth() &&
+                    date.getDate() === today.getDate();
+            }
+
+            // ---------- Renderizar tabla ----------
+            function renderTable() {
+                const today = getToday();
+
+                let headerHtml = '<th>Hora</th>';
+                for (let i = 0; i < daysOfWeek.length; i++) {
+                    const date = getDateForWeekday(currentWeekStart, i);
+                    const dayLabel = daysOfWeek[i];
+                    const dateStr = formatDate(date);
+                    const isTodayClass = isToday(date) ? 'today-header' : '';
+                    headerHtml += `<th class="${isTodayClass}">${dayLabel} ${dateStr}</th>`;
+                }
+                headerRow.innerHTML = headerHtml;
+
+                let bodyHtml = '';
+
+                morningHours.forEach(hour => {
+                    bodyHtml += `<tr><td class="time-slot"><i class="far fa-clock"></i> ${hour}:00</td>`;
+                    for (let i = 0; i < daysOfWeek.length; i++) {
+                        const date = getDateForWeekday(currentWeekStart, i);
+                        const dateStr = formatDate(date);
+                        const dayLabel = daysOfWeek[i];
+                        const value = `${dayLabel} ${dateStr} ${hour}:00`;
+                        const isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, hour);
+                        const disabled = isPastOrCurrent ? 'disabled' : '';
+                        
+                        let cellClass = '';
+                        if (isToday(date)) {
+                            cellClass = 'today-cell';
+                        } else if (!isPastOrCurrent) {
+                            cellClass = 'available-cell';
+                        } else {
+                            cellClass = 'disabled-cell';
+                        }
+                        
+                        bodyHtml +=
+                            `<td class="${cellClass}"><div class="slot-cell"><input type="radio" name="slot" value="${value}" ${disabled}></div></td>`;
+                    }
+                    bodyHtml += `</tr>`;
+                });
+
+                bodyHtml += `<tr class="afternoon-row">`;
+                for (let i = 0; i <= 6; i++) {
+                    const date = getDateForWeekday(currentWeekStart, i);
+                    const isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, 16);
+                    
+                    let cellClass = '';
+                    if (isToday(date)) {
+                        cellClass = 'today-cell';
+                    } else if (!isPastOrCurrent) {
+                        cellClass = 'available-cell';
+                    } else {
+                        cellClass = 'disabled-cell';
+                    }
+                    
+                    if (i === 0) {
+                        bodyHtml += `<td class="${cellClass}" style="text-align: center; letter-spacing: 2px; font-weight: 600; color: #b0b0b0;">
+                            <i class="fas fa-sun" style="margin-right: 8px; color: #777777;"></i> TARDE
+                        </td>`;
+                    } else {
+                        bodyHtml += `<td class="${cellClass}"></td>`;
+                    }
+                }
+                bodyHtml += `</tr>`;
+
+                afternoonHours.forEach(hour => {
+                    bodyHtml += `<tr><td class="time-slot"><i class="far fa-clock"></i> ${hour}:00</td>`;
+                    for (let i = 0; i < daysOfWeek.length; i++) {
+                        const date = getDateForWeekday(currentWeekStart, i);
+                        const dateStr = formatDate(date);
+                        const dayLabel = daysOfWeek[i];
+                        const value = `${dayLabel} ${dateStr} ${hour}:00`;
+                        const isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, hour);
+                        const disabled = isPastOrCurrent ? 'disabled' : '';
+                        
+                        let cellClass = '';
+                        if (isToday(date)) {
+                            cellClass = 'today-cell';
+                        } else if (!isPastOrCurrent) {
+                            cellClass = 'available-cell';
+                        } else {
+                            cellClass = 'disabled-cell';
+                        }
+                        
+                        bodyHtml +=
+                            `<td class="${cellClass}"><div class="slot-cell"><input type="radio" name="slot" value="${value}" ${disabled}></div></td>`;
+                    }
+                    bodyHtml += `</tr>`;
+                });
+
+                tbody.innerHTML = bodyHtml;
+
+                const monthName = getMonthName(currentWeekStart.getMonth());
+                const year = currentWeekStart.getFullYear();
+                weekLabel.textContent = `${monthName} ${year}`;
+
+                const radios = document.querySelectorAll('input[name="slot"]');
+                radios.forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        updateFeedback();
+                        saveFormDataToCookies();
+                    });
+                });
+
+                const horarioGuardado = getCookie('reserva_horario');
+                if (horarioGuardado) {
+                    radios.forEach(radio => {
+                        if (radio.value === horarioGuardado && !radio.disabled) {
+                            radio.checked = true;
+                        }
+                    });
+                }
+
+                updateFeedback();
+            }
+
+            // ---------- Feedback de selección ----------
+            function updateFeedback() {
+                const checked = document.querySelector('input[name="slot"]:checked');
+                if (checked) {
+                    feedback.classList.remove('hidden');
+                    selectedSlotText.textContent = checked.value;
+                } else {
+                    feedback.classList.add('hidden');
+                }
+            }
+
+            // ---------- Eventos ----------
+            nombreInput.addEventListener('input', saveFormDataToCookies);
+            emailInput.addEventListener('input', saveFormDataToCookies);
+            telefonoInput.addEventListener('input', saveFormDataToCookies);
+
+            document.getElementById('prevWeekBtn').addEventListener('click', function() {
+                currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+                renderTable();
+                feedback.classList.add('hidden');
+            });
+
+            document.getElementById('nextWeekBtn').addEventListener('click', function() {
+                currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+                renderTable();
+                feedback.classList.add('hidden');
+            });
+
+            document.getElementById('acceptCookiesBtn').addEventListener('click', function() {
+                setCookie('cookies_aceptadas', 'true', 365);
+                document.getElementById('cookieNotice').style.display = 'none';
+                saveFormDataToCookies();
+                alert('✅ Cookies aceptadas. Tus datos se guardarán automáticamente.');
+            });
+
+            document.getElementById('clearCookiesBtn').addEventListener('click', function() {
+                const cookies = ['reserva_nombre', 'reserva_email', 'reserva_telefono', 'reserva_horario', 'cookies_aceptadas'];
+                cookies.forEach(name => deleteCookie(name));
+                
+                nombreInput.value = '';
+                emailInput.value = '';
+                telefonoInput.value = '';
+                
+                const radios = document.querySelectorAll('input[name="slot"]');
+                radios.forEach(radio => radio.checked = false);
+                feedback.classList.add('hidden');
+                
+                alert('🗑️ Cookies eliminadas. Los datos han sido borrados.');
+            });
+
+            document.getElementById('reservationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const nombre = nombreInput.value.trim();
+                const email = emailInput.value.trim();
+                const telefono = telefonoInput.value.trim();
+                const selected = document.querySelector('input[name="slot"]:checked');
+
+                if (!nombre || !email || !telefono) {
+                    alert('Por favor, completa todos los campos del formulario.');
+                    return;
+                }
+
+                if (!selected) {
+                    alert('Por favor, selecciona un día y hora válido (futuro) en la tabla.');
+                    return;
+                }
+
+                saveFormDataToCookies();
+
+                alert(`✅ Reserva confirmada (simulada)\n\n📅 Horario: ${selected.value}\n👤 Nombre: ${nombre}\n📧 Email: ${email}\n📞 Teléfono: ${telefono}\n\n(Gracias por usar el formulario)`);
+            });
+
+            // ---------- Inicializar ----------
+            loadFormDataFromCookies();
+            renderTable();
+
+            if (getCookie('cookies_aceptadas') === 'true') {
+                document.getElementById('cookieNotice').style.display = 'none';
+            }
+
+        })();
+    </script>
 </body>
 </html>
