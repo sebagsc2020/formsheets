@@ -3,54 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva</title>
+    <title>Reserva tu Horario</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ... (todos los estilos iguales que antes, no los repito por espacio) ... */
-        /* Usa los mismos estilos que ya tenías */
+        /* ... (tus estilos) ... */
+        /* Mantén todos tus estilos actuales */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
         }
-
-        body {
-            background: #1a1a1a;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem 1rem;
-        }
-
-        .card {
-            max-width: 900px;
-            width: 100%;
-            background: #2a2a2a;
-            border-radius: 32px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 8px 20px rgba(0, 0, 0, 0.4);
-            padding: 2rem 2rem 2.5rem;
-            transition: all 0.2s;
-            border: 1px solid #3a3a3a;
-        }
-
         /* ... resto de estilos ... */
-        /* (mantén tus estilos actuales) */
+        td.reserved-cell {
+            background: #3a2a2a !important;
+            opacity: 0.8 !important;
+            position: relative;
+        }
+        td.reserved-cell::after {
+            content: '✕';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff6b6b;
+            font-size: 0.8rem;
+            font-weight: bold;
+            opacity: 0.6;
+        }
+        td.reserved-cell .slot-cell input[type="radio"] {
+            opacity: 0.2;
+            cursor: not-allowed !important;
+            border-color: #3a3a3a;
+            background: #1a1a1a;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
-    <!-- ... (mismo HTML que antes) ... -->
-    
+    <!-- ... (tu HTML) ... -->
+
     <script>
         (function() {
             // ---------- CONFIGURACIÓN ----------
-            // ⚠️ REEMPLAZA ESTA URL CON LA NUEVA URL DE TU APLICACIÓN WEB
-            const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwV-dgJmL_L3Ov878UoBrA0zH5IBGpFgim3M66U2Tv9ctWAlPeUrX7Tx0m_H0_0Q4w0XA/exec';
+            // ⚠️ REEMPLAZA CON LA URL DE TU APLICACIÓN WEB
+            const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxIcCsnFieVmMzGZecvxMQ8whlflZ7oCCno2hPzlBhdQ2AjePZNTKQ15J0OkEutscmjow/exec';
             
-            // ... (resto de variables y funciones iguales) ...
-            
+            const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            const morningHours = [9, 10, 11, 12];
+            const afternoonHours = [16, 17, 18, 19, 20];
+            const COOKIE_EXPIRY_DAYS = 30;
+            const WHATSAPP_NUMBER = '5493518692251';
+
+            let currentWeekStart = getMonday(new Date());
+
+            // Elementos DOM
+            const tbody = document.getElementById('tablaHorarios');
+            const headerRow = document.getElementById('headerRow');
+            const weekLabel = document.getElementById('weekLabel');
+            const infoText = document.getElementById('infoText');
+            const selectedDisplay = document.getElementById('selectedDisplay');
+            const selectedText = document.getElementById('selectedText');
+            const nombreInput = document.getElementById('nombre');
+            const emailInput = document.getElementById('email');
+            const telefonoInput = document.getElementById('telefono');
+            const submitBtn = document.getElementById('submitBtn');
+            const popupOverlay = document.getElementById('popupOverlay');
+            const popupDetails = document.getElementById('popupDetails');
+            const popupCloseBtn = document.getElementById('popupCloseBtn');
+
+            // ---------- FUNCIONES DE COOKIES ----------
+            function setCookie(name, value, days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                const expires = "expires=" + date.toUTCString();
+                document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/";
+            }
+
+            function getCookie(name) {
+                const nameEQ = name + "=";
+                const ca = document.cookie.split(';');
+                for (let i = 0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) === 0) {
+                        return decodeURIComponent(c.substring(nameEQ.length, c.length));
+                    }
+                }
+                return null;
+            }
+
+            function deleteCookie(name) {
+                document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            }
+
+            // ---------- GUARDAR EN GOOGLE SHEETS ----------
+            async function saveToGoogleSheets(data) {
+                try {
+                    const response = await fetch(GOOGLE_SHEETS_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    const result = await response.json();
+                    return result;
+                } catch (error) {
+                    console.error('Error al guardar:', error);
+                    return { success: false, error: error.message };
+                }
+            }
+
             // ---------- CARGAR RESERVAS DESDE GOOGLE SHEETS ----------
             async function loadReservationsFromSheets() {
                 try {
@@ -81,31 +147,179 @@
 
             // ---------- ACTUALIZAR TABLA CON RESERVAS ----------
             function updateTableWithReservations(reservas) {
-                // Crear un Set con los horarios reservados para búsqueda rápida
                 const reservados = new Set();
                 reservas.forEach(r => {
-                    // Formato: "Lun 03 10:00" o "Jue 06 10:00"
                     const clave = `${r.fecha} ${r.hora}`;
                     reservados.add(clave);
                 });
                 
-                // Recorrer todos los radios y deshabilitar los reservados
                 const radios = document.querySelectorAll('input[name="slot"]');
                 radios.forEach(radio => {
                     const valor = radio.value;
                     if (reservados.has(valor)) {
                         radio.disabled = true;
-                        // Marcar visualmente como reservado
                         const cell = radio.closest('td');
                         if (cell) {
-                            cell.classList.remove('available-cell');
+                            cell.classList.remove('available-cell', 'today-cell');
                             cell.classList.add('reserved-cell');
                         }
                     }
                 });
             }
 
-            // ---------- RENDERIZAR TABLA (MODIFICADA) ----------
+            // ---------- GUARDAR DATOS EN COOKIES ----------
+            function saveFormDataToCookies() {
+                const nombre = nombreInput.value.trim();
+                const email = emailInput.value.trim();
+                const telefono = telefonoInput.value.trim();
+                const selected = document.querySelector('input[name="slot"]:checked');
+
+                if (nombre) setCookie('reserva_nombre', nombre, COOKIE_EXPIRY_DAYS);
+                else deleteCookie('reserva_nombre');
+                
+                if (email) setCookie('reserva_email', email, COOKIE_EXPIRY_DAYS);
+                else deleteCookie('reserva_email');
+                
+                if (telefono) setCookie('reserva_telefono', telefono, COOKIE_EXPIRY_DAYS);
+                else deleteCookie('reserva_telefono');
+
+                if (selected) {
+                    setCookie('reserva_horario', selected.value, COOKIE_EXPIRY_DAYS);
+                } else {
+                    deleteCookie('reserva_horario');
+                }
+            }
+
+            // ---------- CARGAR DATOS DESDE COOKIES ----------
+            function loadFormDataFromCookies() {
+                const nombre = getCookie('reserva_nombre');
+                const email = getCookie('reserva_email');
+                const telefono = getCookie('reserva_telefono');
+                const horario = getCookie('reserva_horario');
+
+                if (nombre) nombreInput.value = nombre;
+                if (email) emailInput.value = email;
+                if (telefono) telefonoInput.value = telefono;
+
+                if (horario) {
+                    setTimeout(() => {
+                        const radios = document.querySelectorAll('input[name="slot"]');
+                        radios.forEach(radio => {
+                            if (radio.value === horario && !radio.disabled) {
+                                radio.checked = true;
+                                updateFeedback();
+                            }
+                        });
+                    }, 100);
+                }
+            }
+
+            // ---------- FUNCIONES DEL CALENDARIO ----------
+            function getToday() {
+                const now = new Date();
+                return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            }
+
+            function getMonday(date) {
+                const d = new Date(date);
+                const day = d.getDay();
+                const diff = (day === 0 ? 6 : day - 1);
+                d.setDate(d.getDate() - diff);
+                d.setHours(0, 0, 0, 0);
+                return d;
+            }
+
+            function formatDate(date) {
+                const day = String(date.getDate()).padStart(2, '0');
+                return day;
+            }
+
+            function getMonthName(monthIndex) {
+                const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                ];
+                return months[monthIndex];
+            }
+
+            function getDateForWeekday(weekStart, weekdayIndex) {
+                const d = new Date(weekStart);
+                d.setDate(d.getDate() + weekdayIndex);
+                return d;
+            }
+
+            function isPastOrCurrentSlot(weekStart, weekdayIndex, hour) {
+                const slotDate = getDateForWeekday(weekStart, weekdayIndex);
+                slotDate.setHours(hour, 0, 0, 0);
+                const now = new Date();
+                return slotDate <= now;
+            }
+
+            function isToday(date) {
+                const today = getToday();
+                return date.getFullYear() === today.getFullYear() &&
+                    date.getMonth() === today.getMonth() &&
+                    date.getDate() === today.getDate();
+            }
+
+            // ---------- ACTUALIZAR FEEDBACK VISUAL ----------
+            function updateFeedback() {
+                const checked = document.querySelector('input[name="slot"]:checked');
+                if (checked && !checked.disabled) {
+                    infoText.style.display = 'none';
+                    selectedDisplay.classList.add('show');
+                    selectedText.textContent = checked.value;
+                } else {
+                    infoText.style.display = 'inline';
+                    selectedDisplay.classList.remove('show');
+                }
+            }
+
+            // ---------- MOSTRAR POPUP DE CONFIRMACIÓN ----------
+            function showConfirmationPopup(nombre, email, telefono, horario) {
+                popupDetails.innerHTML = '';
+                
+                const fields = [
+                    { label: 'Nombre', value: nombre },
+                    { label: 'Email', value: email },
+                    { label: 'Teléfono', value: telefono },
+                    { label: 'Horario', value: horario }
+                ];
+                
+                fields.forEach(field => {
+                    const row = document.createElement('div');
+                    row.className = 'detail-row';
+                    row.innerHTML = `
+                        <span class="label">${field.label}</span>
+                        <span class="value">${field.value || '—'}</span>
+                    `;
+                    popupDetails.appendChild(row);
+                });
+                
+                popupOverlay.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+
+            // ---------- CERRAR POPUP ----------
+            function closePopup() {
+                popupOverlay.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+
+            // ---------- ENVIAR MENSAJE POR WHATSAPP ----------
+            function sendWhatsAppMessage(nombre, email, telefono, horario) {
+                const message = `📋 *NUEVA RESERVA*\n\n` +
+                    `👤 *Nombre:* ${nombre}\n` +
+                    `📧 *Email:* ${email}\n` +
+                    `📞 *Teléfono:* ${telefono}\n` +
+                    `📅 *Horario:* ${horario}\n\n` +
+                    `📍 *Reserva confirmada*`;
+                
+                const encodedMessage = encodeURIComponent(message);
+                const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+                window.open(url, '_blank');
+            }
+
+            // ---------- RENDERIZAR TABLA ----------
             async function renderTable() {
                 const today = getToday();
 
@@ -129,9 +343,6 @@
                         const dayLabel = daysOfWeek[i];
                         const value = `${dayLabel} ${dayNumber} ${hour}:00`;
                         const isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, hour);
-                        
-                        // Inicialmente, solo deshabilitamos por hora pasada
-                        // Las reservas se aplicarán después con updateTableWithReservations
                         const disabled = isPastOrCurrent ? 'disabled' : '';
                         
                         let cellClass = '';
@@ -181,7 +392,6 @@
                         const dayLabel = daysOfWeek[i];
                         const value = `${dayLabel} ${dayNumber} ${hour}:00`;
                         const isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, hour);
-                        
                         const disabled = isPastOrCurrent ? 'disabled' : '';
                         
                         let cellClass = '';
@@ -205,37 +415,13 @@
                 const year = currentWeekStart.getFullYear();
                 weekLabel.textContent = `${monthName} ${year}`;
 
-                // Agregar estilos para celdas reservadas
-                const style = document.createElement('style');
-                style.textContent = `
-                    td.reserved-cell {
-                        background: #3a2a2a !important;
-                        opacity: 0.7 !important;
-                        position: relative;
-                    }
-                    td.reserved-cell::after {
-                        content: '✕';
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        color: #ff6b6b;
-                        font-size: 0.8rem;
-                        font-weight: bold;
-                        opacity: 0.6;
-                    }
-                    td.reserved-cell .slot-cell input[type="radio"] {
-                        opacity: 0.3;
-                        cursor: not-allowed;
-                        border-color: #3a3a3a;
-                        background: #1a1a1a;
-                    }
-                `;
-                document.head.appendChild(style);
-
                 // Cargar reservas desde Google Sheets y actualizar tabla
-                const reservas = await loadReservationsFromSheets();
-                updateTableWithReservations(reservas);
+                try {
+                    const reservas = await loadReservationsFromSheets();
+                    updateTableWithReservations(reservas);
+                } catch (error) {
+                    console.error('Error al cargar reservas:', error);
+                }
 
                 // Reasignar eventos a los radios
                 const radios = document.querySelectorAll('input[name="slot"]');
@@ -258,7 +444,115 @@
                 updateFeedback();
             }
 
-            // ... (resto del código igual) ...
+            // ---------- EVENTOS ----------
+            nombreInput.addEventListener('input', saveFormDataToCookies);
+            emailInput.addEventListener('input', saveFormDataToCookies);
+            telefonoInput.addEventListener('input', saveFormDataToCookies);
+
+            document.getElementById('prevWeekBtn').addEventListener('click', function() {
+                currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+                renderTable();
+            });
+
+            document.getElementById('nextWeekBtn').addEventListener('click', function() {
+                currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+                renderTable();
+            });
+
+            document.getElementById('acceptCookiesBtn').addEventListener('click', function() {
+                setCookie('cookies_aceptadas', 'true', 365);
+                document.getElementById('cookieNotice').style.display = 'none';
+                saveFormDataToCookies();
+                alert('✅ Cookies aceptadas. Tus datos se guardarán automáticamente.');
+            });
+
+            document.getElementById('clearCookiesBtn').addEventListener('click', function() {
+                const cookies = ['reserva_nombre', 'reserva_email', 'reserva_telefono', 'reserva_horario', 'cookies_aceptadas'];
+                cookies.forEach(name => deleteCookie(name));
+                
+                nombreInput.value = '';
+                emailInput.value = '';
+                telefonoInput.value = '';
+                
+                const radios = document.querySelectorAll('input[name="slot"]');
+                radios.forEach(radio => radio.checked = false);
+                updateFeedback();
+                
+                alert('🗑️ Cookies eliminadas. Los datos han sido borrados.');
+            });
+
+            popupCloseBtn.addEventListener('click', closePopup);
+
+            popupOverlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closePopup();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && popupOverlay.classList.contains('show')) {
+                    closePopup();
+                }
+            });
+
+            // ---------- SUBMIT DEL FORMULARIO ----------
+            document.getElementById('reservationForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const nombre = nombreInput.value.trim();
+                const email = emailInput.value.trim();
+                const telefono = telefonoInput.value.trim();
+                const selected = document.querySelector('input[name="slot"]:checked');
+
+                if (!nombre || !email || !telefono) {
+                    alert('⚠️ Por favor, completa todos los campos del formulario.');
+                    nombreInput.focus();
+                    return;
+                }
+
+                if (!selected) {
+                    alert('⚠️ Por favor, selecciona un día y hora válido (futuro) en la tabla.');
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+                try {
+                    const parts = selected.value.split(' ');
+                    const fecha = parts[0] + ' ' + parts[1];
+                    const hora = parts[2];
+                    
+                    const data = {
+                        fecha: fecha,
+                        hora: hora,
+                        nombre: nombre,
+                        email: email,
+                        telefono: telefono
+                    };
+
+                    const result = await saveToGoogleSheets(data);
+                    
+                    if (result.success) {
+                        saveFormDataToCookies();
+                        sendWhatsAppMessage(nombre, email, telefono, selected.value);
+                        showConfirmationPopup(nombre, email, telefono, selected.value);
+                        // Recargar la tabla para actualizar reservas
+                        setTimeout(() => {
+                            renderTable();
+                        }, 2000);
+                    } else {
+                        alert('❌ Error al guardar la reserva: ' + (result.error || 'Intenta nuevamente.'));
+                    }
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('❌ Ocurrió un error al procesar la reserva. Por favor, intenta nuevamente.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Reservar';
+                }
+            });
 
             // ---------- INICIALIZAR ----------
             loadFormDataFromCookies();
