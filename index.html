@@ -770,7 +770,6 @@
 
     <div id="message" class="message"></div>
 
-    <!-- Panel de depuración -->
     <div class="debug-panel" id="debugPanel">
         <div id="debugContent"></div>
     </div>
@@ -781,7 +780,7 @@
         // ============================================================
         // 🔴 REEMPLAZA CON TU URL DE APPS SCRIPT 🔴
         // ============================================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxIIJB3Ul_ybsD5WtiS5TWvzg7tCBUMCroBWFkWNjXkghPS8OmLt7GEHDZs5XXd26Kj7Q/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwlGjEvj6r_U8drvrlIlrCmI8A_VgqEA5BSv7ZX3xEBN6-YNtn-dQNFZ0Z0z00LRk1rBw/exec';
         
         // ============================================================
         // CONFIGURACIÓN
@@ -818,6 +817,40 @@
         const scrollRight = document.getElementById('scrollRight');
         const debugPanel = document.getElementById('debugPanel');
         const debugContent = document.getElementById('debugContent');
+
+        // ============================================================
+        // FUNCIONES PARA FORMATEAR FECHA Y HORA
+        // ============================================================
+        function parseDateFromAPI(dateStr) {
+            if (!dateStr) return '';
+            // Si ya está en formato YYYY-MM-DD, devolverlo
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+            
+            // Intentar parsear como Date
+            const date = new Date(dateStr);
+            if (!isNaN(date.getTime())) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+            return dateStr;
+        }
+
+        function parseTimeFromAPI(timeStr) {
+            if (!timeStr) return '';
+            // Si ya está en formato HH:MM, devolverlo
+            if (/^\d{1,2}:\d{2}$/.test(timeStr)) return timeStr;
+            
+            // Intentar parsear como Date
+            const date = new Date(timeStr);
+            if (!isNaN(date.getTime())) {
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${parseInt(hours)}:${minutes}`;
+            }
+            return timeStr;
+        }
 
         // ============================================================
         // DEPURACIÓN
@@ -979,15 +1012,24 @@
                 if (data.success) {
                     reservas = {};
                     data.reservas.forEach(r => {
-                        const fecha = String(r.fecha).trim();
-                        const hora = String(r.hora).trim();
+                        // 🔴 AQUÍ ESTÁ LA MAGIA - Formateamos fecha y hora
+                        const fechaRaw = String(r.fecha || '').trim();
+                        const horaRaw = String(r.hora || '').trim();
+                        
+                        const fecha = parseDateFromAPI(fechaRaw);
+                        const hora = parseTimeFromAPI(horaRaw);
+                        
                         const key = `${fecha}_${hora}`;
-                        reservas[key] = {
-                            nombre: r.nombre || '',
-                            email: r.email || '',
-                            telefono: r.telefono || ''
-                        };
-                        addDebug(`📌 ${key} → ${r.nombre}`, 'success');
+                        if (fecha && hora) {
+                            reservas[key] = {
+                                nombre: r.nombre || '',
+                                email: r.email || '',
+                                telefono: r.telefono || ''
+                            };
+                            addDebug(`📌 ${key} → ${r.nombre}`, 'success');
+                        } else {
+                            addDebug(`⚠️ Skip: fecha=${fechaRaw}, hora=${horaRaw}`, 'warning');
+                        }
                     });
                     addDebug(`📊 Total: ${Object.keys(reservas).length} reservas`, 'success');
                     return true;
