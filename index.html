@@ -144,6 +144,7 @@
             background: #111;
             padding: 2px;
             scroll-behavior: smooth;
+            position: relative;
         }
         .table-wrapper::-webkit-scrollbar {
             height: 6px;
@@ -161,31 +162,49 @@
         }
         .schedule-table {
             width: 100%;
-            min-width: 380px;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             font-size: clamp(13px, 2.2vw, 18px);
             border-radius: 10px;
             overflow: hidden;
             table-layout: fixed;
         }
+
+        /* ===== COLUMNA HORA FIJA ===== */
+        .schedule-table .time-col {
+            font-weight: 600;
+            color: #999;
+            background: #141414;
+            width: 55px;
+            min-width: 55px;
+            max-width: 55px;
+            font-size: clamp(13px, 2vw, 17px);
+            border-right: 1px solid #2a2a2a;
+            position: sticky;
+            left: 0;
+            z-index: 20;
+            text-align: center;
+        }
+
+        /* ===== COLUMNAS DE DÍAS ===== */
         .schedule-table th {
             background: #111;
             color: #b0b0b0;
-            padding: 6px 0px;
+            padding: 6px 2px;
             font-weight: 600;
-            font-size: clamp(12px, 1.8vw, 17px);
+            font-size: clamp(13px, 2vw, 17px);
             border-bottom: 2px solid #2a2a2a;
             position: sticky;
             top: 0;
             z-index: 10;
             text-align: center;
-            width: 38px;
-            min-width: 30px;
-            max-width: 48px;
+            width: 14.285%;
+            min-width: 80px;
+            max-width: 120px;
         }
         .schedule-table th .day-date {
             display: block;
-            font-size: clamp(7px, 1vw, 11px);
+            font-size: clamp(10px, 1.4vw, 14px);
             font-weight: 400;
             opacity: 0.6;
             margin-top: 1px;
@@ -206,62 +225,62 @@
         .schedule-table th.today-header .today-badge {
             background: #d4a820;
             color: #1a1a1a;
-            font-size: 6px;
-            padding: 1px 4px;
-            border-radius: 4px;
+            font-size: 8px;
+            padding: 1px 6px;
+            border-radius: 6px;
             display: inline-block;
             margin-top: 1px;
             font-weight: 700;
             letter-spacing: 0.3px;
             box-shadow: 0 0 15px rgba(212, 168, 32, 0.12);
         }
+
         .schedule-table td {
-            padding: 5px 0px;
+            padding: 6px 2px;
             text-align: center;
             border-bottom: 1px solid #2a2a2a;
             background: #1a1a1a;
             transition: background 0.2s;
-            width: 38px;
-            min-width: 30px;
-            max-width: 48px;
+            width: 14.285%;
+            min-width: 80px;
+            max-width: 120px;
         }
         .schedule-table tr:last-child td {
             border-bottom: none;
         }
-        .schedule-table .time-col {
-            font-weight: 600;
-            color: #999;
-            background: #141414;
-            width: 40px;
-            min-width: 32px;
-            max-width: 50px;
-            font-size: clamp(12px, 1.8vw, 16px);
-            border-right: 1px solid #2a2a2a;
-            position: sticky;
-            left: 0;
-            z-index: 5;
-        }
+
+        /* ===== FILA SEPARADORA ===== */
         .schedule-table tr.separator-row td {
             background: #111;
             border-bottom: 3px solid #3a3220;
-            padding: 3px 0px;
-            height: 16px;
-            width: 38px;
-            min-width: 30px;
-            max-width: 48px;
+            padding: 4px 2px;
+            height: 18px;
+            width: 14.285%;
+            min-width: 80px;
+            max-width: 120px;
         }
         .schedule-table tr.separator-row td .separator-text {
-            font-size: clamp(7px, 1vw, 11px);
+            font-size: clamp(10px, 1.5vw, 14px);
             color: #8a7a4a;
             font-weight: 600;
-            letter-spacing: 0.2px;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
             background: #1a1610;
-            padding: 1px 4px;
-            border-radius: 4px;
+            padding: 2px 8px;
+            border-radius: 6px;
             display: inline-block;
             border: 1px solid #3a3220;
         }
+        /* Columna hora en separador */
+        .schedule-table tr.separator-row td.time-col {
+            background: #111;
+            border-bottom: 3px solid #3a3220;
+            font-size: clamp(11px, 1.6vw, 15px);
+            color: #8a7a4a;
+            font-weight: 600;
+        }
+
+        /* ===== DÍA ACTUAL ===== */
         .schedule-table td.today-column {
             background: #1f1a0e;
             position: relative;
@@ -289,8 +308,8 @@
         }
         .schedule-table td.today-column.reserved::after {
             content: '📌';
-            font-size: 9px;
-            margin-left: 1px;
+            font-size: 12px;
+            margin-left: 2px;
             opacity: 0.7;
         }
         .schedule-table td.today-column.selected {
@@ -305,9 +324,11 @@
             border-left: 2px solid #6a5a20;
             border-right: 2px solid #6a5a20;
         }
+
+        /* ===== CHECKBOXES ===== */
         .schedule-table input[type="radio"] {
-            width: clamp(14px, 2.5vw, 20px);
-            height: clamp(14px, 2.5vw, 20px);
+            width: clamp(18px, 3vw, 24px);
+            height: clamp(18px, 3vw, 24px);
             accent-color: #666;
             cursor: pointer;
             transition: transform 0.15s;
@@ -326,14 +347,15 @@
             cursor: not-allowed;
             opacity: 0.3;
         }
+
         .schedule-table td.reserved {
             background: #2a2a2a;
             position: relative;
         }
         .schedule-table td.reserved::after {
             content: '📌';
-            font-size: 9px;
-            margin-left: 1px;
+            font-size: 12px;
+            margin-left: 2px;
             opacity: 0.5;
         }
         .schedule-table td.past {
@@ -344,6 +366,8 @@
             background: #333;
             box-shadow: inset 0 0 0 2px #555;
         }
+
+        /* ===== FORMULARIO ===== */
         .reservation-form {
             background: #141414;
             padding: 12px 10px;
@@ -473,7 +497,7 @@
             border-color: #c8a020;
         }
 
-        /* Scroll indicators */
+        /* ===== SCROLL INDICATORS ===== */
         .scroll-indicators {
             display: none;
             justify-content: space-between;
@@ -507,7 +531,39 @@
             cursor: not-allowed;
         }
 
-        @media (max-width: 600px) {
+        /* ============================================================
+           RESPONSIVE - MÓVILES (3 días visibles)
+           ============================================================ */
+        @media (max-width: 768px) {
+            .schedule-table th {
+                min-width: 110px;
+                max-width: 150px;
+                font-size: clamp(15px, 2.5vw, 20px);
+            }
+            .schedule-table th .day-date {
+                font-size: clamp(12px, 1.8vw, 16px);
+            }
+            .schedule-table td {
+                min-width: 110px;
+                max-width: 150px;
+                padding: 8px 4px;
+            }
+            .schedule-table .time-col {
+                min-width: 60px;
+                max-width: 60px;
+                font-size: clamp(15px, 2.5vw, 20px);
+            }
+            .schedule-table tr.separator-row td {
+                min-width: 110px;
+                max-width: 150px;
+            }
+            .schedule-table tr.separator-row td .separator-text {
+                font-size: clamp(12px, 1.8vw, 16px);
+            }
+            .schedule-table input[type="radio"] {
+                width: clamp(22px, 3.5vw, 30px);
+                height: clamp(22px, 3.5vw, 30px);
+            }
             .scroll-indicators {
                 display: flex;
             }
@@ -519,14 +575,39 @@
             .week-nav-btn { padding: 6px 10px; font-size: 14px; }
             .today-btn { padding: 6px 10px; font-size: 13px; }
             .week-info { font-size: 14px; min-width: 60px; }
-            .schedule-table { min-width: 300px; font-size: 12px; }
-            .schedule-table th { padding: 4px 0px; font-size: 10px; width: 34px; min-width: 26px; max-width: 42px; }
-            .schedule-table th .day-date { font-size: 6px; }
-            .schedule-table td { padding: 4px 0px; width: 34px; min-width: 26px; max-width: 42px; }
-            .schedule-table .time-col { width: 34px; min-width: 26px; max-width: 42px; font-size: 10px; }
-            .schedule-table input[type="radio"] { width: 13px; height: 13px; }
-            .schedule-table tr.separator-row td { width: 34px; min-width: 26px; max-width: 42px; }
-            .schedule-table tr.separator-row td .separator-text { font-size: 6px; padding: 1px 3px; }
+
+            /* 3 días visibles en móvil */
+            .schedule-table th {
+                min-width: 100px;
+                max-width: 130px;
+                font-size: clamp(14px, 3vw, 18px);
+                padding: 6px 2px;
+            }
+            .schedule-table th .day-date {
+                font-size: clamp(11px, 2.2vw, 14px);
+            }
+            .schedule-table td {
+                min-width: 100px;
+                max-width: 130px;
+                padding: 6px 2px;
+            }
+            .schedule-table .time-col {
+                min-width: 55px;
+                max-width: 55px;
+                font-size: clamp(14px, 2.8vw, 18px);
+            }
+            .schedule-table tr.separator-row td {
+                min-width: 100px;
+                max-width: 130px;
+            }
+            .schedule-table tr.separator-row td .separator-text {
+                font-size: clamp(10px, 2vw, 14px);
+                padding: 2px 6px;
+            }
+            .schedule-table input[type="radio"] {
+                width: clamp(20px, 4vw, 28px);
+                height: clamp(20px, 4vw, 28px);
+            }
             .reservation-form { padding: 10px 8px; gap: 8px; }
             .form-group input { padding: 8px 12px; font-size: 14px; }
             .btn-reserve { padding: 10px 14px; font-size: 15px; }
@@ -537,14 +618,37 @@
         }
 
         @media (max-width: 380px) {
-            .schedule-table { min-width: 240px; font-size: 10px; }
-            .schedule-table th { padding: 3px 0px; font-size: 8px; width: 28px; min-width: 20px; max-width: 34px; }
-            .schedule-table th .day-date { font-size: 5px; }
-            .schedule-table td { padding: 3px 0px; width: 28px; min-width: 20px; max-width: 34px; }
-            .schedule-table .time-col { width: 28px; min-width: 20px; max-width: 34px; font-size: 8px; }
-            .schedule-table input[type="radio"] { width: 11px; height: 11px; }
-            .schedule-table tr.separator-row td { width: 28px; min-width: 20px; max-width: 34px; }
-            .schedule-table tr.separator-row td .separator-text { font-size: 5px; padding: 1px 2px; }
+            .schedule-table th {
+                min-width: 85px;
+                max-width: 110px;
+                font-size: clamp(12px, 2.8vw, 16px);
+                padding: 4px 1px;
+            }
+            .schedule-table th .day-date {
+                font-size: clamp(9px, 2vw, 12px);
+            }
+            .schedule-table td {
+                min-width: 85px;
+                max-width: 110px;
+                padding: 4px 1px;
+            }
+            .schedule-table .time-col {
+                min-width: 48px;
+                max-width: 48px;
+                font-size: clamp(12px, 2.5vw, 16px);
+            }
+            .schedule-table tr.separator-row td {
+                min-width: 85px;
+                max-width: 110px;
+            }
+            .schedule-table tr.separator-row td .separator-text {
+                font-size: clamp(8px, 1.8vw, 12px);
+                padding: 1px 4px;
+            }
+            .schedule-table input[type="radio"] {
+                width: clamp(16px, 3.5vw, 22px);
+                height: clamp(16px, 3.5vw, 22px);
+            }
             .week-nav-btn { padding: 4px 8px; font-size: 11px; }
             .today-btn { padding: 4px 8px; font-size: 11px; }
             .week-info { font-size: 11px; min-width: 50px; }
@@ -560,8 +664,9 @@
             .btn-reserve { width: auto; margin-left: auto; min-width: 130px; }
             .cookie-notice { flex-direction: row; justify-content: space-between; text-align: left; }
             .schedule-table { min-width: 100%; }
-            .schedule-table th { width: 50px; min-width: 40px; max-width: 60px; }
-            .schedule-table td { width: 50px; min-width: 40px; max-width: 60px; }
+            .schedule-table th { min-width: 90px; max-width: 140px; }
+            .schedule-table td { min-width: 90px; max-width: 140px; }
+            .schedule-table tr.separator-row td { min-width: 90px; max-width: 140px; }
             .scroll-indicators { display: none !important; }
         }
     </style>
@@ -851,7 +956,7 @@
             today.setHours(0, 0, 0, 0);
             
             // Encabezado
-            let theadHTML = '<tr><th>Hora</th>';
+            let theadHTML = '<tr><th class="time-col">Hora</th>';
             for (let i = 0; i < 6; i++) {
                 const date = getDateForDay(startDate, i);
                 const dayName = DIAS_SEMANA[i];
@@ -876,12 +981,12 @@
             
             // Separador
             tbodyHTML += `<tr class="separator-row">`;
-            tbodyHTML += `<td class="time-col" style="background:#111; text-align:center; font-size:clamp(7px,1vw,11px); color:#8a7a4a; font-weight:600;">⏰</td>`;
+            tbodyHTML += `<td class="time-col" style="background:#111; text-align:center;">⏰</td>`;
             for (let i = 0; i < 6; i++) {
                 const date = getDateForDay(startDate, i);
                 const isToday = isSameDate(date, today);
                 const todayClass = isToday ? 'today-column' : '';
-                tbodyHTML += `<td class="${todayClass}" style="background:#111; border-bottom: 3px solid #3a3220; text-align:center; font-size:clamp(6px,0.8vw,9px); color:#8a7a4a; font-weight:500; letter-spacing:0.2px;">
+                tbodyHTML += `<td class="${todayClass}" style="background:#111; border-bottom: 3px solid #3a3220; text-align:center;">
                     <span class="separator-text">Tarde</span>
                 </td>`;
             }
