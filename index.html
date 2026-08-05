@@ -461,32 +461,6 @@
             background: #2a2418;
             border-color: #c8a020;
         }
-        .debug-info {
-            background: #111;
-            border: 1px solid #2a2a2a;
-            border-radius: 8px;
-            padding: 10px 14px;
-            margin-top: 10px;
-            font-size: 11px;
-            color: #666;
-            max-height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
-            word-break: break-all;
-        }
-        .debug-info .debug-title {
-            color: #8a7a4a;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        .debug-info .debug-item {
-            padding: 2px 0;
-            border-bottom: 1px solid #1a1a1a;
-            color: #999;
-        }
-        .debug-info .debug-item .key {
-            color: #e8c84a;
-        }
         @media (max-width: 480px) {
             .container { padding: 10px 8px; border-radius: 12px; }
             .week-navigation { padding: 8px 10px; gap: 6px; }
@@ -504,7 +478,6 @@
             .form-group input { padding: 8px 12px; font-size: 14px; }
             .btn-reserve { padding: 10px 16px; font-size: 14px; }
             .message { padding: 10px 14px; font-size: 12px; }
-            .debug-info { font-size: 9px; max-height: 120px; }
         }
         @media (max-width: 380px) {
             .schedule-table { min-width: 400px; font-size: 9px; }
@@ -577,11 +550,6 @@
     </form>
 
     <div id="message" class="message"></div>
-
-    <div class="debug-info" id="debugInfo">
-        <div class="debug-title">🔍 DEPURACIÓN</div>
-        <div id="debugContent"></div>
-    </div>
 </div>
 
 <script>
@@ -621,17 +589,6 @@
         const cookieNotice = document.getElementById('cookieNotice');
         const acceptBtn = document.getElementById('acceptCookies');
         const loadingOverlay = document.getElementById('loadingOverlay');
-        const debugContent = document.getElementById('debugContent');
-
-        function actualizarDebug(mensaje, tipo = 'info') {
-            const colors = { info: '#999', success: '#4caf50', error: '#ff6b6b', warning: '#ffa726' };
-            const iconos = { info: 'ℹ️', success: '✅', error: '❌', warning: '⚠️' };
-            const html = `<div class="debug-item" style="color:${colors[tipo] || '#999'}">${iconos[tipo] || '•'} ${mensaje}</div>`;
-            debugContent.innerHTML += html;
-            debugContent.scrollTop = debugContent.scrollHeight;
-        }
-
-        function limpiarDebug() { debugContent.innerHTML = ''; }
 
         // ============================================================
         // UTILIDADES
@@ -708,31 +665,6 @@
         async function cargarReservasDesdeAPI() {
             try {
                 mostrarLoading(true);
-                limpiarDebug();
-                actualizarDebug('🔄 Cargando reservas desde Google Sheets...', 'info');
-                actualizarDebug(`📡 URL: ${API_URL}`, 'info');
-                
-                // Primero intentamos con fetch directo
-                const resultado = await cargarReservasConFetch();
-                
-                if (!resultado) {
-                    actualizarDebug('⚠️ Intentando método alternativo...', 'warning');
-                    await cargarReservasAlternativo();
-                }
-                
-                return true;
-                
-            } catch (error) {
-                actualizarDebug(`❌ Error: ${error.message}`, 'error');
-                return false;
-            } finally {
-                mostrarLoading(false);
-            }
-        }
-
-        async function cargarReservasConFetch() {
-            try {
-                actualizarDebug('🔄 Intentando con fetch directo...', 'info');
                 const response = await fetch(API_URL + '?t=' + Date.now());
                 
                 if (!response.ok) {
@@ -744,7 +676,6 @@
                 if (data.success) {
                     reservas = {};
                     data.reservas.forEach(r => {
-                        // Limpiar fecha y hora
                         const fecha = String(r.fecha).trim();
                         const hora = String(r.hora).trim();
                         const key = `${fecha}_${hora}`;
@@ -753,90 +684,30 @@
                             email: r.email || '',
                             telefono: r.telefono || ''
                         };
-                        actualizarDebug(`📌 ${key} → ${r.nombre}`, 'success');
                     });
-                    actualizarDebug(`📊 Total de reservas cargadas: ${Object.keys(reservas).length}`, 'success');
-                    return true;
-                } else {
-                    actualizarDebug(`❌ Error: ${data.error || 'Error desconocido'}`, 'error');
-                    return false;
                 }
+                return true;
+                
             } catch (error) {
-                actualizarDebug(`❌ Fetch falló: ${error.message}`, 'error');
+                console.error('Error cargando reservas:', error);
                 return false;
+            } finally {
+                mostrarLoading(false);
             }
-        }
-
-        function cargarReservasAlternativo() {
-            return new Promise((resolve) => {
-                const script = document.createElement('script');
-                const callbackName = 'callback_' + Date.now();
-                
-                window[callbackName] = function(data) {
-                    try {
-                        if (data.success) {
-                            reservas = {};
-                            data.reservas.forEach(r => {
-                                const fecha = String(r.fecha).trim();
-                                const hora = String(r.hora).trim();
-                                const key = `${fecha}_${hora}`;
-                                reservas[key] = {
-                                    nombre: r.nombre || '',
-                                    email: r.email || '',
-                                    telefono: r.telefono || ''
-                                };
-                                actualizarDebug(`📌 ${key} → ${r.nombre}`, 'success');
-                            });
-                            actualizarDebug(`📊 Total de reservas cargadas: ${Object.keys(reservas).length}`, 'success');
-                            resolve(true);
-                        } else {
-                            actualizarDebug(`❌ Error: ${data.error || 'Error desconocido'}`, 'error');
-                            resolve(false);
-                        }
-                    } catch (error) {
-                        actualizarDebug(`❌ Error procesando: ${error.message}`, 'error');
-                        resolve(false);
-                    }
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                };
-                
-                script.src = API_URL + '?callback=' + callbackName + '&t=' + Date.now();
-                script.onerror = function() {
-                    actualizarDebug('❌ Error en JSONP', 'error');
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    resolve(false);
-                };
-                document.body.appendChild(script);
-                
-                setTimeout(() => {
-                    if (window[callbackName]) {
-                        actualizarDebug('⚠️ Timeout JSONP', 'warning');
-                        delete window[callbackName];
-                        document.body.removeChild(script);
-                        resolve(false);
-                    }
-                }, 10000);
-            });
         }
 
         async function guardarReservaEnAPI(fecha, hora, nombre, email, telefono) {
             try {
-                actualizarDebug(`📤 Enviando reserva: ${fecha} ${hora} - ${nombre}`, 'info');
-                
                 await fetch(API_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ fecha, hora, nombre, email, telefono: telefono || '' })
                 });
-
-                actualizarDebug(`✅ Reserva enviada correctamente`, 'success');
                 return { success: true };
                 
             } catch (error) {
-                actualizarDebug(`❌ Error al guardar: ${error.message}`, 'error');
+                console.error('Error guardando reserva:', error);
                 return { success: false, error: error.message };
             }
         }
@@ -1139,15 +1010,12 @@
         // INICIALIZAR
         // ============================================================
         async function init() {
-            actualizarDebug('🚀 Iniciando aplicación...', 'info');
-            
             const savedData = getCookie('reservas_data');
             if (savedData) {
                 cookiesAccepted = true;
                 cookieNotice.style.display = 'none';
                 loadFromCookies();
                 autoSaveUserData();
-                actualizarDebug('🍪 Datos de cookies cargados', 'success');
             }
 
             await cargarReservasDesdeAPI();
@@ -1157,8 +1025,6 @@
             currentWeekStart = today < FECHA_INICIO ? getWeekStart(FECHA_INICIO) : getWeekStart(today);
             
             renderTable(currentWeekStart);
-            actualizarDebug('✅ Aplicación iniciada correctamente', 'success');
-            actualizarDebug(`📅 Semana actual: ${formatDate(currentWeekStart)}`, 'info');
         }
 
         // ============================================================
