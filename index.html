@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>Reservas - Calendario Semanal</title>
     <style>
         * {
@@ -16,15 +16,15 @@
             background: #0d0d0d;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
         }
 
         .container {
             background: #1a1a1a;
-            padding: 30px 25px;
-            border-radius: 20px;
+            padding: 15px 12px;
+            border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             max-width: 1100px;
             width: 100%;
@@ -35,7 +35,7 @@
             text-align: center;
             color: #d0d0d0;
             font-weight: 600;
-            font-size: 28px;
+            font-size: clamp(20px, 5vw, 28px);
             letter-spacing: 1px;
             margin-bottom: 5px;
         }
@@ -43,8 +43,8 @@
         .subtitle {
             text-align: center;
             color: #777;
-            margin-bottom: 20px;
-            font-size: 15px;
+            margin-bottom: 15px;
+            font-size: clamp(12px, 2.5vw, 15px);
         }
 
         /* === NAVEGACIÓN SEMANAL === */
@@ -53,27 +53,28 @@
             justify-content: space-between;
             align-items: center;
             background: #141414;
-            padding: 12px 20px;
+            padding: 10px 12px;
             border-radius: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border: 1px solid #2a2a2a;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
         }
 
         .week-nav-btn {
             background: #222;
             color: #c0c0c0;
             border: 1px solid #333;
-            padding: 8px 20px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: clamp(11px, 2vw, 14px);
             cursor: pointer;
             transition: background 0.25s, transform 0.1s, border-color 0.25s;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+            white-space: nowrap;
         }
 
         .week-nav-btn:hover:not(:disabled) {
@@ -92,10 +93,12 @@
         }
 
         .week-info {
-            font-size: 18px;
+            font-size: clamp(13px, 2.5vw, 18px);
             font-weight: 600;
             color: #d0d0d0;
             text-align: center;
+            flex: 1;
+            min-width: 120px;
         }
 
         .week-info span {
@@ -106,12 +109,13 @@
             background: #222;
             color: #c0c0c0;
             border: 1px solid #333;
-            padding: 8px 18px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: clamp(11px, 2vw, 13px);
             cursor: pointer;
             transition: all 0.25s;
+            white-space: nowrap;
         }
 
         .today-btn:hover:not(:disabled) {
@@ -124,29 +128,60 @@
             cursor: not-allowed;
         }
 
+        /* === CONTENEDOR TABLA CON SCROLL === */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            background: #111;
+            padding: 2px;
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #3a3220;
+            border-radius: 10px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #5a4a2a;
+        }
+
         /* === TABLA DE HORARIOS === */
         .schedule-table {
             width: 100%;
+            min-width: 620px;
             border-collapse: collapse;
-            margin-bottom: 30px;
-            font-size: 14px;
+            font-size: clamp(11px, 2.2vw, 14px);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
         .schedule-table th {
             background: #111;
             color: #b0b0b0;
-            padding: 12px 5px;
+            padding: 8px 4px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: clamp(10px, 2vw, 14px);
             border-bottom: 2px solid #2a2a2a;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            min-width: 60px;
         }
 
         .schedule-table th .day-date {
             display: block;
-            font-size: 12px;
+            font-size: clamp(8px, 1.5vw, 12px);
             font-weight: 400;
             opacity: 0.6;
             margin-top: 2px;
@@ -156,7 +191,6 @@
             background: #0e0e0e;
         }
 
-        /* Día actual destacado - AMARILLO Y ORO */
         .schedule-table th.today-header {
             background: #1f1a0e;
             color: #e8d48a;
@@ -172,22 +206,23 @@
         .schedule-table th.today-header .today-badge {
             background: #d4a820;
             color: #1a1a1a;
-            font-size: 10px;
-            padding: 2px 10px;
-            border-radius: 12px;
+            font-size: 8px;
+            padding: 1px 8px;
+            border-radius: 10px;
             display: inline-block;
-            margin-top: 3px;
+            margin-top: 2px;
             font-weight: 700;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             box-shadow: 0 0 20px rgba(212, 168, 32, 0.15);
         }
 
         .schedule-table td {
-            padding: 8px 4px;
+            padding: 6px 3px;
             text-align: center;
             border-bottom: 1px solid #2a2a2a;
             background: #1a1a1a;
             transition: background 0.2s;
+            min-width: 44px;
         }
 
         .schedule-table tr:last-child td {
@@ -198,33 +233,37 @@
             font-weight: 600;
             color: #999;
             background: #141414;
-            width: 70px;
-            font-size: 13px;
+            width: 50px;
+            min-width: 44px;
+            font-size: clamp(10px, 1.8vw, 13px);
             border-right: 1px solid #2a2a2a;
+            position: sticky;
+            left: 0;
+            z-index: 5;
         }
 
         /* Fila separadora */
         .schedule-table tr.separator-row td {
             background: #111;
             border-bottom: 3px solid #3a3220;
-            padding: 4px 4px;
-            height: 20px;
+            padding: 3px 3px;
+            height: 16px;
         }
 
         .schedule-table tr.separator-row td .separator-text {
-            font-size: 11px;
+            font-size: clamp(8px, 1.5vw, 11px);
             color: #8a7a4a;
             font-weight: 600;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             background: #1a1610;
-            padding: 2px 16px;
-            border-radius: 12px;
+            padding: 1px 12px;
+            border-radius: 10px;
             display: inline-block;
             border: 1px solid #3a3220;
         }
 
-        /* Columna del día actual - AMARILLO/ORO OSCURO */
+        /* Columna del día actual */
         .schedule-table td.today-column {
             background: #1f1a0e;
             position: relative;
@@ -256,8 +295,8 @@
 
         .schedule-table td.today-column.reserved::after {
             content: '📌';
-            font-size: 12px;
-            margin-left: 4px;
+            font-size: 10px;
+            margin-left: 2px;
             opacity: 0.7;
         }
 
@@ -270,7 +309,6 @@
             accent-color: #d4a820;
         }
 
-        /* Separador en día actual */
         .schedule-table tr.separator-row td.today-column {
             background: #161410;
             border-left: 2px solid #6a5a20;
@@ -278,17 +316,22 @@
         }
 
         .schedule-table input[type="radio"] {
-            width: 18px;
-            height: 18px;
+            width: clamp(16px, 3.5vw, 20px);
+            height: clamp(16px, 3.5vw, 20px);
             accent-color: #666;
             cursor: pointer;
             transition: transform 0.15s;
             position: relative;
             z-index: 1;
+            touch-action: manipulation;
         }
 
         .schedule-table input[type="radio"]:hover:not(:disabled) {
-            transform: scale(1.2);
+            transform: scale(1.15);
+        }
+
+        .schedule-table input[type="radio"]:active:not(:disabled) {
+            transform: scale(0.9);
         }
 
         .schedule-table input[type="radio"]:disabled {
@@ -297,7 +340,6 @@
             opacity: 0.3;
         }
 
-        /* Estilos generales de celdas */
         .schedule-table td.reserved {
             background: #2a2a2a;
             position: relative;
@@ -305,8 +347,8 @@
 
         .schedule-table td.reserved::after {
             content: '📌';
-            font-size: 12px;
-            margin-left: 4px;
+            font-size: 10px;
+            margin-left: 2px;
             opacity: 0.5;
         }
 
@@ -323,42 +365,41 @@
         /* === FORMULARIO === */
         .reservation-form {
             background: #141414;
-            padding: 22px 20px;
-            border-radius: 16px;
+            padding: 16px 14px;
+            border-radius: 14px;
             border: 1px solid #2a2a2a;
             display: flex;
-            flex-wrap: wrap;
-            align-items: flex-end;
-            gap: 18px 20px;
+            flex-direction: column;
+            gap: 12px;
             margin-top: 10px;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            flex: 1 1 160px;
-            min-width: 140px;
-            position: relative;
+            width: 100%;
         }
 
         .form-group label {
-            font-size: 13px;
+            font-size: clamp(12px, 2.2vw, 14px);
             font-weight: 600;
             color: #999;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             letter-spacing: 0.3px;
         }
 
         .form-group input {
-            padding: 10px 12px;
+            padding: 10px 14px;
             border: 1.5px solid #2a2a2a;
             border-radius: 10px;
-            font-size: 14px;
+            font-size: clamp(14px, 2.5vw, 16px);
             background: #111;
             color: #d0d0d0;
             transition: border 0.2s, box-shadow 0.2s;
             outline: none;
             width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .form-group input::placeholder {
@@ -379,17 +420,15 @@
             background: #222;
             color: #d0d0d0;
             border: 1px solid #333;
-            padding: 10px 28px;
+            padding: 12px 20px;
             border-radius: 30px;
             font-weight: 600;
-            font-size: 15px;
+            font-size: clamp(15px, 2.8vw, 18px);
             cursor: pointer;
             transition: background 0.25s, transform 0.1s, border-color 0.25s;
-            margin-left: auto;
-            height: 44px;
-            align-self: flex-end;
+            width: 100%;
             letter-spacing: 0.5px;
-            min-width: 130px;
+            touch-action: manipulation;
         }
 
         .btn-reserve:hover:not(:disabled) {
@@ -398,7 +437,7 @@
         }
 
         .btn-reserve:active:not(:disabled) {
-            transform: scale(0.96);
+            transform: scale(0.97);
         }
 
         .btn-reserve:disabled {
@@ -407,15 +446,15 @@
         }
 
         .message {
-            margin-top: 20px;
-            padding: 14px 18px;
+            margin-top: 15px;
+            padding: 12px 16px;
             background: #141414;
             border-left: 5px solid #333;
             color: #c0c0c0;
             border-radius: 10px;
             font-weight: 500;
             display: none;
-            font-size: 15px;
+            font-size: clamp(13px, 2.2vw, 15px);
         }
 
         .message.show {
@@ -438,18 +477,18 @@
             background: #111;
             border: 1px solid #2a2a2a;
             border-radius: 10px;
-            padding: 12px 18px;
-            margin-bottom: 20px;
+            padding: 10px 14px;
+            margin-bottom: 15px;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
+            text-align: center;
         }
 
         .cookie-notice p {
             margin: 0;
-            font-size: 14px;
+            font-size: clamp(12px, 2vw, 14px);
             color: #888;
         }
 
@@ -457,12 +496,13 @@
             background: #222;
             color: #d0d0d0;
             border: 1px solid #333;
-            padding: 6px 18px;
+            padding: 6px 20px;
             border-radius: 20px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 13px;
+            font-size: clamp(12px, 2vw, 13px);
             transition: all 0.25s;
+            touch-action: manipulation;
         }
 
         .cookie-notice button:hover {
@@ -470,29 +510,170 @@
             border-color: #c8a020;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container { padding: 18px 12px; }
-            .week-navigation { flex-direction: column; align-items: stretch; text-align: center; }
-            .week-info { order: -1; }
-            .schedule-table { font-size: 12px; }
-            .schedule-table th { padding: 8px 3px; font-size: 12px; }
-            .schedule-table td { padding: 5px 2px; }
-            .schedule-table .time-col { width: 50px; font-size: 11px; }
-            .schedule-table input[type="radio"] { width: 15px; height: 15px; }
-            .schedule-table tr.separator-row td .separator-text { font-size: 9px; padding: 1px 10px; }
-            .reservation-form { flex-direction: column; align-items: stretch; gap: 12px; }
-            .btn-reserve { margin-left: 0; width: 100%; align-self: center; }
-            .form-group { flex: 1 1 auto; }
-            .cookie-notice { flex-direction: column; text-align: center; }
+        /* === MEJORAS PARA TOCAR EN MÓVIL === */
+        .schedule-table td {
+            touch-action: manipulation;
         }
 
+        .schedule-table input[type="radio"] {
+            touch-action: manipulation;
+        }
+
+        /* === MEDIA QUERIES === */
         @media (max-width: 480px) {
-            .schedule-table th { font-size: 10px; padding: 6px 2px; }
-            .schedule-table th .day-date { font-size: 9px; }
-            .schedule-table td { padding: 4px 1px; }
-            .schedule-table .time-col { width: 40px; font-size: 10px; }
-            .schedule-table tr.separator-row td .separator-text { font-size: 8px; padding: 1px 8px; }
+            .container {
+                padding: 10px 8px;
+                border-radius: 12px;
+            }
+
+            .week-navigation {
+                padding: 8px 10px;
+                gap: 6px;
+            }
+
+            .week-nav-btn {
+                padding: 5px 10px;
+                font-size: 10px;
+            }
+
+            .today-btn {
+                padding: 5px 12px;
+                font-size: 10px;
+            }
+
+            .week-info {
+                font-size: 11px;
+                min-width: 80px;
+            }
+
+            .schedule-table {
+                min-width: 480px;
+                font-size: 10px;
+            }
+
+            .schedule-table th {
+                padding: 6px 2px;
+                font-size: 9px;
+                min-width: 40px;
+            }
+
+            .schedule-table th .day-date {
+                font-size: 7px;
+            }
+
+            .schedule-table td {
+                padding: 4px 2px;
+                min-width: 32px;
+            }
+
+            .schedule-table .time-col {
+                width: 36px;
+                min-width: 32px;
+                font-size: 9px;
+            }
+
+            .schedule-table input[type="radio"] {
+                width: 14px;
+                height: 14px;
+            }
+
+            .schedule-table tr.separator-row td .separator-text {
+                font-size: 7px;
+                padding: 1px 8px;
+                letter-spacing: 1px;
+            }
+
+            .reservation-form {
+                padding: 12px 10px;
+                gap: 10px;
+            }
+
+            .form-group input {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            .btn-reserve {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+
+            .message {
+                padding: 10px 14px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .schedule-table {
+                min-width: 400px;
+                font-size: 9px;
+            }
+
+            .schedule-table th {
+                padding: 4px 1px;
+                font-size: 8px;
+                min-width: 30px;
+            }
+
+            .schedule-table th .day-date {
+                font-size: 6px;
+            }
+
+            .schedule-table td {
+                padding: 3px 1px;
+                min-width: 26px;
+            }
+
+            .schedule-table .time-col {
+                width: 30px;
+                min-width: 26px;
+                font-size: 8px;
+            }
+
+            .schedule-table input[type="radio"] {
+                width: 12px;
+                height: 12px;
+            }
+
+            .week-nav-btn {
+                padding: 4px 8px;
+                font-size: 9px;
+            }
+
+            .today-btn {
+                padding: 4px 10px;
+                font-size: 9px;
+            }
+
+            .week-info {
+                font-size: 10px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .reservation-form {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: flex-end;
+            }
+
+            .form-group {
+                flex: 1 1 160px;
+                min-width: 140px;
+            }
+
+            .btn-reserve {
+                width: auto;
+                margin-left: auto;
+                min-width: 130px;
+            }
+
+            .cookie-notice {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+            }
         }
     </style>
 </head>
@@ -517,14 +698,14 @@
             <span id="weekRange">01/08/2026 - 07/08/2026</span>
         </div>
         
-        <div style="display: flex; gap: 8px;">
+        <div style="display: flex; gap: 6px;">
             <button class="today-btn" id="todayBtn">📌 Hoy</button>
             <button class="week-nav-btn" id="nextWeek">Semana siguiente ▶</button>
         </div>
     </div>
 
-    <!-- TABLA DE HORARIOS -->
-    <div id="tableContainer">
+    <!-- TABLA DE HORARIOS CON SCROLL -->
+    <div class="table-wrapper">
         <table class="schedule-table" id="scheduleTable">
             <thead id="tableHead"></thead>
             <tbody id="tableBody"></tbody>
@@ -602,9 +783,7 @@
         }
 
         // === CONFIGURACIÓN ===
-        // Horarios de mañana (sin 13:00)
         const HORAS_MANANA = ['9:00', '10:00', '11:00', '12:00'];
-        // Horarios de tarde (sin 13:00)
         const HORAS_TARDE = ['16:00', '17:00', '18:00', '19:00', '20:00'];
         const DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
         
@@ -756,25 +935,23 @@
             // Generar cuerpo
             let tbodyHTML = '';
             
-            // Horarios de mañana (sin 13:00)
             HORAS_MANANA.forEach(hora => {
                 tbodyHTML += generarFilaHora(hora, startDate, today);
             });
             
-            // FILA SEPARADORA (después de 12:00, antes de 16:00)
+            // FILA SEPARADORA
             tbodyHTML += `<tr class="separator-row">`;
-            tbodyHTML += `<td class="time-col" style="background:#111; text-align:center; font-size:11px; color:#8a7a4a; font-weight:600;">⏰</td>`;
+            tbodyHTML += `<td class="time-col" style="background:#111; text-align:center; font-size:clamp(8px,1.5vw,11px); color:#8a7a4a; font-weight:600;">⏰</td>`;
             for (let i = 0; i < 6; i++) {
                 const date = getDateForDay(startDate, i);
                 const isToday = isSameDate(date, today);
                 const todayClass = isToday ? 'today-column' : '';
-                tbodyHTML += `<td class="${todayClass}" style="background:#111; border-bottom: 3px solid #3a3220; text-align:center; font-size:10px; color:#8a7a4a; font-weight:500; letter-spacing:1px;">
+                tbodyHTML += `<td class="${todayClass}" style="background:#111; border-bottom: 3px solid #3a3220; text-align:center; font-size:clamp(7px,1.2vw,10px); color:#8a7a4a; font-weight:500; letter-spacing:1px;">
                     <span class="separator-text">⏳ TARDE</span>
                 </td>`;
             }
             tbodyHTML += `</tr>`;
             
-            // Horarios de tarde (sin 13:00)
             HORAS_TARDE.forEach(hora => {
                 tbodyHTML += generarFilaHora(hora, startDate, today);
             });
@@ -965,7 +1142,7 @@
             messageDiv.innerHTML = `
                 ✦ <strong>¡Reserva confirmada!</strong><br>
                 <span style="font-weight:400;">${nombre}, tu reserva para el <strong>${dateStr}</strong> a las <strong>${selectedSlot.time}</strong> ha sido registrada.</span><br>
-                <span style="font-size:14px; opacity:0.6;">Te enviaremos un correo a ${email} con los detalles.</span>
+                <span style="font-size:clamp(12px,2vw,14px); opacity:0.6;">Te enviaremos un correo a ${email} con los detalles.</span>
             `;
 
             console.log('Reserva confirmada:', {
