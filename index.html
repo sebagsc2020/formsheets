@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>Calendario Semanal</title>
+    <title>Reservas - Calendario Semanal</title>
     <style>
         /* ===== TODOS LOS ESTILOS (MISMO QUE ANTES) ===== */
         * {
@@ -12,7 +12,6 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
         body {
             background: #0d0d0d;
             display: flex;
@@ -21,7 +20,6 @@
             min-height: 100vh;
             padding: 10px;
         }
-
         .container {
             background: #1a1a1a;
             padding: 15px 12px;
@@ -31,7 +29,6 @@
             width: 100%;
             border: 1px solid #2a2a2a;
         }
-
         h1 {
             text-align: center;
             color: #d0d0d0;
@@ -40,14 +37,12 @@
             letter-spacing: 1px;
             margin-bottom: 5px;
         }
-
         .subtitle {
             text-align: center;
             color: #777;
             margin-bottom: 15px;
             font-size: clamp(12px, 2.5vw, 15px);
         }
-
         .loading-overlay {
             display: none;
             text-align: center;
@@ -55,11 +50,9 @@
             color: #e8c84a;
             font-weight: 500;
         }
-
         .loading-overlay.show {
             display: block;
         }
-
         .loading-overlay .spinner {
             display: inline-block;
             width: 30px;
@@ -70,12 +63,10 @@
             animation: spin 0.8s linear infinite;
             margin-bottom: 10px;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
         .week-navigation {
             display: flex;
             justify-content: space-between;
@@ -88,7 +79,6 @@
             flex-wrap: wrap;
             gap: 8px;
         }
-
         .week-nav-btn {
             background: #222;
             color: #c0c0c0;
@@ -104,22 +94,18 @@
             gap: 4px;
             white-space: nowrap;
         }
-
         .week-nav-btn:hover:not(:disabled) {
             background: #333;
             border-color: #c8a020;
         }
-
         .week-nav-btn:active:not(:disabled) {
             transform: scale(0.95);
         }
-
         .week-nav-btn:disabled {
             opacity: 0.25;
             cursor: not-allowed;
             transform: none;
         }
-
         .week-info {
             font-size: clamp(13px, 2.5vw, 18px);
             font-weight: 600;
@@ -128,11 +114,9 @@
             flex: 1;
             min-width: 120px;
         }
-
         .week-info span {
             color: #e8c84a;
         }
-
         .today-btn {
             background: #222;
             color: #c0c0c0;
@@ -145,17 +129,14 @@
             transition: all 0.25s;
             white-space: nowrap;
         }
-
         .today-btn:hover:not(:disabled) {
             background: #333;
             border-color: #c8a020;
         }
-
         .today-btn:disabled {
             opacity: 0.25;
             cursor: not-allowed;
         }
-
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -164,25 +145,20 @@
             background: #111;
             padding: 2px;
         }
-
         .table-wrapper::-webkit-scrollbar {
             height: 6px;
         }
-
         .table-wrapper::-webkit-scrollbar-track {
             background: #1a1a1a;
             border-radius: 10px;
         }
-
         .table-wrapper::-webkit-scrollbar-thumb {
             background: #3a3220;
             border-radius: 10px;
         }
-
         .table-wrapper::-webkit-scrollbar-thumb:hover {
             background: #5a4a2a;
         }
-
         .schedule-table {
             width: 100%;
             min-width: 620px;
@@ -191,7 +167,6 @@
             border-radius: 12px;
             overflow: hidden;
         }
-
         .schedule-table th {
             background: #111;
             color: #b0b0b0;
@@ -204,7 +179,6 @@
             z-index: 10;
             min-width: 60px;
         }
-
         .schedule-table th .day-date {
             display: block;
             font-size: clamp(8px, 1.5vw, 12px);
@@ -212,23 +186,19 @@
             opacity: 0.6;
             margin-top: 2px;
         }
-
         .schedule-table th.weekend {
             background: #0e0e0e;
         }
-
         .schedule-table th.today-header {
             background: #1f1a0e;
             color: #e8d48a;
             border-bottom: 3px solid #d4a820;
             box-shadow: 0 0 30px rgba(212, 168, 32, 0.06);
         }
-
         .schedule-table th.today-header .day-date {
             color: #aa9a66;
             opacity: 1;
         }
-
         .schedule-table th.today-header .today-badge {
             background: #d4a820;
             color: #1a1a1a;
@@ -241,7 +211,6 @@
             letter-spacing: 0.3px;
             box-shadow: 0 0 20px rgba(212, 168, 32, 0.15);
         }
-
         .schedule-table td {
             padding: 6px 3px;
             text-align: center;
@@ -250,11 +219,9 @@
             transition: background 0.2s;
             min-width: 44px;
         }
-
         .schedule-table tr:last-child td {
             border-bottom: none;
         }
-
         .schedule-table .time-col {
             font-weight: 600;
             color: #999;
@@ -267,14 +234,12 @@
             left: 0;
             z-index: 5;
         }
-
         .schedule-table tr.separator-row td {
             background: #111;
             border-bottom: 3px solid #3a3220;
             padding: 3px 3px;
             height: 16px;
         }
-
         .schedule-table tr.separator-row td .separator-text {
             font-size: clamp(8px, 1.5vw, 11px);
             color: #8a7a4a;
@@ -287,14 +252,12 @@
             display: inline-block;
             border: 1px solid #3a3220;
         }
-
         .schedule-table td.today-column {
             background: #1f1a0e;
             position: relative;
             border-left: 1px solid #6a5a20;
             border-right: 1px solid #6a5a20;
         }
-
         .schedule-table td.today-column::before {
             content: '';
             position: absolute;
@@ -305,40 +268,33 @@
             background: radial-gradient(circle at center, rgba(212, 168, 32, 0.04) 0%, transparent 70%);
             pointer-events: none;
         }
-
         .schedule-table td.today-column.past {
             background: #161410;
             opacity: 0.5;
         }
-
         .schedule-table td.today-column.reserved {
             background: #1f1a10;
             border-left: 2px solid #d4a820;
             border-right: 2px solid #d4a820;
         }
-
         .schedule-table td.today-column.reserved::after {
             content: '📌';
             font-size: 10px;
             margin-left: 2px;
             opacity: 0.7;
         }
-
         .schedule-table td.today-column.selected {
             background: #2a2214;
             box-shadow: inset 0 0 0 2px #d4a820, 0 0 25px rgba(212, 168, 32, 0.06);
         }
-
         .schedule-table td.today-column .slot-radio:checked {
             accent-color: #d4a820;
         }
-
         .schedule-table tr.separator-row td.today-column {
             background: #161410;
             border-left: 2px solid #6a5a20;
             border-right: 2px solid #6a5a20;
         }
-
         .schedule-table input[type="radio"] {
             width: clamp(16px, 3.5vw, 20px);
             height: clamp(16px, 3.5vw, 20px);
@@ -349,43 +305,35 @@
             z-index: 1;
             touch-action: manipulation;
         }
-
         .schedule-table input[type="radio"]:hover:not(:disabled) {
             transform: scale(1.15);
         }
-
         .schedule-table input[type="radio"]:active:not(:disabled) {
             transform: scale(0.9);
         }
-
         .schedule-table input[type="radio"]:disabled {
             accent-color: #333;
             cursor: not-allowed;
             opacity: 0.3;
         }
-
         .schedule-table td.reserved {
             background: #2a2a2a;
             position: relative;
         }
-
         .schedule-table td.reserved::after {
             content: '📌';
             font-size: 10px;
             margin-left: 2px;
             opacity: 0.5;
         }
-
         .schedule-table td.past {
             background: #161616;
             opacity: 0.4;
         }
-
         .schedule-table td.selected {
             background: #333;
             box-shadow: inset 0 0 0 2px #555;
         }
-
         .reservation-form {
             background: #141414;
             padding: 16px 14px;
@@ -396,13 +344,11 @@
             gap: 12px;
             margin-top: 10px;
         }
-
         .form-group {
             display: flex;
             flex-direction: column;
             width: 100%;
         }
-
         .form-group label {
             font-size: clamp(12px, 2.2vw, 14px);
             font-weight: 600;
@@ -410,7 +356,6 @@
             margin-bottom: 4px;
             letter-spacing: 0.3px;
         }
-
         .form-group input {
             padding: 10px 14px;
             border: 1.5px solid #2a2a2a;
@@ -424,21 +369,17 @@
             -webkit-appearance: none;
             appearance: none;
         }
-
         .form-group input::placeholder {
             color: #555;
         }
-
         .form-group input:focus {
             border-color: #c8a020;
             box-shadow: 0 0 0 3px rgba(200, 160, 32, 0.05);
         }
-
         .form-group input:-webkit-autofill {
             -webkit-box-shadow: 0 0 0 30px #111 inset !important;
             -webkit-text-fill-color: #d0d0d0 !important;
         }
-
         .btn-reserve {
             background: #222;
             color: #d0d0d0;
@@ -453,21 +394,17 @@
             letter-spacing: 0.5px;
             touch-action: manipulation;
         }
-
         .btn-reserve:hover:not(:disabled) {
             background: #2a2418;
             border-color: #c8a020;
         }
-
         .btn-reserve:active:not(:disabled) {
             transform: scale(0.97);
         }
-
         .btn-reserve:disabled {
             opacity: 0.3;
             cursor: not-allowed;
         }
-
         .message {
             margin-top: 15px;
             padding: 12px 16px;
@@ -479,23 +416,19 @@
             display: none;
             font-size: clamp(13px, 2.2vw, 15px);
         }
-
         .message.show {
             display: block;
         }
-
         .message.error {
             border-left-color: #cc3333;
             background: #1a0e0e;
             color: #ff6b6b;
         }
-
         .message.success {
             border-left-color: #c8a020;
             background: #1a1610;
             color: #d4c88a;
         }
-
         .cookie-notice {
             background: #111;
             border: 1px solid #2a2a2a;
@@ -508,13 +441,11 @@
             gap: 8px;
             text-align: center;
         }
-
         .cookie-notice p {
             margin: 0;
             font-size: clamp(12px, 2vw, 14px);
             color: #888;
         }
-
         .cookie-notice button {
             background: #222;
             color: #d0d0d0;
@@ -527,12 +458,10 @@
             transition: all 0.25s;
             touch-action: manipulation;
         }
-
         .cookie-notice button:hover {
             background: #2a2418;
             border-color: #c8a020;
         }
-
         .debug-info {
             background: #111;
             border: 1px solid #2a2a2a;
@@ -546,28 +475,23 @@
             font-family: monospace;
             word-break: break-all;
         }
-
         .debug-info .debug-title {
             color: #8a7a4a;
             font-weight: 600;
             margin-bottom: 5px;
         }
-
         .debug-info .debug-item {
             padding: 2px 0;
             border-bottom: 1px solid #1a1a1a;
             color: #999;
         }
-
         .debug-info .debug-item .key {
             color: #e8c84a;
         }
-
         .debug-info .debug-error {
             color: #ff6b6b;
             padding: 4px 0;
         }
-
         @media (max-width: 480px) {
             .container { padding: 10px 8px; border-radius: 12px; }
             .week-navigation { padding: 8px 10px; gap: 6px; }
@@ -587,7 +511,6 @@
             .message { padding: 10px 14px; font-size: 12px; }
             .debug-info { font-size: 9px; max-height: 120px; }
         }
-
         @media (max-width: 380px) {
             .schedule-table { min-width: 400px; font-size: 9px; }
             .schedule-table th { padding: 4px 1px; font-size: 8px; min-width: 30px; }
@@ -599,7 +522,6 @@
             .today-btn { padding: 4px 10px; font-size: 9px; }
             .week-info { font-size: 10px; }
         }
-
         @media (min-width: 769px) {
             .reservation-form { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
             .form-group { flex: 1 1 160px; min-width: 140px; }
@@ -661,7 +583,6 @@
 
     <div id="message" class="message"></div>
 
-    <!-- PANEL DE DEPURACIÓN -->
     <div class="debug-info" id="debugInfo">
         <div class="debug-title">🔍 DEPURACIÓN</div>
         <div id="debugContent"></div>
@@ -671,21 +592,18 @@
 <script>
     (function() {
         // ============================================================
-        // 🔴 CONFIGURACIÓN - REEMPLAZA CON TU URL DE APPS SCRIPT 🔴
+        // 🔴 TU URL DE APPS SCRIPT 🔴
         // ============================================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbw0hv5_qhV3iS18Tu7Z0FwQKvywAiqO-p_OFAPM29x-42rnxVRoV78CqwmiMUWJLre_aA/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwlGjEvj6r_U8drvrlIlrCmI8A_VgqEA5BSv7ZX3xEBN6-YNtn-dQNFZ0Z0z00LRk1rBw/exec';
         
         // ============================================================
-        // CONFIGURACIÓN DE HORARIOS
+        // CONFIGURACIÓN
         // ============================================================
         const HORAS_MANANA = ['9:00', '10:00', '11:00', '12:00'];
         const HORAS_TARDE = ['16:00', '17:00', '18:00', '19:00', '20:00'];
         const DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
         const FECHA_INICIO = new Date(2026, 7, 1);
 
-        // ============================================================
-        // ESTADO
-        // ============================================================
         let currentWeekStart = getWeekStart(FECHA_INICIO);
         let reservas = {};
         let selectedSlot = null;
@@ -709,6 +627,16 @@
         const acceptBtn = document.getElementById('acceptCookies');
         const loadingOverlay = document.getElementById('loadingOverlay');
         const debugContent = document.getElementById('debugContent');
+
+        function actualizarDebug(mensaje, tipo = 'info') {
+            const colors = { info: '#999', success: '#4caf50', error: '#ff6b6b', warning: '#ffa726' };
+            const iconos = { info: 'ℹ️', success: '✅', error: '❌', warning: '⚠️' };
+            const html = `<div class="debug-item" style="color:${colors[tipo] || '#999'}">${iconos[tipo] || '•'} ${mensaje}</div>`;
+            debugContent.innerHTML += html;
+            debugContent.scrollTop = debugContent.scrollHeight;
+        }
+
+        function limpiarDebug() { debugContent.innerHTML = ''; }
 
         // ============================================================
         // UTILIDADES
@@ -780,32 +708,7 @@
         }
 
         // ============================================================
-        // DEPURACIÓN
-        // ============================================================
-        function actualizarDebug(mensaje, tipo = 'info') {
-            const colors = {
-                info: '#999',
-                success: '#4caf50',
-                error: '#ff6b6b',
-                warning: '#ffa726'
-            };
-            const iconos = {
-                info: 'ℹ️',
-                success: '✅',
-                error: '❌',
-                warning: '⚠️'
-            };
-            const html = `<div class="debug-item" style="color:${colors[tipo] || '#999'}">${iconos[tipo] || '•'} ${mensaje}</div>`;
-            debugContent.innerHTML += html;
-            debugContent.scrollTop = debugContent.scrollHeight;
-        }
-
-        function limpiarDebug() {
-            debugContent.innerHTML = '';
-        }
-
-        // ============================================================
-        // API - GOOGLE SHEETS
+        // API - GOOGLE SHEETS CON no-cors
         // ============================================================
         async function cargarReservasDesdeAPI() {
             try {
@@ -814,18 +717,112 @@
                 actualizarDebug('🔄 Cargando reservas desde Google Sheets...', 'info');
                 actualizarDebug(`📡 URL: ${API_URL}`, 'info');
                 
-                const response = await fetch(API_URL);
+                // Usamos mode: 'no-cors' para evitar problemas de CORS
+                const response = await fetch(API_URL, {
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
-                }
+                // Con no-cors no podemos leer la respuesta directamente
+                // Pero podemos usar un enfoque alternativo: JSONP o proxy
+                // Como solución, haremos una petición GET normal y esperaremos
+                // que el servidor responda con el texto JSON
                 
+                // Para evitar el error de CORS, usamos una técnica diferente
+                // Hacemos la petición con 'no-cors' y usamos un iframe o script
+                // Pero la forma más simple es usar un servicio proxy o JSONP
+                
+                // Como esto es complejo, usamos un enfoque con script
+                // Cargamos los datos mediante un <script> con callback
+                
+                actualizarDebug('⚠️ Usando método alternativo para cargar datos...', 'warning');
+                
+                // Vamos a intentar cargar usando un proxy o directamente con fetch
+                // con el modo correcto. El problema es que el servidor no devuelve
+                // los headers CORS.
+                
+                // Intentamos con un método alternativo
+                await cargarReservasAlternativo();
+                
+                return true;
+                
+            } catch (error) {
+                actualizarDebug(`❌ Error de conexión: ${error.message}`, 'error');
+                return false;
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // Función alternativa para cargar reservas usando JSONP
+        function cargarReservasAlternativo() {
+            return new Promise((resolve, reject) => {
+                // Crear un script para cargar los datos
+                const script = document.createElement('script');
+                const callbackName = 'callback_' + Date.now();
+                
+                // Definir la función callback
+                window[callbackName] = function(data) {
+                    try {
+                        if (data.success) {
+                            reservas = {};
+                            data.reservas.forEach(r => {
+                                const key = `${r.fecha}_${r.hora}`;
+                                reservas[key] = {
+                                    nombre: r.nombre || '',
+                                    email: r.email || '',
+                                    telefono: r.telefono || ''
+                                };
+                                actualizarDebug(`📌 ${key} → ${r.nombre}`, 'success');
+                            });
+                            actualizarDebug(`📊 Total de reservas cargadas: ${Object.keys(reservas).length}`, 'success');
+                            resolve(true);
+                        } else {
+                            actualizarDebug(`❌ Error: ${data.error || 'Error desconocido'}`, 'error');
+                            resolve(false);
+                        }
+                    } catch (error) {
+                        actualizarDebug(`❌ Error al procesar datos: ${error.message}`, 'error');
+                        resolve(false);
+                    }
+                    // Limpiar
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                };
+                
+                // Configurar el script con el callback
+                const url = `${API_URL}?callback=${callbackName}`;
+                script.src = url;
+                script.onerror = function() {
+                    actualizarDebug('❌ Error al cargar el script JSONP', 'error');
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    // Intentar con fetch normal
+                    cargarReservasConFetch().then(resolve);
+                };
+                document.body.appendChild(script);
+                
+                // Timeout por si no responde
+                setTimeout(() => {
+                    if (window[callbackName]) {
+                        actualizarDebug('⚠️ Timeout en la carga JSONP, intentando con fetch...', 'warning');
+                        delete window[callbackName];
+                        document.body.removeChild(script);
+                        cargarReservasConFetch().then(resolve);
+                    }
+                }, 10000);
+            });
+        }
+
+        // Función de respaldo con fetch
+        async function cargarReservasConFetch() {
+            try {
+                actualizarDebug('🔄 Intentando con fetch directo...', 'info');
+                const response = await fetch(API_URL + '?t=' + Date.now());
                 const data = await response.json();
-                actualizarDebug(`📦 Respuesta recibida: ${JSON.stringify(data).substring(0, 200)}...`, 'info');
                 
                 if (data.success) {
                     reservas = {};
-                    
                     data.reservas.forEach(r => {
                         const key = `${r.fecha}_${r.hora}`;
                         reservas[key] = {
@@ -835,7 +832,6 @@
                         };
                         actualizarDebug(`📌 ${key} → ${r.nombre}`, 'success');
                     });
-                    
                     actualizarDebug(`📊 Total de reservas cargadas: ${Object.keys(reservas).length}`, 'success');
                     return true;
                 } else {
@@ -843,12 +839,8 @@
                     return false;
                 }
             } catch (error) {
-                actualizarDebug(`❌ Error de conexión: ${error.message}`, 'error');
-                actualizarDebug(`💡 Verifica que la URL de la API sea correcta y esté publicada`, 'warning');
-                actualizarDebug(`💡 La URL debe terminar en /exec`, 'warning');
+                actualizarDebug(`❌ Error en fetch: ${error.message}`, 'error');
                 return false;
-            } finally {
-                mostrarLoading(false);
             }
         }
 
@@ -856,14 +848,15 @@
             try {
                 actualizarDebug(`📤 Enviando reserva: ${fecha} ${hora} - ${nombre}`, 'info');
                 
-                const response = await fetch(API_URL, {
+                // Usamos mode: 'no-cors' para el POST
+                await fetch(API_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ fecha, hora, nombre, email, telefono: telefono || '' })
                 });
 
-                actualizarDebug(`✅ Reserva enviada correctamente (no-cors)`, 'success');
+                actualizarDebug(`✅ Reserva enviada correctamente`, 'success');
                 return { success: true };
                 
             } catch (error) {
@@ -894,9 +887,6 @@
             const startDate = new Date(weekStart);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            
-            actualizarDebug(`🎨 Renderizando tabla para semana: ${formatDate(startDate)}`, 'info');
-            actualizarDebug(`📊 Reservas disponibles: ${Object.keys(reservas).length}`, 'info');
             
             // Encabezado
             let theadHTML = '<tr><th>Hora</th>';
