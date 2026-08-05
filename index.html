@@ -152,7 +152,6 @@
             background: #2a3a4a;
         }
 
-        /* Día actual destacado en el encabezado */
         .schedule-table th.today-header {
             background: #2a7de1;
             box-shadow: inset 0 -3px 0 #ffd700;
@@ -183,6 +182,26 @@
             font-size: 13px;
         }
 
+        /* Fila separadora */
+        .schedule-table tr.separator-row td {
+            background: #e8edf5;
+            border-bottom: 3px solid #c0c8d4;
+            padding: 4px 4px;
+            height: 20px;
+        }
+
+        .schedule-table tr.separator-row td .separator-text {
+            font-size: 11px;
+            color: #6b7a8a;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: #dce3ec;
+            padding: 2px 16px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
         /* Columna del día actual - fondo difuminado */
         .schedule-table td.today-column {
             background: linear-gradient(135deg, #e8f0fe 0%, #d4e4ff 100%);
@@ -211,6 +230,11 @@
         .schedule-table td.today-column.selected {
             background: linear-gradient(135deg, #b5d4ff 0%, #8bb8f5 100%);
             box-shadow: inset 0 0 0 2px #2a7de1;
+        }
+
+        /* Separador en día actual */
+        .schedule-table tr.separator-row td.today-column {
+            background: linear-gradient(135deg, #d4e0f5 0%, #c0d4f0 100%);
         }
 
         .schedule-table input[type="radio"] {
@@ -400,6 +424,7 @@
             .schedule-table td { padding: 5px 2px; }
             .schedule-table .time-col { width: 50px; font-size: 11px; }
             .schedule-table input[type="radio"] { width: 15px; height: 15px; }
+            .schedule-table tr.separator-row td .separator-text { font-size: 9px; padding: 1px 10px; }
             .reservation-form { flex-direction: column; align-items: stretch; gap: 12px; }
             .btn-reserve { margin-left: 0; width: 100%; align-self: center; }
             .form-group { flex: 1 1 auto; }
@@ -411,6 +436,7 @@
             .schedule-table th .day-date { font-size: 9px; }
             .schedule-table td { padding: 4px 1px; }
             .schedule-table .time-col { width: 40px; font-size: 10px; }
+            .schedule-table tr.separator-row td .separator-text { font-size: 8px; padding: 1px 8px; }
         }
     </style>
 </head>
@@ -520,7 +546,10 @@
         }
 
         // === CONFIGURACIÓN ===
-        const HORAS = ['9:00', '10:00', '11:00', '12:00', '13:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
+        // Horarios de mañana
+        const HORAS_MANANA = ['9:00', '10:00', '11:00', '12:00', '13:00'];
+        // Horarios de tarde
+        const HORAS_TARDE = ['16:00', '17:00', '18:00', '19:00', '20:00'];
         const DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
         
         const FECHA_INICIO = new Date(2026, 7, 1);
@@ -642,7 +671,7 @@
             });
         }
 
-        // === GENERAR TABLA CON DÍA ACTUAL DESTACADO ===
+        // === GENERAR TABLA CON SEPARADOR ===
         function renderTable(weekStart) {
             const startDate = new Date(weekStart);
             const today = new Date();
@@ -656,8 +685,6 @@
                 const dateStr = formatDate(date);
                 const isWeekend = (i === 5);
                 const weekendClass = isWeekend ? 'weekend' : '';
-                
-                // Verificar si es hoy
                 const isToday = isSameDate(date, today);
                 const todayClass = isToday ? 'today-header' : '';
                 
@@ -672,42 +699,30 @@
 
             // Generar cuerpo
             let tbodyHTML = '';
-            HORAS.forEach(hora => {
-                tbodyHTML += `<tr><td class="time-col">${hora}</td>`;
-                for (let i = 0; i < 6; i++) {
-                    const date = getDateForDay(startDate, i);
-                    const dateKey = formatDateKey(date);
-                    const radioId = `${dateKey}_${hora}`;
-                    const isPast = isPastDate(date) || isBeforeSiteStart(date);
-                    const isReserved = reservas[radioId] !== undefined;
-                    const isSelected = selectedSlot && selectedSlot.dateKey === dateKey && selectedSlot.time === hora;
-                    const isToday = isSameDate(date, today);
-                    
-                    // Clases para el td
-                    let tdClass = '';
-                    if (isPast) tdClass += 'past ';
-                    if (isReserved) tdClass += 'reserved ';
-                    if (isSelected) tdClass += 'selected ';
-                    if (isToday) tdClass += 'today-column ';
-                    
-                    tbodyHTML += `<td class="${tdClass}">`;
-                    
-                    const disabled = isPast || isReserved;
-                    const checked = isSelected ? 'checked' : '';
-                    
-                    tbodyHTML += `<input type="radio" 
-                                   name="slot" 
-                                   id="${radioId}" 
-                                   data-date="${dateKey}" 
-                                   data-time="${hora}"
-                                   ${checked}
-                                   ${disabled ? 'disabled' : ''}
-                            >`;
-                    
-                    tbodyHTML += '</td>';
-                }
-                tbodyHTML += '</tr>';
+            
+            // Horarios de mañana
+            HORAS_MANANA.forEach(hora => {
+                tbodyHTML += generarFilaHora(hora, startDate, today);
             });
+            
+            // FILA SEPARADORA
+            tbodyHTML += `<tr class="separator-row">`;
+            tbodyHTML += `<td class="time-col" style="background:#e8edf5; text-align:center; font-size:11px; color:#6b7a8a; font-weight:600;">⏰</td>`;
+            for (let i = 0; i < 6; i++) {
+                const date = getDateForDay(startDate, i);
+                const isToday = isSameDate(date, today);
+                const todayClass = isToday ? 'today-column' : '';
+                tbodyHTML += `<td class="${todayClass}" style="background:#e8edf5; border-bottom: 3px solid #c0c8d4; text-align:center; font-size:10px; color:#6b7a8a; font-weight:500; letter-spacing:1px;">
+                    <span class="separator-text">⏳ TARDE</span>
+                </td>`;
+            }
+            tbodyHTML += `</tr>`;
+            
+            // Horarios de tarde
+            HORAS_TARDE.forEach(hora => {
+                tbodyHTML += generarFilaHora(hora, startDate, today);
+            });
+            
             tableBody.innerHTML = tbodyHTML;
 
             // Actualizar rango de fechas
@@ -731,6 +746,44 @@
 
             updateSubmitButton();
             attachRadioEvents();
+        }
+
+        // === FUNCIÓN PARA GENERAR FILA DE HORA ===
+        function generarFilaHora(hora, startDate, today) {
+            let html = `<tr><td class="time-col">${hora}</td>`;
+            for (let i = 0; i < 6; i++) {
+                const date = getDateForDay(startDate, i);
+                const dateKey = formatDateKey(date);
+                const radioId = `${dateKey}_${hora}`;
+                const isPast = isPastDate(date) || isBeforeSiteStart(date);
+                const isReserved = reservas[radioId] !== undefined;
+                const isSelected = selectedSlot && selectedSlot.dateKey === dateKey && selectedSlot.time === hora;
+                const isToday = isSameDate(date, today);
+                
+                let tdClass = '';
+                if (isPast) tdClass += 'past ';
+                if (isReserved) tdClass += 'reserved ';
+                if (isSelected) tdClass += 'selected ';
+                if (isToday) tdClass += 'today-column ';
+                
+                html += `<td class="${tdClass}">`;
+                
+                const disabled = isPast || isReserved;
+                const checked = isSelected ? 'checked' : '';
+                
+                html += `<input type="radio" 
+                               name="slot" 
+                               id="${radioId}" 
+                               data-date="${dateKey}" 
+                               data-time="${hora}"
+                               ${checked}
+                               ${disabled ? 'disabled' : ''}
+                        >`;
+                
+                html += '</td>';
+            }
+            html += '</tr>';
+            return html;
         }
 
         // === EVENTOS DE RADIO ===
@@ -839,7 +892,6 @@
                 return;
             }
 
-            // Guardar reserva
             reservas[slotId] = {
                 nombre,
                 email,
@@ -891,12 +943,10 @@
                 autoSaveUserData();
             }
 
-            // Asegurar que la semana actual siempre muestre el día de hoy
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const todayWeekStart = getWeekStart(today);
             
-            // Si la fecha actual es anterior al inicio del sitio, usar fecha de inicio
             if (today < FECHA_INICIO) {
                 currentWeekStart = getWeekStart(FECHA_INICIO);
             } else {
