@@ -3,35 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservas - Sebastián González</title>
+    <title>Reservas Semanales</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #0b0b0b; color: #e0e0e0; display: flex; justify-content: center; padding: 20px; min-height: 100vh; }
-        .container { width: 100%; max-width: 900px; background-color: #141414; border-radius: 30px; padding: 30px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 1px solid #2a2a2a; }
+        .container { width: 100%; max-width: 800px; background-color: #141414; border-radius: 30px; padding: 30px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 1px solid #2a2a2a; }
         h1 { text-align: center; color: #f2c94c; font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 5px; }
         h1 span { font-size: 1.8rem; }
         .subtitle { text-align: center; color: #b0b0b0; margin-bottom: 30px; font-size: 1.1rem; }
-        .month-header { display: flex; justify-content: center; align-items: center; gap: 40px; margin-bottom: 25px; }
-        .month-header h2 { font-size: 1.8rem; font-weight: 400; color: #e0e0e0; }
-        .month-header button { background: none; border: none; color: #f2c94c; font-size: 2rem; cursor: pointer; padding: 0 15px; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 20px; }
-        .weekday { text-align: center; color: #888; font-size: 0.9rem; font-weight: bold; padding: 10px 0; letter-spacing: 1px; }
-        .day-box { background-color: #1e1e1e; border-radius: 12px; padding: 10px 5px; text-align: center; min-height: 90px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; transition: all 0.2s ease; border: 1px solid transparent; cursor: default; }
-        .day-box.selected { border-color: #f2c94c; background-color: #252525; }
-        .day-number { font-size: 1rem; font-weight: 500; color: #e0e0e0; margin-bottom: 5px; }
-        .day-box.empty { background-color: transparent; min-height: auto; }
-        .btn-elegir { background: #f2c94c; color: #0b0b0b; border: none; border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: bold; cursor: pointer; margin: 5px 0 2px 0; transition: 0.2s; }
-        .btn-elegir:hover { background: #ffda66; }
-        .btn-reservar { background: transparent; border: 1px solid #f2c94c; color: #f2c94c; border-radius: 15px; padding: 2px 10px; font-size: 0.65rem; cursor: pointer; width: fit-content; }
-        .btn-reservar:hover { background: #f2c94c; color: #0b0b0b; }
-        .sin-turnos { color: #555; font-size: 0.65rem; margin-top: 5px; }
-        .slots-container { margin-top: 20px; padding-top: 15px; border-top: 1px solid #2a2a2a; text-align: center; min-height: 60px; }
-        .slots-container p { color: #888; font-size: 0.9rem; }
-        .slots-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px; }
-        .slot-item { background-color: #2a2a2a; color: #aaa; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; cursor: not-allowed; }
-        .slot-item.available { background-color: #f2c94c; color: #0b0b0b; cursor: pointer; font-weight: bold; }
-        .slot-item.available:hover { background-color: #ffda66; }
-        .slot-item.selected-slot { background-color: #1e1e1e; border: 2px solid #f2c94c; color: #f2c94c; }
+        
+        .week-controls { display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 25px; }
+        .week-controls h2 { font-size: 1.5rem; font-weight: 400; color: #e0e0e0; }
+        .week-controls button { background: none; border: none; color: #f2c94c; font-size: 2rem; cursor: pointer; padding: 0 15px; }
+        
+        .day-row { display: flex; justify-content: space-between; align-items: center; background-color: #1e1e1e; border-radius: 15px; padding: 15px 20px; margin-bottom: 10px; border: 1px solid transparent; }
+        .day-row.today { border-color: #f2c94c; background-color: #252525; }
+        .day-label { font-weight: bold; color: #f2c94c; width: 120px; font-size: 1.1rem; }
+        .slots-group { display: flex; flex-wrap: wrap; gap: 8px; flex: 1; justify-content: flex-end; }
+        .slot-btn { background-color: #2a2a2a; border: none; color: #888; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; cursor: default; transition: 0.2s; }
+        .slot-btn.available { background-color: #f2c94c; color: #0b0b0b; cursor: pointer; font-weight: bold; }
+        .slot-btn.available:hover { background-color: #ffda66; }
         
         #modalReserva { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: #141414; padding: 30px; border-radius: 20px; max-width: 400px; width: 90%; border: 1px solid #333; }
@@ -40,7 +31,11 @@
         .modal-content button { width: 100%; padding: 12px; background: #f2c94c; border: none; border-radius: 10px; font-weight: bold; color: #0b0b0b; margin-top: 10px; cursor: pointer; }
         .close-modal { background: transparent !important; color: #888 !important; border: 1px solid #333 !important; }
         
-        @media (max-width: 600px) { .day-box { min-height: 75px; padding: 8px 2px; } .btn-elegir { font-size: 0.7rem; padding: 3px 8px; } }
+        @media (max-width: 600px) { 
+            .day-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .day-label { width: 100%; }
+            .slots-group { justify-content: flex-start; width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -49,28 +44,18 @@
     <h1><span>✦</span> RESERVAS <span>✦</span></h1>
     <p class="subtitle">Seleccioná un día y horario disponible</p>
 
-    <div class="month-header">
-        <button onclick="cambiarMes(-1)">&#10094;</button>
-        <h2 id="mesAnioTexto">Agosto 2026</h2>
-        <button onclick="cambiarMes(1)">&#10095;</button>
+    <div class="week-controls">
+        <button onclick="cambiarSemana(-7)">&#10094;</button>
+        <h2 id="semanaTexto">Semana del 03 al 09 de Agosto</h2>
+        <button onclick="cambiarSemana(7)">&#10095;</button>
     </div>
 
-    <div class="calendar-grid" id="calendarioGrid">
-        <div class="weekday">LUN</div>
-        <div class="weekday">MAR</div>
-        <div class="weekday">MIÉ</div>
-        <div class="weekday">JUE</div>
-        <div class="weekday">VIE</div>
-        <div class="weekday">SÁB</div>
-        <div class="weekday">DOM</div>
-    </div>
-
-    <div class="slots-container" id="slotsContainer">
-        <p>Seleccioná un día del calendario para ver los horarios disponibles.</p>
+    <div id="listaSemanal">
+        <!-- Aquí se generarán los días con sus horarios -->
     </div>
 </div>
 
-<!-- Modal para hacer la reserva -->
+<!-- Modal -->
 <div id="modalReserva">
     <div class="modal-content">
         <h3>Confirmar Reserva</h3>
@@ -84,151 +69,108 @@
 </div>
 
 <script>
-    // ============================================================
-    // CONFIGURACIÓN (USANDO LA URL QUE ME DISTE)
-    // ============================================================
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzYYE99_wIL7BJTPjMcuCTaL5w-rcsJAIu_MC2D__IYmRfX1sjVeYFopjrDvJFrju4rRQ/exec';
+    // CONFIGURACIÓN
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyzKD7CHpY5iFdiUQt6D1kbaMIwiHqPBH9TONcNnvIjhtUCqqsboKclaYoHYWu7IOnorCw/exec';
     const ALL_SLOTS = ['09:00','10:00','11:00','12:00','13:00','16:00','17:00','18:00','19:00','20:00','21:00'];
 
     let reservasGlobal = {};
-    let currentYear = 2026;
-    let currentMonth = 7; // 0 = Enero, 7 = Agosto
-    let diaSeleccionado = null;
-    let horaSeleccionada = null;
+    let fechaInicioSemana = new Date(); // Empieza en la fecha actual
 
-    // ============================================================
-    // FUNCIÓN PARA FORMATEAR FECHA A YYYY-MM-DD
-    // ============================================================
-    function formatearFechaServidor(year, month, day) {
-        const m = String(month + 1).padStart(2, '0');
-        const d = String(day).padStart(2, '0');
-        return `${year}-${m}-${d}`;
-    }
-
-    // ============================================================
-    // CARGAR RESERVAS
-    // ============================================================
     async function cargarReservas() {
         try {
-            console.log('Cargando reservas desde:', API_URL + '?action=getReservas');
             const response = await fetch(API_URL + '?action=getReservas');
             const data = await response.json();
-            
             if (data.status === 'ok') {
                 reservasGlobal = data.reservas || {};
-                console.log('Reservas cargadas:', reservasGlobal);
-                renderizarCalendario();
-                if (diaSeleccionado) mostrarHorarios(diaSeleccionado);
+                renderizarSemana();
             } else {
-                console.error('Error en datos del servidor:', data.mensaje);
+                console.error('Error:', data.mensaje);
             }
         } catch (error) {
             console.error('Error de conexión:', error);
         }
     }
 
-    // ============================================================
-    // RENDERIZAR CALENDARIO
-    // ============================================================
-    function renderizarCalendario() {
-        const grid = document.getElementById('calendarioGrid');
-        grid.innerHTML = `
-            <div class="weekday">LUN</div>
-            <div class="weekday">MAR</div>
-            <div class="weekday">MIÉ</div>
-            <div class="weekday">JUE</div>
-            <div class="weekday">VIE</div>
-            <div class="weekday">SÁB</div>
-            <div class="weekday">DOM</div>
-        `;
+    function formatearFechaServidor(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
 
-        const nombreMeses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-        document.getElementById('mesAnioTexto').textContent = `${nombreMeses[currentMonth]} ${currentYear}`;
+    function renderizarSemana() {
+        const container = document.getElementById('listaSemanal');
+        container.innerHTML = '';
+        
+        const hoy = new Date();
+        const nombreDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-        const primerDia = new Date(currentYear, currentMonth, 1);
-        const ultimoDia = new Date(currentYear, currentMonth + 1, 0);
-        const totalDias = ultimoDia.getDate();
+        // Calcular el inicio de semana (Lunes)
+        let diaSemana = fechaInicioSemana.getDay();
+        let diff = fechaInicioSemana.getDate() - (diaSemana === 0 ? 6 : diaSemana - 1); // Ajuste para que empiece en Lunes
+        let lunes = new Date(fechaInicioSemana);
+        lunes.setDate(diff);
 
-        let diaSemanaInicio = primerDia.getDay();
-        let offset = (diaSemanaInicio + 6) % 7; 
+        let domingo = new Date(lunes);
+        domingo.setDate(lunes.getDate() + 6);
 
-        for (let i = 0; i < offset; i++) {
-            const emptyDiv = document.createElement('div');
-            emptyDiv.className = 'day-box empty';
-            grid.appendChild(emptyDiv);
-        }
+        document.getElementById('semanaTexto').textContent = 
+            `Semana del ${String(lunes.getDate()).padStart(2,'0')} al ${String(domingo.getDate()).padStart(2,'0')} de ${domingo.toLocaleString('default', { month: 'long' })}`;
 
-        for (let day = 1; day <= totalDias; day++) {
-            const dayDiv = document.createElement('div');
-            dayDiv.className = 'day-box';
-            if (diaSeleccionado === day) dayDiv.classList.add('selected');
+        for(let i = 0; i < 7; i++) {
+            let fechaActual = new Date(lunes);
+            fechaActual.setDate(lunes.getDate() + i);
+            
+            let fechaStr = formatearFechaServidor(fechaActual);
+            let reservasDelDia = reservasGlobal[fechaStr] || [];
+            let disponibles = ALL_SLOTS.filter(h => !reservasDelDia.includes(h));
 
-            const fechaStr = formatearFechaServidor(currentYear, currentMonth, day);
-            const reservasDelDia = reservasGlobal[fechaStr] || [];
-            const disponibles = ALL_SLOTS.filter(h => !reservasDelDia.includes(h));
-
-            dayDiv.innerHTML = `<div class="day-number">${day}</div>`;
-
-            if (disponibles.length > 0) {
-                dayDiv.innerHTML += `
-                    <button class="btn-elegir" onclick="seleccionarDia(${day})">Elegir hs</button>
-                    <button class="btn-reservar" onclick="abrirModal(${day})">RESERVAR</button>
-                `;
-            } else {
-                dayDiv.innerHTML += `<div class="sin-turnos">Sin turnos</div>`;
+            let row = document.createElement('div');
+            row.className = 'day-row';
+            
+            // Resaltar el día de hoy
+            if(fechaActual.toDateString() === hoy.toDateString()) {
+                row.classList.add('today');
             }
 
-            dayDiv.onclick = function() { seleccionarDia(day); };
-            grid.appendChild(dayDiv);
-        }
-    }
+            let label = document.createElement('div');
+            label.className = 'day-label';
+            label.textContent = `${nombreDias[i]} ${fechaActual.getDate()}`;
 
-    // ============================================================
-    // SELECCIÓN DE DÍA Y HORA
-    // ============================================================
-    function seleccionarDia(day) {
-        diaSeleccionado = day;
-        horaSeleccionada = null;
-        renderizarCalendario();
-        mostrarHorarios(day);
-    }
+            let slotsGroup = document.createElement('div');
+            slotsGroup.className = 'slots-group';
 
-    function mostrarHorarios(day) {
-        const container = document.getElementById('slotsContainer');
-        const fechaStr = formatearFechaServidor(currentYear, currentMonth, day);
-        const reservasDelDia = reservasGlobal[fechaStr] || [];
-        const disponibles = ALL_SLOTS.filter(h => !reservasDelDia.includes(h));
-
-        let html = `<p style="color:#e0e0e0; font-weight:500;">Horarios disponibles para ${fechaStr}:</p><div class="slots-list">`;
-        
-        if (disponibles.length === 0) {
-            html = `<p style="color:#888;">No hay horarios disponibles para este día.</p>`;
-        } else {
             ALL_SLOTS.forEach(hora => {
-                const disponible = disponibles.includes(hora);
-                html += `<div class="slot-item ${disponible ? 'available' : ''}" onclick="${disponible ? `seleccionarHora('${hora}')` : ''}">
-                            ${hora}
-                         </div>`;
+                let btn = document.createElement('button');
+                btn.className = 'slot-btn';
+                btn.textContent = hora;
+                
+                if(disponibles.includes(hora)) {
+                    btn.classList.add('available');
+                    btn.onclick = () => abrirModal(fechaStr, hora);
+                }
+                slotsGroup.appendChild(btn);
             });
+
+            row.appendChild(label);
+            row.appendChild(slotsGroup);
+            container.appendChild(row);
         }
-        html += `</div>`;
-        container.innerHTML = html;
     }
 
-    function seleccionarHora(hora) {
-        horaSeleccionada = hora;
-        const slots = document.querySelectorAll('.slot-item');
-        slots.forEach(s => s.classList.remove('selected-slot'));
-        Array.from(slots).find(s => s.textContent.trim() === hora)?.classList.add('selected-slot');
+    function cambiarSemana(dias) {
+        fechaInicioSemana.setDate(fechaInicioSemana.getDate() + dias);
+        renderizarSemana();
     }
 
-    function abrirModal(day) {
-        if (!horaSeleccionada) {
-            alert('Por favor, primero hacé clic en un horario disponible.');
-            return;
-        }
-        const fechaStr = formatearFechaServidor(currentYear, currentMonth, day);
-        document.getElementById('modalInfo').textContent = `📆 ${fechaStr} - 🕒 ${horaSeleccionada}`;
+    // Modal y Reserva
+    let fechaReservaSeleccionada = '';
+    let horaReservaSeleccionada = '';
+
+    function abrirModal(fecha, hora) {
+        fechaReservaSeleccionada = fecha;
+        horaReservaSeleccionada = hora;
+        document.getElementById('modalInfo').textContent = `📆 ${fecha} - 🕒 ${hora}`;
         document.getElementById('modalReserva').style.display = 'flex';
     }
 
@@ -236,58 +178,48 @@
         document.getElementById('modalReserva').style.display = 'none';
     }
 
-    // ============================================================
-    // GUARDAR RESERVA (CORREGIDO PARA EVITAR "ACCIÓN NO VÁLIDA")
-    // ============================================================
     async function guardarReserva() {
         const cliente = document.getElementById('inputCliente').value.trim();
         const telefono = document.getElementById('inputTelefono').value.trim();
         const notas = document.getElementById('inputNotas').value.trim();
-        const fechaStr = formatearFechaServidor(currentYear, currentMonth, diaSeleccionado);
 
         if (!cliente || !telefono) {
             alert('Completá tu nombre y teléfono.');
             return;
         }
 
-        // 🔥 CORRECCIÓN: Usamos FormData, NO JSON. Esto hace que el doPost lo entienda.
         const formData = new FormData();
-        formData.append('fecha', fechaStr);
-        formData.append('hora', horaSeleccionada);
+        formData.append('fecha', fechaReservaSeleccionada);
+        formData.append('hora', horaReservaSeleccionada);
         formData.append('cliente', cliente);
         formData.append('telefono', telefono);
         formData.append('notas', notas);
 
         try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                body: formData
-            });
+            const response = await fetch(API_URL, { method: 'POST', body: formData });
             const text = await response.text();
             
             if (text === 'OK') {
                 alert('✅ ¡Reserva confirmada!');
                 cerrarModal();
-                cargarReservas(); // Recarga el calendario para bloquear el horario
+                // Espera 2 segundos y recarga
+                setTimeout(() => cargarReservas(), 2000);
             } else {
-                alert('❌ Error al guardar: ' + text);
+                alert('❌ Error: ' + text);
             }
         } catch (error) {
             alert('Error de conexión: ' + error.message);
         }
     }
 
-    function cambiarMes(direccion) {
-        currentMonth += direccion;
-        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-        diaSeleccionado = null;
-        horaSeleccionada = null;
-        renderizarCalendario();
-        document.getElementById('slotsContainer').innerHTML = `<p>Seleccioná un día del calendario para ver los horarios disponibles.</p>`;
-    }
-
     // Inicializar
+    // Para que la semana empiece en la fecha actual, pero calcule el lunes actual:
+    let hoy = new Date();
+    let dia = hoy.getDay();
+    let diffHoy = hoy.getDate() - (dia === 0 ? 6 : dia - 1);
+    fechaInicioSemana = new Date(hoy);
+    fechaInicioSemana.setDate(diffHoy);
+
     cargarReservas();
 </script>
 </body>
