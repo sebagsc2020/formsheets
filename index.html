@@ -5,233 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas - Sebastián González</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background-color: #0b0b0b;
-            color: #e0e0e0;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-            min-height: 100vh;
-        }
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background-color: #141414;
-            border-radius: 30px;
-            padding: 30px 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border: 1px solid #2a2a2a;
-        }
-        h1 {
-            text-align: center;
-            color: #f2c94c;
-            font-size: 2.5rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-        }
-        h1 span {
-            font-size: 1.8rem;
-        }
-        .subtitle {
-            text-align: center;
-            color: #b0b0b0;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-        }
-        .month-header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 40px;
-            margin-bottom: 25px;
-        }
-        .month-header h2 {
-            font-size: 1.8rem;
-            font-weight: 400;
-            color: #e0e0e0;
-        }
-        .month-header button {
-            background: none;
-            border: none;
-            color: #f2c94c;
-            font-size: 2rem;
-            cursor: pointer;
-            padding: 0 15px;
-        }
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        .weekday {
-            text-align: center;
-            color: #888;
-            font-size: 0.9rem;
-            font-weight: bold;
-            padding: 10px 0;
-            letter-spacing: 1px;
-        }
-        .day-box {
-            background-color: #1e1e1e;
-            border-radius: 12px;
-            padding: 10px 5px;
-            text-align: center;
-            min-height: 90px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-            cursor: default;
-        }
-        .day-box.selected {
-            border-color: #f2c94c;
-            background-color: #252525;
-        }
-        .day-number {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #e0e0e0;
-            margin-bottom: 5px;
-        }
-        .day-box.empty {
-            background-color: transparent;
-            min-height: auto;
-        }
-        .btn-elegir {
-            background: #f2c94c;
-            color: #0b0b0b;
-            border: none;
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 5px 0 2px 0;
-            transition: 0.2s;
-        }
-        .btn-elegir:hover {
-            background: #ffda66;
-        }
-        .btn-reservar {
-            background: transparent;
-            border: 1px solid #f2c94c;
-            color: #f2c94c;
-            border-radius: 15px;
-            padding: 2px 10px;
-            font-size: 0.65rem;
-            cursor: pointer;
-            width: fit-content;
-        }
-        .btn-reservar:hover {
-            background: #f2c94c;
-            color: #0b0b0b;
-        }
-        .sin-turnos {
-            color: #555;
-            font-size: 0.65rem;
-            margin-top: 5px;
-        }
-
-        /* Horarios del día seleccionado */
-        .slots-container {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #2a2a2a;
-            text-align: center;
-            min-height: 60px;
-        }
-        .slots-container p {
-            color: #888;
-            font-size: 0.9rem;
-        }
-        .slots-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .slot-item {
-            background-color: #2a2a2a;
-            color: #aaa;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            cursor: not-allowed;
-        }
-        .slot-item.available {
-            background-color: #f2c94c;
-            color: #0b0b0b;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .slot-item.available:hover {
-            background-color: #ffda66;
-        }
-        .slot-item.selected-slot {
-            background-color: #1e1e1e;
-            border: 2px solid #f2c94c;
-            color: #f2c94c;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0b0b; color: #e0e0e0; display: flex; justify-content: center; padding: 20px; min-height: 100vh; }
+        .container { width: 100%; max-width: 900px; background-color: #141414; border-radius: 30px; padding: 30px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 1px solid #2a2a2a; }
+        h1 { text-align: center; color: #f2c94c; font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 5px; }
+        h1 span { font-size: 1.8rem; }
+        .subtitle { text-align: center; color: #b0b0b0; margin-bottom: 30px; font-size: 1.1rem; }
+        .month-header { display: flex; justify-content: center; align-items: center; gap: 40px; margin-bottom: 25px; }
+        .month-header h2 { font-size: 1.8rem; font-weight: 400; color: #e0e0e0; }
+        .month-header button { background: none; border: none; color: #f2c94c; font-size: 2rem; cursor: pointer; padding: 0 15px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 20px; }
+        .weekday { text-align: center; color: #888; font-size: 0.9rem; font-weight: bold; padding: 10px 0; letter-spacing: 1px; }
+        .day-box { background-color: #1e1e1e; border-radius: 12px; padding: 10px 5px; text-align: center; min-height: 90px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; transition: all 0.2s ease; border: 1px solid transparent; cursor: default; }
+        .day-box.selected { border-color: #f2c94c; background-color: #252525; }
+        .day-number { font-size: 1rem; font-weight: 500; color: #e0e0e0; margin-bottom: 5px; }
+        .day-box.empty { background-color: transparent; min-height: auto; }
+        .btn-elegir { background: #f2c94c; color: #0b0b0b; border: none; border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: bold; cursor: pointer; margin: 5px 0 2px 0; transition: 0.2s; }
+        .btn-elegir:hover { background: #ffda66; }
+        .btn-reservar { background: transparent; border: 1px solid #f2c94c; color: #f2c94c; border-radius: 15px; padding: 2px 10px; font-size: 0.65rem; cursor: pointer; width: fit-content; }
+        .btn-reservar:hover { background: #f2c94c; color: #0b0b0b; }
+        .sin-turnos { color: #555; font-size: 0.65rem; margin-top: 5px; }
+        .slots-container { margin-top: 20px; padding-top: 15px; border-top: 1px solid #2a2a2a; text-align: center; min-height: 60px; }
+        .slots-container p { color: #888; font-size: 0.9rem; }
+        .slots-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px; }
+        .slot-item { background-color: #2a2a2a; color: #aaa; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; cursor: not-allowed; }
+        .slot-item.available { background-color: #f2c94c; color: #0b0b0b; cursor: pointer; font-weight: bold; }
+        .slot-item.available:hover { background-color: #ffda66; }
+        .slot-item.selected-slot { background-color: #1e1e1e; border: 2px solid #f2c94c; color: #f2c94c; }
         
-        #modalReserva {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: #141414;
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 400px;
-            width: 90%;
-            border: 1px solid #333;
-        }
+        #modalReserva { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #141414; padding: 30px; border-radius: 20px; max-width: 400px; width: 90%; border: 1px solid #333; }
         .modal-content h3 { margin-bottom: 15px; color: #f2c94c; }
-        .modal-content input, .modal-content textarea {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            background: #1e1e1e;
-            border: 1px solid #333;
-            border-radius: 10px;
-            color: #e0e0e0;
-        }
-        .modal-content button {
-            width: 100%;
-            padding: 12px;
-            background: #f2c94c;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            color: #0b0b0b;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-        .close-modal {
-            background: transparent !important;
-            color: #888 !important;
-            border: 1px solid #333 !important;
-        }
+        .modal-content input, .modal-content textarea { width: 100%; padding: 12px; margin: 8px 0; background: #1e1e1e; border: 1px solid #333; border-radius: 10px; color: #e0e0e0; }
+        .modal-content button { width: 100%; padding: 12px; background: #f2c94c; border: none; border-radius: 10px; font-weight: bold; color: #0b0b0b; margin-top: 10px; cursor: pointer; }
+        .close-modal { background: transparent !important; color: #888 !important; border: 1px solid #333 !important; }
         
-        @media (max-width: 600px) {
-            .day-box { min-height: 75px; padding: 8px 2px; }
-            .btn-elegir { font-size: 0.7rem; padding: 3px 8px; }
-        }
+        @media (max-width: 600px) { .day-box { min-height: 75px; padding: 8px 2px; } .btn-elegir { font-size: 0.7rem; padding: 3px 8px; } }
     </style>
 </head>
 <body>
@@ -276,9 +85,9 @@
 
 <script>
     // ============================================================
-    // CONFIGURACIÓN (URL exacta de tu captura de pantalla)
+    // CONFIGURACIÓN (USANDO LA URL QUE ME DISTE)
     // ============================================================
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzKD7CHpY5iFdiUQt6D1kbaMIwiHqPBH9TONcNnvIjhtUCqqsboKclaYoHYWu7IOnorCw/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyzKD7CHpY5iFdiUQt6D1kbaMIwiHqPBH9TONcNnvIjhtUCqqsboKclaYoHYWu7IOnorCw/exec';
     const ALL_SLOTS = ['09:00','10:00','11:00','12:00','13:00','16:00','17:00','18:00','19:00','20:00','21:00'];
 
     let reservasGlobal = {};
@@ -288,7 +97,7 @@
     let horaSeleccionada = null;
 
     // ============================================================
-    // FUNCIÓN CLAVE CORREGIDA: Formatear fecha a YYYY-MM-DD
+    // FUNCIÓN PARA FORMATEAR FECHA A YYYY-MM-DD
     // ============================================================
     function formatearFechaServidor(year, month, day) {
         const m = String(month + 1).padStart(2, '0');
@@ -297,7 +106,7 @@
     }
 
     // ============================================================
-    // OBTENER RESERVAS DEL SERVIDOR
+    // CARGAR RESERVAS
     // ============================================================
     async function cargarReservas() {
         try {
@@ -311,10 +120,10 @@
                 renderizarCalendario();
                 if (diaSeleccionado) mostrarHorarios(diaSeleccionado);
             } else {
-                console.error('Error en datos:', data.mensaje);
+                console.error('Error en datos del servidor:', data.mensaje);
             }
         } catch (error) {
-            console.error('Error al conectar con el servidor:', error);
+            console.error('Error de conexión:', error);
         }
     }
 
@@ -323,7 +132,6 @@
     // ============================================================
     function renderizarCalendario() {
         const grid = document.getElementById('calendarioGrid');
-        // Limpiar días previos (dejar solo los encabezados)
         grid.innerHTML = `
             <div class="weekday">LUN</div>
             <div class="weekday">MAR</div>
@@ -337,31 +145,24 @@
         const nombreMeses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
         document.getElementById('mesAnioTexto').textContent = `${nombreMeses[currentMonth]} ${currentYear}`;
 
-        // Calcular días del mes
         const primerDia = new Date(currentYear, currentMonth, 1);
         const ultimoDia = new Date(currentYear, currentMonth + 1, 0);
         const totalDias = ultimoDia.getDate();
 
-        // Día de la semana del primer día (0=Dom, 6=Sáb). 
-        // Mapeamos al orden de nuestro grid (LUN=0, DOM=6)
-        let diaSemanaInicio = primerDia.getDay(); // 0 (Dom) a 6 (Sáb)
-        // Ajuste para que DOM sea la columna 6, LUN la 0
+        let diaSemanaInicio = primerDia.getDay();
         let offset = (diaSemanaInicio + 6) % 7; 
 
-        // Días vacíos al inicio
         for (let i = 0; i < offset; i++) {
             const emptyDiv = document.createElement('div');
             emptyDiv.className = 'day-box empty';
             grid.appendChild(emptyDiv);
         }
 
-        // Días con números
         for (let day = 1; day <= totalDias; day++) {
             const dayDiv = document.createElement('div');
             dayDiv.className = 'day-box';
             if (diaSeleccionado === day) dayDiv.classList.add('selected');
 
-            // Fecha en string (YYYY-MM-DD) para buscar en reservasGlobal
             const fechaStr = formatearFechaServidor(currentYear, currentMonth, day);
             const reservasDelDia = reservasGlobal[fechaStr] || [];
             const disponibles = ALL_SLOTS.filter(h => !reservasDelDia.includes(h));
@@ -383,12 +184,12 @@
     }
 
     // ============================================================
-    // MANEJADORES DE EVENTOS
+    // SELECCIÓN DE DÍA Y HORA
     // ============================================================
     function seleccionarDia(day) {
         diaSeleccionado = day;
         horaSeleccionada = null;
-        renderizarCalendario(); // Refresca el borde dorado del día
+        renderizarCalendario();
         mostrarHorarios(day);
     }
 
@@ -416,19 +217,14 @@
 
     function seleccionarHora(hora) {
         horaSeleccionada = hora;
-        // Resaltar la hora seleccionada en la lista visualmente
         const slots = document.querySelectorAll('.slot-item');
         slots.forEach(s => s.classList.remove('selected-slot'));
         Array.from(slots).find(s => s.textContent.trim() === hora)?.classList.add('selected-slot');
-        
-        // Desplazarse suavemente al botón de reservar
-        const btnReservar = document.querySelector('.day-box.selected .btn-reservar');
-        if(btnReservar) btnReservar.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     function abrirModal(day) {
         if (!horaSeleccionada) {
-            alert('Por favor, primero hacé clic en un horario disponible ("Elegir hs")');
+            alert('Por favor, primero hacé clic en un horario disponible.');
             return;
         }
         const fechaStr = formatearFechaServidor(currentYear, currentMonth, day);
@@ -440,6 +236,9 @@
         document.getElementById('modalReserva').style.display = 'none';
     }
 
+    // ============================================================
+    // GUARDAR RESERVA (CORREGIDO PARA EVITAR "ACCIÓN NO VÁLIDA")
+    // ============================================================
     async function guardarReserva() {
         const cliente = document.getElementById('inputCliente').value.trim();
         const telefono = document.getElementById('inputTelefono').value.trim();
@@ -451,25 +250,25 @@
             return;
         }
 
-        const payload = {
-            fecha: fechaStr,
-            hora: horaSeleccionada,
-            cliente: cliente,
-            telefono: telefono,
-            notas: notas
-        };
+        // 🔥 CORRECCIÓN: Usamos FormData, NO JSON. Esto hace que el doPost lo entienda.
+        const formData = new FormData();
+        formData.append('fecha', fechaStr);
+        formData.append('hora', horaSeleccionada);
+        formData.append('cliente', cliente);
+        formData.append('telefono', telefono);
+        formData.append('notas', notas);
 
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
-                body: JSON.stringify(payload)
+                body: formData
             });
             const text = await response.text();
             
             if (text === 'OK') {
-                alert('✅ ¡Reserva confirmada! Te llegará un correo.');
+                alert('✅ ¡Reserva confirmada!');
                 cerrarModal();
-                cargarReservas(); // Recargar las reservas para actualizar el calendario
+                cargarReservas(); // Recarga el calendario para bloquear el horario
             } else {
                 alert('❌ Error al guardar: ' + text);
             }
@@ -488,11 +287,8 @@
         document.getElementById('slotsContainer').innerHTML = `<p>Seleccioná un día del calendario para ver los horarios disponibles.</p>`;
     }
 
-    // ============================================================
-    // INICIALIZACIÓN
-    // ============================================================
+    // Inicializar
     cargarReservas();
-
 </script>
 </body>
 </html>
