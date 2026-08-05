@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>Reservas - Calendario Semanal</title>
     <style>
-        /* ===== ESTILOS (MISMO QUE ANTES) ===== */
+        /* ===== TODOS LOS ESTILOS (MISMO QUE ANTES) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -533,7 +533,6 @@
             border-color: #c8a020;
         }
 
-        /* DEBUG - Mostrar estado de reservas */
         .debug-info {
             background: #111;
             border: 1px solid #2a2a2a;
@@ -542,15 +541,10 @@
             margin-top: 10px;
             font-size: 11px;
             color: #666;
-            display: none;
-            max-height: 150px;
+            max-height: 200px;
             overflow-y: auto;
             font-family: monospace;
             word-break: break-all;
-        }
-
-        .debug-info.show {
-            display: block;
         }
 
         .debug-info .debug-title {
@@ -567,6 +561,11 @@
 
         .debug-info .debug-item .key {
             color: #e8c84a;
+        }
+
+        .debug-info .debug-error {
+            color: #ff6b6b;
+            padding: 4px 0;
         }
 
         @media (max-width: 480px) {
@@ -586,6 +585,7 @@
             .form-group input { padding: 8px 12px; font-size: 14px; }
             .btn-reserve { padding: 10px 16px; font-size: 14px; }
             .message { padding: 10px 14px; font-size: 12px; }
+            .debug-info { font-size: 9px; max-height: 120px; }
         }
 
         @media (max-width: 380px) {
@@ -614,34 +614,28 @@
     <h1>📅 Reserva tu Horario</h1>
     <p class="subtitle">Selecciona un único día y hora para tu reserva</p>
 
-    <!-- AVISO DE COOKIES -->
     <div class="cookie-notice" id="cookieNotice">
         <p>🍪 Usamos cookies para recordar tus datos.</p>
         <button id="acceptCookies">Aceptar</button>
     </div>
 
-    <!-- CARGANDO -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner"></div>
         <p>Cargando disponibilidad...</p>
     </div>
 
-    <!-- NAVEGACIÓN SEMANAL -->
     <div class="week-navigation">
         <button class="week-nav-btn" id="prevWeek">◀ Semana anterior</button>
-        
         <div class="week-info">
             <span id="weekLabel">Semana del</span>
             <span id="weekRange">01/08/2026 - 07/08/2026</span>
         </div>
-        
         <div style="display: flex; gap: 6px;">
             <button class="today-btn" id="todayBtn">📌 Hoy</button>
             <button class="week-nav-btn" id="nextWeek">Semana siguiente ▶</button>
         </div>
     </div>
 
-    <!-- TABLA DE HORARIOS CON SCROLL -->
     <div class="table-wrapper">
         <table class="schedule-table" id="scheduleTable">
             <thead id="tableHead"></thead>
@@ -649,51 +643,27 @@
         </table>
     </div>
 
-    <!-- FORMULARIO -->
     <form id="reservationForm" class="reservation-form">
         <div class="form-group">
             <label for="nombre">Nombre completo</label>
-            <input 
-                type="text" 
-                id="nombre" 
-                name="nombre"
-                placeholder="Ej: Ana Pérez" 
-                autocomplete="name"
-                required
-            >
+            <input type="text" id="nombre" name="nombre" placeholder="Ej: Ana Pérez" autocomplete="name" required>
         </div>
-
         <div class="form-group">
             <label for="email">Correo electrónico</label>
-            <input 
-                type="email" 
-                id="email" 
-                name="email"
-                placeholder="ana@email.com" 
-                autocomplete="email"
-                required
-            >
+            <input type="email" id="email" name="email" placeholder="ana@email.com" autocomplete="email" required>
         </div>
-
         <div class="form-group">
             <label for="telefono">Teléfono</label>
-            <input 
-                type="tel" 
-                id="telefono" 
-                name="telefono"
-                placeholder="+34 600 000 000" 
-                autocomplete="tel"
-            >
+            <input type="tel" id="telefono" name="telefono" placeholder="+34 600 000 000" autocomplete="tel">
         </div>
-
         <button type="submit" class="btn-reserve" id="submitBtn" disabled>Selecciona un horario</button>
     </form>
 
     <div id="message" class="message"></div>
 
-    <!-- PANEL DE DEPURACIÓN (oculto por defecto) -->
+    <!-- PANEL DE DEPURACIÓN -->
     <div class="debug-info" id="debugInfo">
-        <div class="debug-title">🔍 DEPURACIÓN - Reservas cargadas:</div>
+        <div class="debug-title">🔍 DEPURACIÓN</div>
         <div id="debugContent"></div>
     </div>
 </div>
@@ -701,13 +671,9 @@
 <script>
     (function() {
         // ============================================================
-        // CONFIGURACIÓN
+        // 🔴 CONFIGURACIÓN - REEMPLAZA CON TU URL DE APPS SCRIPT 🔴
         // ============================================================
-        // 🔴 REEMPLAZA ESTA URL CON LA DE TU APPS SCRIPT 🔴
-        const API_URL = 'https://script.google.com/macros/s/AKfycbz3bwmvYxuQierHehE8FGXqKL0HAI58WUo9DZ8sb_rFbgHhKqrYsQg7Y2UsnuvxautH/exec';
-        
-        // Modo debug - muestra información de depuración
-        const DEBUG_MODE = true;
+        const API_URL = 'https://script.google.com/macros/s/AKfycbw0hv5_qhV3iS18Tu7Z0FwQKvywAiqO-p_OFAPM29x-42rnxVRoV78CqwmiMUWJLre_aA/exec';
         
         // ============================================================
         // CONFIGURACIÓN DE HORARIOS
@@ -742,17 +708,15 @@
         const cookieNotice = document.getElementById('cookieNotice');
         const acceptBtn = document.getElementById('acceptCookies');
         const loadingOverlay = document.getElementById('loadingOverlay');
-        const debugInfo = document.getElementById('debugInfo');
         const debugContent = document.getElementById('debugContent');
 
         // ============================================================
-        // UTILIDADES DE COOKIES
+        // UTILIDADES
         // ============================================================
         function setCookie(name, value, days = 365) {
             const date = new Date();
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            const expires = `expires=${date.toUTCString()}`;
-            document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))}; ${expires}; path=/; SameSite=Lax`;
+            document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))}; expires=${date.toUTCString()}; path=/; SameSite=Lax`;
         }
 
         function getCookie(name) {
@@ -761,20 +725,13 @@
             for (let cookie of cookies) {
                 cookie = cookie.trim();
                 if (cookie.indexOf(cookieName) === 0) {
-                    const value = cookie.substring(cookieName.length);
-                    try {
-                        return JSON.parse(decodeURIComponent(value));
-                    } catch (e) {
-                        return null;
-                    }
+                    try { return JSON.parse(decodeURIComponent(cookie.substring(cookieName.length))); }
+                    catch (e) { return null; }
                 }
             }
             return null;
         }
 
-        // ============================================================
-        // FUNCIONES DE FECHAS
-        // ============================================================
         function getWeekStart(date) {
             const d = new Date(date);
             const day = d.getDay();
@@ -792,18 +749,12 @@
 
         function formatDate(date) {
             const d = new Date(date);
-            const day = String(d.getDate()).padStart(2, '0');
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const year = d.getFullYear();
-            return `${day}/${month}/${year}`;
+            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
         }
 
         function formatDateKey(date) {
             const d = new Date(date);
-            const day = String(d.getDate()).padStart(2, '0');
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const year = d.getFullYear();
-            return `${year}-${month}-${day}`;
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         }
 
         function getDateForDay(weekStart, dayIndex) {
@@ -813,9 +764,7 @@
         }
 
         function isSameDate(d1, d2) {
-            return d1.getFullYear() === d2.getFullYear() &&
-                   d1.getMonth() === d2.getMonth() &&
-                   d1.getDate() === d2.getDate();
+            return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
         }
 
         function isPastDate(date) {
@@ -831,23 +780,52 @@
         }
 
         // ============================================================
+        // DEPURACIÓN
+        // ============================================================
+        function actualizarDebug(mensaje, tipo = 'info') {
+            const colors = {
+                info: '#999',
+                success: '#4caf50',
+                error: '#ff6b6b',
+                warning: '#ffa726'
+            };
+            const iconos = {
+                info: 'ℹ️',
+                success: '✅',
+                error: '❌',
+                warning: '⚠️'
+            };
+            const html = `<div class="debug-item" style="color:${colors[tipo] || '#999'}">${iconos[tipo] || '•'} ${mensaje}</div>`;
+            debugContent.innerHTML += html;
+            debugContent.scrollTop = debugContent.scrollHeight;
+        }
+
+        function limpiarDebug() {
+            debugContent.innerHTML = '';
+        }
+
+        // ============================================================
         // API - GOOGLE SHEETS
         // ============================================================
         async function cargarReservasDesdeAPI() {
             try {
                 mostrarLoading(true);
-                console.log('🔄 Cargando reservas desde API...');
+                limpiarDebug();
+                actualizarDebug('🔄 Cargando reservas desde Google Sheets...', 'info');
+                actualizarDebug(`📡 URL: ${API_URL}`, 'info');
                 
                 const response = await fetch(API_URL);
-                const data = await response.json();
                 
-                console.log('📦 Respuesta de la API:', data);
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                actualizarDebug(`📦 Respuesta recibida: ${JSON.stringify(data).substring(0, 200)}...`, 'info');
                 
                 if (data.success) {
-                    // Limpiar reservas anteriores
                     reservas = {};
                     
-                    // Convertir array de reservas a objeto para acceso rápido
                     data.reservas.forEach(r => {
                         const key = `${r.fecha}_${r.hora}`;
                         reservas[key] = {
@@ -855,24 +833,19 @@
                             email: r.email || '',
                             telefono: r.telefono || ''
                         };
-                        console.log(`✅ Reserva cargada: ${key} - ${r.nombre}`);
+                        actualizarDebug(`📌 ${key} → ${r.nombre}`, 'success');
                     });
                     
-                    // Mostrar depuración
-                    if (DEBUG_MODE) {
-                        mostrarDebug(reservas);
-                    }
-                    
-                    console.log(`📊 Total de reservas cargadas: ${Object.keys(reservas).length}`);
+                    actualizarDebug(`📊 Total de reservas cargadas: ${Object.keys(reservas).length}`, 'success');
                     return true;
                 } else {
-                    console.error('❌ Error al cargar reservas:', data.error);
-                    mostrarMensaje('⚠️ Error al cargar disponibilidad. Intenta de nuevo.', 'error');
+                    actualizarDebug(`❌ Error: ${data.error || 'Error desconocido'}`, 'error');
                     return false;
                 }
             } catch (error) {
-                console.error('❌ Error de conexión:', error);
-                mostrarMensaje('⚠️ Error de conexión. Verifica tu internet.', 'error');
+                actualizarDebug(`❌ Error de conexión: ${error.message}`, 'error');
+                actualizarDebug(`💡 Verifica que la URL de la API sea correcta y esté publicada`, 'warning');
+                actualizarDebug(`💡 La URL debe terminar en /exec`, 'warning');
                 return false;
             } finally {
                 mostrarLoading(false);
@@ -881,50 +854,22 @@
 
         async function guardarReservaEnAPI(fecha, hora, nombre, email, telefono) {
             try {
-                console.log('📤 Enviando reserva:', { fecha, hora, nombre, email, telefono });
+                actualizarDebug(`📤 Enviando reserva: ${fecha} ${hora} - ${nombre}`, 'info');
                 
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        fecha: fecha,
-                        hora: hora,
-                        nombre: nombre,
-                        email: email,
-                        telefono: telefono || ''
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fecha, hora, nombre, email, telefono: telefono || '' })
                 });
 
-                // Con no-cors no podemos leer la respuesta directamente
-                console.log('📤 Reserva enviada (no-cors)');
+                actualizarDebug(`✅ Reserva enviada correctamente (no-cors)`, 'success');
                 return { success: true };
                 
             } catch (error) {
-                console.error('❌ Error al guardar:', error);
-                return { success: false, error: error.toString() };
+                actualizarDebug(`❌ Error al guardar: ${error.message}`, 'error');
+                return { success: false, error: error.message };
             }
-        }
-
-        // ============================================================
-        // DEPURACIÓN
-        // ============================================================
-        function mostrarDebug(reservasObj) {
-            debugInfo.classList.add('show');
-            let html = '';
-            const keys = Object.keys(reservasObj);
-            if (keys.length === 0) {
-                html = '<div class="debug-item">No hay reservas cargadas</div>';
-            } else {
-                keys.forEach(key => {
-                    const r = reservasObj[key];
-                    html += `<div class="debug-item"><span class="key">${key}</span> → ${r.nombre} (${r.email})</div>`;
-                });
-                html += `<div class="debug-item" style="color:#8a7a4a; margin-top:5px; border-top:1px solid #2a2a2a; padding-top:5px;">Total: ${keys.length} reservas</div>`;
-            }
-            debugContent.innerHTML = html;
         }
 
         // ============================================================
@@ -932,60 +877,14 @@
         // ============================================================
         function mostrarLoading(show) {
             isLoading = show;
+            const wrapper = document.querySelector('.table-wrapper');
             if (show) {
                 loadingOverlay.classList.add('show');
-                const wrapper = document.querySelector('.table-wrapper');
-                if (wrapper) {
-                    wrapper.style.opacity = '0.3';
-                    wrapper.style.pointerEvents = 'none';
-                }
+                if (wrapper) { wrapper.style.opacity = '0.3'; wrapper.style.pointerEvents = 'none'; }
             } else {
                 loadingOverlay.classList.remove('show');
-                const wrapper = document.querySelector('.table-wrapper');
-                if (wrapper) {
-                    wrapper.style.opacity = '1';
-                    wrapper.style.pointerEvents = 'auto';
-                }
+                if (wrapper) { wrapper.style.opacity = '1'; wrapper.style.pointerEvents = 'auto'; }
             }
-        }
-
-        // ============================================================
-        // GESTIÓN DE COOKIES
-        // ============================================================
-        function loadFromCookies() {
-            const savedData = getCookie('reservas_data');
-            if (savedData && savedData.user) {
-                document.getElementById('nombre').value = savedData.user.nombre || '';
-                document.getElementById('email').value = savedData.user.email || '';
-                document.getElementById('telefono').value = savedData.user.telefono || '';
-                return true;
-            }
-            return false;
-        }
-
-        function saveToCookies() {
-            if (!cookiesAccepted) return;
-            
-            const data = {
-                user: {
-                    nombre: document.getElementById('nombre').value.trim(),
-                    email: document.getElementById('email').value.trim(),
-                    telefono: document.getElementById('telefono').value.trim()
-                }
-            };
-            setCookie('reservas_data', data);
-        }
-
-        function autoSaveUserData() {
-            const inputs = ['nombre', 'email', 'telefono'];
-            inputs.forEach(id => {
-                const input = document.getElementById(id);
-                input.addEventListener('input', function() {
-                    if (cookiesAccepted) {
-                        saveToCookies();
-                    }
-                });
-            });
         }
 
         // ============================================================
@@ -996,37 +895,34 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            console.log('🎨 Renderizando tabla para semana:', formatDate(startDate));
-            console.log('📊 Reservas disponibles:', Object.keys(reservas).length);
+            actualizarDebug(`🎨 Renderizando tabla para semana: ${formatDate(startDate)}`, 'info');
+            actualizarDebug(`📊 Reservas disponibles: ${Object.keys(reservas).length}`, 'info');
             
-            // Generar encabezado
+            // Encabezado
             let theadHTML = '<tr><th>Hora</th>';
             for (let i = 0; i < 6; i++) {
                 const date = getDateForDay(startDate, i);
                 const dayName = DIAS_SEMANA[i];
                 const dateStr = formatDate(date);
-                const isWeekend = (i === 5);
-                const weekendClass = isWeekend ? 'weekend' : '';
+                const isWeekend = (i === 5) ? 'weekend' : '';
                 const isToday = isSameDate(date, today);
                 const todayClass = isToday ? 'today-header' : '';
                 
-                theadHTML += `<th class="${weekendClass} ${todayClass}">${dayName}<span class="day-date">${dateStr}</span>`;
-                if (isToday) {
-                    theadHTML += ` <span class="today-badge">✦ HOY</span>`;
-                }
+                theadHTML += `<th class="${isWeekend} ${todayClass}">${dayName}<span class="day-date">${dateStr}</span>`;
+                if (isToday) theadHTML += ` <span class="today-badge">✦ HOY</span>`;
                 theadHTML += `</th>`;
             }
             theadHTML += '</tr>';
             tableHead.innerHTML = theadHTML;
 
-            // Generar cuerpo
+            // Cuerpo
             let tbodyHTML = '';
             
             HORAS_MANANA.forEach(hora => {
                 tbodyHTML += generarFilaHora(hora, startDate, today);
             });
             
-            // FILA SEPARADORA
+            // Separador
             tbodyHTML += `<tr class="separator-row">`;
             tbodyHTML += `<td class="time-col" style="background:#111; text-align:center; font-size:clamp(8px,1.5vw,11px); color:#8a7a4a; font-weight:600;">⏰</td>`;
             for (let i = 0; i < 6; i++) {
@@ -1045,32 +941,23 @@
             
             tableBody.innerHTML = tbodyHTML;
 
-            // Actualizar rango de fechas
+            // Actualizar rango
             const endDate = addWeeks(startDate, 1);
             endDate.setDate(endDate.getDate() - 1);
             weekRange.textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
             weekLabel.textContent = 'Semana del';
 
-            // Actualizar botones de navegación
+            // Botones
             const todayWeekStart = getWeekStart(today);
-            
             const startWeek = getWeekStart(FECHA_INICIO);
             const diffWeeks = Math.floor((startDate - startWeek) / (7 * 24 * 60 * 60 * 1000));
             prevBtn.disabled = (diffWeeks <= 0);
-
-            if (isSameDate(startDate, todayWeekStart)) {
-                todayBtn.disabled = true;
-            } else {
-                todayBtn.disabled = false;
-            }
+            todayBtn.disabled = isSameDate(startDate, todayWeekStart);
 
             updateSubmitButton();
             attachRadioEvents();
         }
 
-        // ============================================================
-        // FUNCIÓN PARA GENERAR FILA DE HORA
-        // ============================================================
         function generarFilaHora(hora, startDate, today) {
             let html = `<tr><td class="time-col">${hora}</td>`;
             for (let i = 0; i < 6; i++) {
@@ -1078,16 +965,9 @@
                 const dateKey = formatDateKey(date);
                 const radioId = `${dateKey}_${hora}`;
                 const isPast = isPastDate(date) || isBeforeSiteStart(date);
-                
-                // Verificar si está reservado
                 const isReserved = reservas[radioId] !== undefined;
                 const isSelected = selectedSlot && selectedSlot.dateKey === dateKey && selectedSlot.time === hora;
                 const isToday = isSameDate(date, today);
-                
-                // DEBUG: Mostrar estado de cada celda
-                if (isReserved && DEBUG_MODE) {
-                    console.log(`🔒 ${radioId} → RESERVADO por ${reservas[radioId].nombre}`);
-                }
                 
                 let tdClass = '';
                 if (isPast) tdClass += 'past ';
@@ -1096,29 +976,16 @@
                 if (isToday) tdClass += 'today-column ';
                 
                 html += `<td class="${tdClass}">`;
-                
-                const disabled = isPast || isReserved;
-                const checked = isSelected ? 'checked' : '';
-                
-                html += `<input type="radio" 
-                               class="slot-radio"
-                               name="slot" 
-                               id="${radioId}" 
-                               data-date="${dateKey}" 
-                               data-time="${hora}"
-                               ${checked}
-                               ${disabled ? 'disabled' : ''}
-                        >`;
-                
+                html += `<input type="radio" class="slot-radio" name="slot" id="${radioId}" 
+                               data-date="${dateKey}" data-time="${hora}" 
+                               ${isSelected ? 'checked' : ''} 
+                               ${(isPast || isReserved) ? 'disabled' : ''}>`;
                 html += '</td>';
             }
             html += '</tr>';
             return html;
         }
 
-        // ============================================================
-        // EVENTOS DE RADIO
-        // ============================================================
         function attachRadioEvents() {
             document.querySelectorAll('input[name="slot"]').forEach(radio => {
                 radio.removeEventListener('change', handleRadioChange);
@@ -1143,18 +1010,13 @@
                 }
                 
                 selectedSlot = { dateKey, time };
-                
                 const parentTd = radio.closest('td');
                 if (parentTd) parentTd.classList.add('selected');
-                
                 updateSubmitButton();
                 messageDiv.classList.remove('show');
             }
         }
 
-        // ============================================================
-        // ACTUALIZAR BOTÓN DE SUBMIT
-        // ============================================================
         function updateSubmitButton() {
             if (selectedSlot) {
                 submitBtn.disabled = false;
@@ -1179,24 +1041,16 @@
         function goToToday() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            const todayWeekStart = getWeekStart(today);
-            currentWeekStart = todayWeekStart;
+            currentWeekStart = getWeekStart(today);
             selectedSlot = null;
             renderTable(currentWeekStart);
             messageDiv.classList.remove('show');
         }
 
-        // ============================================================
-        // MENSAJES
-        // ============================================================
         function mostrarMensaje(texto, tipo = 'success') {
             messageDiv.textContent = texto;
             messageDiv.className = 'message show';
-            if (tipo === 'error') {
-                messageDiv.classList.add('error');
-            } else {
-                messageDiv.classList.add('success');
-            }
+            messageDiv.classList.add(tipo === 'error' ? 'error' : 'success');
         }
 
         // ============================================================
@@ -1220,27 +1074,25 @@
             const telefono = document.getElementById('telefono').value.trim();
 
             if (!nombre || nombre.length < 2) {
-                mostrarMensaje('⚠️ Por favor, ingresa un nombre válido.', 'error');
+                mostrarMensaje('⚠️ Ingresa un nombre válido.', 'error');
                 return;
             }
 
             if (!email || !email.includes('@') || !email.includes('.')) {
-                mostrarMensaje('⚠️ Ingresa un correo electrónico válido.', 'error');
+                mostrarMensaje('⚠️ Ingresa un correo válido.', 'error');
                 return;
             }
 
             const slotId = `${selectedSlot.dateKey}_${selectedSlot.time}`;
             
-            // Verificar que el horario no haya sido reservado mientras tanto
             if (reservas[slotId]) {
-                mostrarMensaje('⚠️ Este horario ya fue reservado. Por favor, selecciona otro.', 'error');
+                mostrarMensaje('⚠️ Este horario ya fue reservado.', 'error');
                 selectedSlot = null;
                 await cargarReservasDesdeAPI();
                 renderTable(currentWeekStart);
                 return;
             }
 
-            // Guardar en Google Sheets
             mostrarLoading(true);
             const result = await guardarReservaEnAPI(
                 selectedSlot.dateKey,
@@ -1250,15 +1102,11 @@
                 telefono
             );
             
-            // Esperar un momento para que se procese en el servidor
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Recargar reservas desde la API para confirmar
+            await new Promise(resolve => setTimeout(resolve, 1500));
             await cargarReservasDesdeAPI();
             mostrarLoading(false);
 
             if (result.success) {
-                // Guardar localmente también
                 reservas[slotId] = { nombre, email, telefono };
                 saveToCookies();
 
@@ -1273,15 +1121,6 @@
                     <span style="font-size:clamp(12px,2vw,14px); opacity:0.6;">Te enviaremos un correo a ${email} con los detalles.</span>
                 `;
 
-                console.log('✅ Reserva confirmada:', {
-                    nombre,
-                    email,
-                    telefono,
-                    fecha: dateStr,
-                    hora: selectedSlot.time,
-                    dateKey: selectedSlot.dateKey
-                });
-
                 selectedSlot = null;
                 renderTable(currentWeekStart);
             } else {
@@ -1291,8 +1130,38 @@
         });
 
         // ============================================================
-        // COOKIES - ACEPTAR
+        // COOKIES
         // ============================================================
+        function loadFromCookies() {
+            const savedData = getCookie('reservas_data');
+            if (savedData && savedData.user) {
+                document.getElementById('nombre').value = savedData.user.nombre || '';
+                document.getElementById('email').value = savedData.user.email || '';
+                document.getElementById('telefono').value = savedData.user.telefono || '';
+                return true;
+            }
+            return false;
+        }
+
+        function saveToCookies() {
+            if (!cookiesAccepted) return;
+            setCookie('reservas_data', {
+                user: {
+                    nombre: document.getElementById('nombre').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    telefono: document.getElementById('telefono').value.trim()
+                }
+            });
+        }
+
+        function autoSaveUserData() {
+            ['nombre', 'email', 'telefono'].forEach(id => {
+                document.getElementById(id).addEventListener('input', () => {
+                    if (cookiesAccepted) saveToCookies();
+                });
+            });
+        }
+
         acceptBtn.addEventListener('click', function() {
             cookiesAccepted = true;
             cookieNotice.style.display = 'none';
@@ -1304,49 +1173,35 @@
         // INICIALIZAR
         // ============================================================
         async function init() {
-            console.log('🚀 Iniciando aplicación...');
+            actualizarDebug('🚀 Iniciando aplicación...', 'info');
             
-            // Cargar datos de cookies
             const savedData = getCookie('reservas_data');
             if (savedData) {
                 cookiesAccepted = true;
                 cookieNotice.style.display = 'none';
                 loadFromCookies();
                 autoSaveUserData();
-                console.log('🍪 Datos de cookies cargados');
+                actualizarDebug('🍪 Datos de cookies cargados', 'success');
             }
 
-            // Cargar reservas desde Google Sheets
-            console.log('📥 Cargando reservas desde Google Sheets...');
             await cargarReservasDesdeAPI();
 
-            // Configurar semana inicial
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            const todayWeekStart = getWeekStart(today);
+            currentWeekStart = today < FECHA_INICIO ? getWeekStart(FECHA_INICIO) : getWeekStart(today);
             
-            if (today < FECHA_INICIO) {
-                currentWeekStart = getWeekStart(FECHA_INICIO);
-            } else {
-                currentWeekStart = todayWeekStart;
-            }
-            
-            console.log('📅 Semana inicial:', formatDate(currentWeekStart));
             renderTable(currentWeekStart);
-            
-            console.log('✅ Aplicación iniciada correctamente');
+            actualizarDebug('✅ Aplicación iniciada correctamente', 'success');
+            actualizarDebug(`📅 Semana actual: ${formatDate(currentWeekStart)}`, 'info');
         }
 
         // ============================================================
-        // EVENTOS DE NAVEGACIÓN
+        // EVENTOS
         // ============================================================
         prevBtn.addEventListener('click', () => goToWeek(-1));
         nextBtn.addEventListener('click', () => goToWeek(1));
         todayBtn.addEventListener('click', goToToday);
 
-        // ============================================================
-        // INICIAR
-        // ============================================================
         init();
 
     })();
