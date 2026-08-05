@@ -152,6 +152,17 @@
             background: #2a3a4a;
         }
 
+        /* Día actual destacado en el encabezado */
+        .schedule-table th.today-header {
+            background: #2a7de1;
+            box-shadow: inset 0 -3px 0 #ffd700;
+        }
+
+        .schedule-table th.today-header .day-date {
+            color: #ffd700;
+            opacity: 1;
+        }
+
         .schedule-table td {
             padding: 8px 4px;
             text-align: center;
@@ -172,12 +183,44 @@
             font-size: 13px;
         }
 
+        /* Columna del día actual - fondo difuminado */
+        .schedule-table td.today-column {
+            background: linear-gradient(135deg, #e8f0fe 0%, #d4e4ff 100%);
+            position: relative;
+        }
+
+        .schedule-table td.today-column::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(42, 125, 225, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .schedule-table td.today-column.past {
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+        }
+
+        .schedule-table td.today-column.reserved {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        }
+
+        .schedule-table td.today-column.selected {
+            background: linear-gradient(135deg, #b5d4ff 0%, #8bb8f5 100%);
+            box-shadow: inset 0 0 0 2px #2a7de1;
+        }
+
         .schedule-table input[type="radio"] {
             width: 18px;
             height: 18px;
             accent-color: #2a7de1;
             cursor: pointer;
             transition: transform 0.15s;
+            position: relative;
+            z-index: 1;
         }
 
         .schedule-table input[type="radio"]:hover:not(:disabled) {
@@ -476,10 +519,6 @@
             return null;
         }
 
-        function deleteCookie(name) {
-            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-        }
-
         // === CONFIGURACIÓN ===
         const HORAS = ['9:00', '10:00', '11:00', '12:00', '13:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
         const DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -567,7 +606,6 @@
             const savedData = getCookie('reservas_data');
             if (savedData) {
                 reservas = savedData.reservas || {};
-                // Cargar datos del usuario
                 if (savedData.user) {
                     document.getElementById('nombre').value = savedData.user.nombre || '';
                     document.getElementById('email').value = savedData.user.email || '';
@@ -593,7 +631,6 @@
         }
 
         function autoSaveUserData() {
-            // Guardar automáticamente cuando el usuario escribe
             const inputs = ['nombre', 'email', 'telefono'];
             inputs.forEach(id => {
                 const input = document.getElementById(id);
@@ -605,9 +642,11 @@
             });
         }
 
-        // === GENERAR TABLA ===
+        // === GENERAR TABLA CON DÍA ACTUAL DESTACADO ===
         function renderTable(weekStart) {
             const startDate = new Date(weekStart);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
             
             // Generar encabezado
             let theadHTML = '<tr><th>Hora</th>';
@@ -617,7 +656,16 @@
                 const dateStr = formatDate(date);
                 const isWeekend = (i === 5);
                 const weekendClass = isWeekend ? 'weekend' : '';
-                theadHTML += `<th class="${weekendClass}">${dayName}<span class="day-date">${dateStr}</span></th>`;
+                
+                // Verificar si es hoy
+                const isToday = isSameDate(date, today);
+                const todayClass = isToday ? 'today-header' : '';
+                
+                theadHTML += `<th class="${weekendClass} ${todayClass}">${dayName}<span class="day-date">${dateStr}</span>`;
+                if (isToday) {
+                    theadHTML += ` <span style="font-size:10px; background:#ffd700; color:#1e2b3a; padding:1px 8px; border-radius:10px; display:inline-block; margin-top:3px;">HOY</span>`;
+                }
+                theadHTML += `</th>`;
             }
             theadHTML += '</tr>';
             tableHead.innerHTML = theadHTML;
@@ -633,11 +681,14 @@
                     const isPast = isPastDate(date) || isBeforeSiteStart(date);
                     const isReserved = reservas[radioId] !== undefined;
                     const isSelected = selectedSlot && selectedSlot.dateKey === dateKey && selectedSlot.time === hora;
+                    const isToday = isSameDate(date, today);
                     
+                    // Clases para el td
                     let tdClass = '';
                     if (isPast) tdClass += 'past ';
                     if (isReserved) tdClass += 'reserved ';
                     if (isSelected) tdClass += 'selected ';
+                    if (isToday) tdClass += 'today-column ';
                     
                     tbodyHTML += `<td class="${tdClass}">`;
                     
@@ -666,8 +717,6 @@
             weekLabel.textContent = 'Semana del';
 
             // Actualizar botones de navegación
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
             const todayWeekStart = getWeekStart(today);
             
             const startWeek = getWeekStart(FECHA_INICIO);
@@ -797,7 +846,6 @@
                 telefono
             };
 
-            // Guardar en cookies
             saveToCookies();
 
             const [year, month, day] = selectedSlot.dateKey.split('-');
@@ -829,15 +877,12 @@
         acceptBtn.addEventListener('click', function() {
             cookiesAccepted = true;
             cookieNotice.style.display = 'none';
-            // Guardar datos actuales
             saveToCookies();
-            // Activar auto-guardado
             autoSaveUserData();
         });
 
         // === INICIALIZAR ===
         function init() {
-            // Verificar si ya se aceptaron las cookies
             const savedData = getCookie('reservas_data');
             if (savedData) {
                 cookiesAccepted = true;
@@ -846,10 +891,20 @@
                 autoSaveUserData();
             }
 
-            currentWeekStart = getWeekStart(FECHA_INICIO);
+            // Asegurar que la semana actual siempre muestre el día de hoy
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayWeekStart = getWeekStart(today);
+            
+            // Si la fecha actual es anterior al inicio del sitio, usar fecha de inicio
+            if (today < FECHA_INICIO) {
+                currentWeekStart = getWeekStart(FECHA_INICIO);
+            } else {
+                currentWeekStart = todayWeekStart;
+            }
+            
             renderTable(currentWeekStart);
 
-            // Reservas de ejemplo (solo si no hay datos en cookies)
             if (!savedData) {
                 reservas['2026-08-03_10:00'] = { nombre: 'Ana Pérez', email: 'ana@email.com', telefono: '600000000' };
                 reservas['2026-08-05_16:00'] = { nombre: 'Carlos Gómez', email: 'carlos@email.com', telefono: '611111111' };
