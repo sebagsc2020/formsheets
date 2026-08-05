@@ -75,11 +75,11 @@
             gap: 6px;
         }
 
-        .week-nav-btn:hover {
+        .week-nav-btn:hover:not(:disabled) {
             background: #2a7de1;
         }
 
-        .week-nav-btn:active {
+        .week-nav-btn:active:not(:disabled) {
             transform: scale(0.95);
         }
 
@@ -112,8 +112,13 @@
             transition: all 0.25s;
         }
 
-        .today-btn:hover {
+        .today-btn:hover:not(:disabled) {
             background: #d0d9e6;
+        }
+
+        .today-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
 
         /* === TABLA DE HORARIOS === */
@@ -152,6 +157,7 @@
             text-align: center;
             border-bottom: 1px solid #eaeef2;
             background: #fafbfc;
+            transition: background 0.2s;
         }
 
         .schedule-table tr:last-child td {
@@ -166,7 +172,7 @@
             font-size: 13px;
         }
 
-        .schedule-table input[type="checkbox"] {
+        .schedule-table input[type="radio"] {
             width: 18px;
             height: 18px;
             accent-color: #2a7de1;
@@ -174,14 +180,35 @@
             transition: transform 0.15s;
         }
 
-        .schedule-table input[type="checkbox"]:hover {
+        .schedule-table input[type="radio"]:hover:not(:disabled) {
             transform: scale(1.2);
         }
 
-        .schedule-table input[type="checkbox"]:disabled {
+        .schedule-table input[type="radio"]:disabled {
             accent-color: #b0b8c4;
             cursor: not-allowed;
             opacity: 0.5;
+        }
+
+        .schedule-table td.reserved {
+            background: #e8f0fe;
+            position: relative;
+        }
+
+        .schedule-table td.reserved::after {
+            content: '📌';
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .schedule-table td.past {
+            background: #f5f5f5;
+            opacity: 0.6;
+        }
+
+        .schedule-table td.selected {
+            background: #d4e4ff;
+            box-shadow: inset 0 0 0 2px #2a7de1;
         }
 
         /* === FORMULARIO === */
@@ -250,12 +277,17 @@
             min-width: 130px;
         }
 
-        .btn-reserve:hover {
+        .btn-reserve:hover:not(:disabled) {
             background: #2a7de1;
         }
 
-        .btn-reserve:active {
+        .btn-reserve:active:not(:disabled) {
             transform: scale(0.96);
+        }
+
+        .btn-reserve:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .message {
@@ -280,6 +312,41 @@
             color: #a11f2a;
         }
 
+        .cookie-notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .cookie-notice p {
+            margin: 0;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        .cookie-notice button {
+            background: #1e2b3a;
+            color: white;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: background 0.25s;
+        }
+
+        .cookie-notice button:hover {
+            background: #2a7de1;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .container { padding: 18px 12px; }
@@ -289,10 +356,11 @@
             .schedule-table th { padding: 8px 3px; font-size: 12px; }
             .schedule-table td { padding: 5px 2px; }
             .schedule-table .time-col { width: 50px; font-size: 11px; }
-            .schedule-table input[type="checkbox"] { width: 15px; height: 15px; }
+            .schedule-table input[type="radio"] { width: 15px; height: 15px; }
             .reservation-form { flex-direction: column; align-items: stretch; gap: 12px; }
             .btn-reserve { margin-left: 0; width: 100%; align-self: center; }
             .form-group { flex: 1 1 auto; }
+            .cookie-notice { flex-direction: column; text-align: center; }
         }
 
         @media (max-width: 480px) {
@@ -307,7 +375,13 @@
 
 <div class="container">
     <h1>📅 Reserva tu Horario</h1>
-    <p class="subtitle">Selecciona día y hora para tu reserva</p>
+    <p class="subtitle">Selecciona un único día y hora para tu reserva</p>
+
+    <!-- AVISO DE COOKIES -->
+    <div class="cookie-notice" id="cookieNotice">
+        <p>🍪 Usamos cookies para recordar tus datos y reservas.</p>
+        <button id="acceptCookies">Aceptar</button>
+    </div>
 
     <!-- NAVEGACIÓN SEMANAL -->
     <div class="week-navigation">
@@ -324,15 +398,11 @@
         </div>
     </div>
 
-    <!-- TABLA DE HORARIOS (se genera dinámicamente) -->
+    <!-- TABLA DE HORARIOS -->
     <div id="tableContainer">
         <table class="schedule-table" id="scheduleTable">
-            <thead id="tableHead">
-                <!-- Se genera con JavaScript -->
-            </thead>
-            <tbody id="tableBody">
-                <!-- Se genera con JavaScript -->
-            </tbody>
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
         </table>
     </div>
 
@@ -344,21 +414,10 @@
                 type="text" 
                 id="nombre" 
                 name="nombre"
-                list="nombres-sugeridos"
                 placeholder="Ej: Ana Pérez" 
                 autocomplete="name"
                 required
             >
-            <datalist id="nombres-sugeridos">
-                <option value="Ana Pérez">
-                <option value="Carlos Gómez">
-                <option value="María Rodríguez">
-                <option value="Juan Martínez">
-                <option value="Laura Fernández">
-                <option value="Pedro Sánchez">
-                <option value="Elena López">
-                <option value="Miguel Torres">
-            </datalist>
         </div>
 
         <div class="form-group">
@@ -367,21 +426,10 @@
                 type="email" 
                 id="email" 
                 name="email"
-                list="emails-sugeridos"
                 placeholder="ana@email.com" 
                 autocomplete="email"
                 required
             >
-            <datalist id="emails-sugeridos">
-                <option value="ana.perez@email.com">
-                <option value="carlos.gomez@email.com">
-                <option value="maria.rodriguez@email.com">
-                <option value="juan.martinez@email.com">
-                <option value="laura.fernandez@email.com">
-                <option value="pedro.sanchez@email.com">
-                <option value="elena.lopez@email.com">
-                <option value="miguel.torres@email.com">
-            </datalist>
         </div>
 
         <div class="form-group">
@@ -395,7 +443,7 @@
             >
         </div>
 
-        <button type="submit" class="btn-reserve">Confirmar Reserva</button>
+        <button type="submit" class="btn-reserve" id="submitBtn" disabled>Selecciona un horario</button>
     </form>
 
     <div id="message" class="message"></div>
@@ -403,17 +451,46 @@
 
 <script>
     (function() {
+        // === UTILIDADES DE COOKIES ===
+        function setCookie(name, value, days = 365) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = `expires=${date.toUTCString()}`;
+            document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))}; ${expires}; path=/; SameSite=Lax`;
+        }
+
+        function getCookie(name) {
+            const cookieName = `${name}=`;
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.indexOf(cookieName) === 0) {
+                    const value = cookie.substring(cookieName.length);
+                    try {
+                        return JSON.parse(decodeURIComponent(value));
+                    } catch (e) {
+                        return null;
+                    }
+                }
+            }
+            return null;
+        }
+
+        function deleteCookie(name) {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        }
+
         // === CONFIGURACIÓN ===
         const HORAS = ['9:00', '10:00', '11:00', '12:00', '13:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
         const DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-        const DIAS_EN = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
         
-        // Fecha de inicio: 1 de Agosto 2026
-        const FECHA_INICIO = new Date(2026, 7, 1); // Mes 7 = Agosto
+        const FECHA_INICIO = new Date(2026, 7, 1);
 
         // Estado
         let currentWeekStart = getWeekStart(FECHA_INICIO);
-        let reservas = {}; // Formato: { '2026-08-03_9:00': true }
+        let reservas = {};
+        let selectedSlot = null;
+        let cookiesAccepted = false;
 
         // Elementos DOM
         const tableHead = document.getElementById('tableHead');
@@ -425,12 +502,14 @@
         const todayBtn = document.getElementById('todayBtn');
         const form = document.getElementById('reservationForm');
         const messageDiv = document.getElementById('message');
+        const submitBtn = document.getElementById('submitBtn');
+        const cookieNotice = document.getElementById('cookieNotice');
+        const acceptBtn = document.getElementById('acceptCookies');
 
         // === FUNCIONES DE FECHAS ===
         function getWeekStart(date) {
             const d = new Date(date);
             const day = d.getDay();
-            // Si es domingo (0), restamos 6 para ir al lunes anterior
             const diff = (day === 0) ? 6 : day - 1;
             d.setDate(d.getDate() - diff);
             d.setHours(0, 0, 0, 0);
@@ -459,13 +538,7 @@
             return `${year}-${month}-${day}`;
         }
 
-        function getDayOfWeek(date) {
-            const d = new Date(date);
-            return d.getDay(); // 0=domingo, 1=lunes...
-        }
-
         function getDateForDay(weekStart, dayIndex) {
-            // dayIndex: 0=lunes, 1=martes... 5=sábado
             const d = new Date(weekStart);
             d.setDate(d.getDate() + dayIndex);
             return d;
@@ -483,17 +556,66 @@
             return date < today;
         }
 
+        function isBeforeSiteStart(date) {
+            const start = new Date(FECHA_INICIO);
+            start.setHours(0, 0, 0, 0);
+            return date < start;
+        }
+
+        // === GESTIÓN DE COOKIES ===
+        function loadFromCookies() {
+            const savedData = getCookie('reservas_data');
+            if (savedData) {
+                reservas = savedData.reservas || {};
+                // Cargar datos del usuario
+                if (savedData.user) {
+                    document.getElementById('nombre').value = savedData.user.nombre || '';
+                    document.getElementById('email').value = savedData.user.email || '';
+                    document.getElementById('telefono').value = savedData.user.telefono || '';
+                }
+                return true;
+            }
+            return false;
+        }
+
+        function saveToCookies() {
+            if (!cookiesAccepted) return;
+            
+            const data = {
+                reservas: reservas,
+                user: {
+                    nombre: document.getElementById('nombre').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    telefono: document.getElementById('telefono').value.trim()
+                }
+            };
+            setCookie('reservas_data', data);
+        }
+
+        function autoSaveUserData() {
+            // Guardar automáticamente cuando el usuario escribe
+            const inputs = ['nombre', 'email', 'telefono'];
+            inputs.forEach(id => {
+                const input = document.getElementById(id);
+                input.addEventListener('input', function() {
+                    if (cookiesAccepted) {
+                        saveToCookies();
+                    }
+                });
+            });
+        }
+
         // === GENERAR TABLA ===
         function renderTable(weekStart) {
             const startDate = new Date(weekStart);
             
-            // Actualizar encabezado
+            // Generar encabezado
             let theadHTML = '<tr><th>Hora</th>';
             for (let i = 0; i < 6; i++) {
                 const date = getDateForDay(startDate, i);
                 const dayName = DIAS_SEMANA[i];
                 const dateStr = formatDate(date);
-                const isWeekend = (i === 5); // Sábado
+                const isWeekend = (i === 5);
                 const weekendClass = isWeekend ? 'weekend' : '';
                 theadHTML += `<th class="${weekendClass}">${dayName}<span class="day-date">${dateStr}</span></th>`;
             }
@@ -507,25 +629,31 @@
                 for (let i = 0; i < 6; i++) {
                     const date = getDateForDay(startDate, i);
                     const dateKey = formatDateKey(date);
-                    const checkboxId = `${dateKey}_${hora}`;
-                    const isPast = isPastDate(date);
-                    const isReserved = reservas[checkboxId] || false;
+                    const radioId = `${dateKey}_${hora}`;
+                    const isPast = isPastDate(date) || isBeforeSiteStart(date);
+                    const isReserved = reservas[radioId] !== undefined;
+                    const isSelected = selectedSlot && selectedSlot.dateKey === dateKey && selectedSlot.time === hora;
                     
-                    // Deshabilitar si es pasado o ya reservado
+                    let tdClass = '';
+                    if (isPast) tdClass += 'past ';
+                    if (isReserved) tdClass += 'reserved ';
+                    if (isSelected) tdClass += 'selected ';
+                    
+                    tbodyHTML += `<td class="${tdClass}">`;
+                    
                     const disabled = isPast || isReserved;
-                    const checked = isReserved ? 'checked' : '';
+                    const checked = isSelected ? 'checked' : '';
                     
-                    tbodyHTML += `<td>
-                        <input type="checkbox" 
-                               class="slot" 
-                               id="${checkboxId}" 
-                               data-date="${dateKey}" 
-                               data-time="${hora}"
-                               ${checked}
-                               ${disabled ? 'disabled' : ''}
-                        >
-                        ${isReserved ? '<span style="font-size:10px;color:#2a7de1;display:block;">📌</span>' : ''}
-                    </td>`;
+                    tbodyHTML += `<input type="radio" 
+                                   name="slot" 
+                                   id="${radioId}" 
+                                   data-date="${dateKey}" 
+                                   data-time="${hora}"
+                                   ${checked}
+                                   ${disabled ? 'disabled' : ''}
+                            >`;
+                    
+                    tbodyHTML += '</td>';
                 }
                 tbodyHTML += '</tr>';
             });
@@ -533,7 +661,7 @@
 
             // Actualizar rango de fechas
             const endDate = addWeeks(startDate, 1);
-            endDate.setDate(endDate.getDate() - 1); // Último día de la semana (sábado)
+            endDate.setDate(endDate.getDate() - 1);
             weekRange.textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
             weekLabel.textContent = 'Semana del';
 
@@ -542,68 +670,71 @@
             today.setHours(0, 0, 0, 0);
             const todayWeekStart = getWeekStart(today);
             
-            // Deshabilitar "Semana anterior" si estamos en la semana de inicio (Agosto 2026)
             const startWeek = getWeekStart(FECHA_INICIO);
             const diffWeeks = Math.floor((startDate - startWeek) / (7 * 24 * 60 * 60 * 1000));
             prevBtn.disabled = (diffWeeks <= 0);
 
-            // Deshabilitar "Hoy" si ya estamos en la semana actual
             if (isSameDate(startDate, todayWeekStart)) {
                 todayBtn.disabled = true;
-                todayBtn.style.opacity = '0.5';
             } else {
                 todayBtn.disabled = false;
-                todayBtn.style.opacity = '1';
             }
 
-            // Actualizar checkboxes (re-asignar eventos)
-            attachCheckboxEvents();
+            updateSubmitButton();
+            attachRadioEvents();
         }
 
-        // === EVENTOS DE CHECKBOX ===
-        function attachCheckboxEvents() {
-            document.querySelectorAll('.slot').forEach(cb => {
-                cb.removeEventListener('change', handleCheckboxChange);
-                cb.addEventListener('change', handleCheckboxChange);
+        // === EVENTOS DE RADIO ===
+        function attachRadioEvents() {
+            document.querySelectorAll('input[name="slot"]').forEach(radio => {
+                radio.removeEventListener('change', handleRadioChange);
+                radio.addEventListener('change', handleRadioChange);
             });
         }
 
-        function handleCheckboxChange(e) {
-            const cb = e.target;
-            const dateKey = cb.getAttribute('data-date');
-            const time = cb.getAttribute('data-time');
-            const id = `${dateKey}_${time}`;
-            
-            if (cb.checked) {
-                // Marcar como reservado
-                reservas[id] = true;
-                cb.disabled = true;
-                // Agregar indicador visual
-                const parentTd = cb.closest('td');
-                if (!parentTd.querySelector('span')) {
-                    const span = document.createElement('span');
-                    span.style.cssText = 'font-size:10px;color:#2a7de1;display:block;';
-                    span.textContent = '📌';
-                    parentTd.appendChild(span);
+        function handleRadioChange(e) {
+            const radio = e.target;
+            if (radio.checked) {
+                const dateKey = radio.getAttribute('data-date');
+                const time = radio.getAttribute('data-time');
+                
+                if (selectedSlot) {
+                    const prevId = `${selectedSlot.dateKey}_${selectedSlot.time}`;
+                    const prevRadio = document.getElementById(prevId);
+                    if (prevRadio) {
+                        prevRadio.checked = false;
+                        const parentTd = prevRadio.closest('td');
+                        if (parentTd) parentTd.classList.remove('selected');
+                    }
                 }
-                mostrarMensaje('✅ Horario reservado correctamente', 'success');
-            } else {
-                // Si se desmarca (no debería pasar porque se deshabilita)
-                delete reservas[id];
-                const parentTd = cb.closest('td');
-                const span = parentTd.querySelector('span');
-                if (span) span.remove();
+                
+                selectedSlot = { dateKey, time };
+                
+                const parentTd = radio.closest('td');
+                if (parentTd) parentTd.classList.add('selected');
+                
+                updateSubmitButton();
+                messageDiv.classList.remove('show');
             }
-            
-            console.log('Reservas actuales:', reservas);
+        }
+
+        // === ACTUALIZAR BOTÓN DE SUBMIT ===
+        function updateSubmitButton() {
+            if (selectedSlot) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '✅ Confirmar Reserva';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Selecciona un horario';
+            }
         }
 
         // === NAVEGACIÓN ===
         function goToWeek(weeksOffset) {
             const newWeek = addWeeks(currentWeekStart, weeksOffset);
             currentWeekStart = newWeek;
+            selectedSlot = null;
             renderTable(currentWeekStart);
-            // Ocultar mensaje al cambiar de semana
             messageDiv.classList.remove('show');
         }
 
@@ -612,6 +743,7 @@
             today.setHours(0, 0, 0, 0);
             const todayWeekStart = getWeekStart(today);
             currentWeekStart = todayWeekStart;
+            selectedSlot = null;
             renderTable(currentWeekStart);
             messageDiv.classList.remove('show');
         }
@@ -631,11 +763,15 @@
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
+            if (!selectedSlot) {
+                mostrarMensaje('⚠️ Debes seleccionar un horario.', 'error');
+                return;
+            }
+
             const nombre = document.getElementById('nombre').value.trim();
             const email = document.getElementById('email').value.trim();
             const telefono = document.getElementById('telefono').value.trim();
 
-            // Validar
             if (!nombre || nombre.length < 2) {
                 mostrarMensaje('⚠️ Por favor, ingresa un nombre válido.', 'error');
                 return;
@@ -646,61 +782,87 @@
                 return;
             }
 
-            // Obtener horarios seleccionados (los que están checked)
-            const selectedSlots = [];
-            document.querySelectorAll('.slot:checked').forEach(cb => {
-                const dateKey = cb.getAttribute('data-date');
-                const time = cb.getAttribute('data-time');
-                // Formatear fecha para mostrar
-                const [year, month, day] = dateKey.split('-');
-                const dateObj = new Date(year, month - 1, day);
-                const dateStr = formatDate(dateObj);
-                selectedSlots.push(`${dateStr} a las ${time}`);
-            });
-
-            if (selectedSlots.length === 0) {
-                mostrarMensaje('⚠️ Debes seleccionar al menos un horario disponible.', 'error');
+            const slotId = `${selectedSlot.dateKey}_${selectedSlot.time}`;
+            if (reservas[slotId]) {
+                mostrarMensaje('⚠️ Este horario ya fue reservado. Por favor, selecciona otro.', 'error');
+                selectedSlot = null;
+                renderTable(currentWeekStart);
                 return;
             }
 
-            // Éxito
-            const horariosStr = selectedSlots.join('; ');
+            // Guardar reserva
+            reservas[slotId] = {
+                nombre,
+                email,
+                telefono
+            };
+
+            // Guardar en cookies
+            saveToCookies();
+
+            const [year, month, day] = selectedSlot.dateKey.split('-');
+            const dateObj = new Date(year, month - 1, day);
+            const dateStr = formatDate(dateObj);
+            
             messageDiv.className = 'message show';
             messageDiv.innerHTML = `
                 ✅ <strong>¡Reserva confirmada!</strong><br>
-                <span style="font-weight:400;">${nombre}, hemos registrado tu reserva para:</span><br>
-                <span style="font-weight:500;">${horariosStr}</span><br>
+                <span style="font-weight:400;">${nombre}, tu reserva para el <strong>${dateStr}</strong> a las <strong>${selectedSlot.time}</strong> ha sido registrada.</span><br>
                 <span style="font-size:14px; opacity:0.8;">Te enviaremos un correo a ${email} con los detalles.</span>
             `;
             messageDiv.classList.remove('error');
 
-            console.log('Reserva completa:', {
+            console.log('Reserva confirmada:', {
                 nombre,
                 email,
                 telefono,
-                horarios: selectedSlots
+                fecha: dateStr,
+                hora: selectedSlot.time,
+                dateKey: selectedSlot.dateKey
             });
 
-            // Opcional: limpiar formulario
-            // document.getElementById('nombre').value = '';
-            // document.getElementById('email').value = '';
-            // document.getElementById('telefono').value = '';
+            selectedSlot = null;
+            renderTable(currentWeekStart);
         });
+
+        // === COOKIES - ACEPTAR ===
+        acceptBtn.addEventListener('click', function() {
+            cookiesAccepted = true;
+            cookieNotice.style.display = 'none';
+            // Guardar datos actuales
+            saveToCookies();
+            // Activar auto-guardado
+            autoSaveUserData();
+        });
+
+        // === INICIALIZAR ===
+        function init() {
+            // Verificar si ya se aceptaron las cookies
+            const savedData = getCookie('reservas_data');
+            if (savedData) {
+                cookiesAccepted = true;
+                cookieNotice.style.display = 'none';
+                loadFromCookies();
+                autoSaveUserData();
+            }
+
+            currentWeekStart = getWeekStart(FECHA_INICIO);
+            renderTable(currentWeekStart);
+
+            // Reservas de ejemplo (solo si no hay datos en cookies)
+            if (!savedData) {
+                reservas['2026-08-03_10:00'] = { nombre: 'Ana Pérez', email: 'ana@email.com', telefono: '600000000' };
+                reservas['2026-08-05_16:00'] = { nombre: 'Carlos Gómez', email: 'carlos@email.com', telefono: '611111111' };
+                renderTable(currentWeekStart);
+            }
+        }
 
         // === EVENTOS DE NAVEGACIÓN ===
         prevBtn.addEventListener('click', () => goToWeek(-1));
         nextBtn.addEventListener('click', () => goToWeek(1));
         todayBtn.addEventListener('click', goToToday);
 
-        // === INICIALIZAR ===
-        // Empezar desde la semana que contiene el 1 de Agosto 2026
-        currentWeekStart = getWeekStart(FECHA_INICIO);
-        renderTable(currentWeekStart);
-
-        // Cargar algunas reservas de ejemplo (opcional)
-        // reservas['2026-08-03_10:00'] = true;
-        // reservas['2026-08-05_16:00'] = true;
-        // renderTable(currentWeekStart);
+        init();
 
     })();
 </script>
