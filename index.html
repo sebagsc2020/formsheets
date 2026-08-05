@@ -175,9 +175,9 @@
             font-weight: 600;
             color: #999;
             background: #141414;
-            width: 55px;
-            min-width: 55px;
-            max-width: 55px;
+            width: 60px;
+            min-width: 60px;
+            max-width: 60px;
             font-size: clamp(13px, 2vw, 17px);
             border-right: 1px solid #2a2a2a;
             position: sticky;
@@ -532,37 +532,38 @@
         }
 
         /* ============================================================
-           RESPONSIVE - MÓVILES (3 días visibles)
+           RESPONSIVE - MÓVILES (3 días visibles + 10% más grande)
            ============================================================ */
         @media (max-width: 768px) {
             .schedule-table th {
-                min-width: 110px;
-                max-width: 150px;
-                font-size: clamp(15px, 2.5vw, 20px);
+                min-width: 120px;
+                max-width: 160px;
+                font-size: clamp(16.5px, 2.75vw, 22px);
+                padding: 6px 2px;
             }
             .schedule-table th .day-date {
-                font-size: clamp(12px, 1.8vw, 16px);
+                font-size: clamp(13.2px, 2vw, 17.6px);
             }
             .schedule-table td {
-                min-width: 110px;
-                max-width: 150px;
+                min-width: 120px;
+                max-width: 160px;
                 padding: 8px 4px;
             }
             .schedule-table .time-col {
-                min-width: 60px;
-                max-width: 60px;
-                font-size: clamp(15px, 2.5vw, 20px);
+                min-width: 66px;
+                max-width: 66px;
+                font-size: clamp(16.5px, 2.75vw, 22px);
             }
             .schedule-table tr.separator-row td {
-                min-width: 110px;
-                max-width: 150px;
+                min-width: 120px;
+                max-width: 160px;
             }
             .schedule-table tr.separator-row td .separator-text {
-                font-size: clamp(12px, 1.8vw, 16px);
+                font-size: clamp(13.2px, 2vw, 17.6px);
             }
             .schedule-table input[type="radio"] {
-                width: clamp(22px, 3.5vw, 30px);
-                height: clamp(22px, 3.5vw, 30px);
+                width: clamp(24px, 3.85vw, 33px);
+                height: clamp(24px, 3.85vw, 33px);
             }
             .scroll-indicators {
                 display: flex;
@@ -572,90 +573,91 @@
         @media (max-width: 480px) {
             .container { padding: 8px 5px; border-radius: 10px; }
             .week-navigation { padding: 6px 8px; gap: 4px; }
-            .week-nav-btn { padding: 6px 10px; font-size: 14px; }
-            .today-btn { padding: 6px 10px; font-size: 13px; }
-            .week-info { font-size: 14px; min-width: 60px; }
+            .week-nav-btn { padding: 6px 10px; font-size: 15.4px; }
+            .today-btn { padding: 6px 10px; font-size: 14.3px; }
+            .week-info { font-size: 15.4px; min-width: 60px; }
 
-            /* 3 días visibles en móvil */
+            /* 3 días visibles + 10% más grande */
             .schedule-table th {
-                min-width: 100px;
-                max-width: 130px;
-                font-size: clamp(14px, 3vw, 18px);
+                min-width: 110px;
+                max-width: 143px;
+                font-size: clamp(15.4px, 3.3vw, 19.8px);
                 padding: 6px 2px;
             }
             .schedule-table th .day-date {
-                font-size: clamp(11px, 2.2vw, 14px);
+                font-size: clamp(12.1px, 2.42vw, 15.4px);
             }
             .schedule-table td {
-                min-width: 100px;
-                max-width: 130px;
+                min-width: 110px;
+                max-width: 143px;
                 padding: 6px 2px;
             }
             .schedule-table .time-col {
-                min-width: 55px;
-                max-width: 55px;
-                font-size: clamp(14px, 2.8vw, 18px);
+                min-width: 60px;
+                max-width: 60px;
+                font-size: clamp(15.4px, 3.08vw, 19.8px);
             }
             .schedule-table tr.separator-row td {
-                min-width: 100px;
-                max-width: 130px;
+                min-width: 110px;
+                max-width: 143px;
             }
             .schedule-table tr.separator-row td .separator-text {
-                font-size: clamp(10px, 2vw, 14px);
+                font-size: clamp(11px, 2.2vw, 15.4px);
                 padding: 2px 6px;
             }
             .schedule-table input[type="radio"] {
-                width: clamp(20px, 4vw, 28px);
-                height: clamp(20px, 4vw, 28px);
+                width: clamp(22px, 4.4vw, 30.8px);
+                height: clamp(22px, 4.4vw, 30.8px);
             }
             .reservation-form { padding: 10px 8px; gap: 8px; }
-            .form-group input { padding: 8px 12px; font-size: 14px; }
-            .btn-reserve { padding: 10px 14px; font-size: 15px; }
-            .message { padding: 8px 12px; font-size: 13px; }
+            .form-group label { font-size: clamp(15.4px, 2.64vw, 19.8px); }
+            .form-group input { padding: 8px 12px; font-size: 15.4px; }
+            .btn-reserve { padding: 10px 14px; font-size: 16.5px; }
+            .message { padding: 8px 12px; font-size: 14.3px; }
             .scroll-indicators button { width: 30px; height: 30px; font-size: 15px; }
-            .cookie-notice p { font-size: 13px; }
-            .cookie-notice button { font-size: 13px; padding: 5px 14px; }
+            .cookie-notice p { font-size: 14.3px; }
+            .cookie-notice button { font-size: 14.3px; padding: 5px 14px; }
         }
 
         @media (max-width: 380px) {
             .schedule-table th {
-                min-width: 85px;
-                max-width: 110px;
-                font-size: clamp(12px, 2.8vw, 16px);
+                min-width: 95px;
+                max-width: 120px;
+                font-size: clamp(13.2px, 3.08vw, 17.6px);
                 padding: 4px 1px;
             }
             .schedule-table th .day-date {
-                font-size: clamp(9px, 2vw, 12px);
+                font-size: clamp(9.9px, 2.2vw, 13.2px);
             }
             .schedule-table td {
-                min-width: 85px;
-                max-width: 110px;
+                min-width: 95px;
+                max-width: 120px;
                 padding: 4px 1px;
             }
             .schedule-table .time-col {
-                min-width: 48px;
-                max-width: 48px;
-                font-size: clamp(12px, 2.5vw, 16px);
+                min-width: 52px;
+                max-width: 52px;
+                font-size: clamp(13.2px, 2.75vw, 17.6px);
             }
             .schedule-table tr.separator-row td {
-                min-width: 85px;
-                max-width: 110px;
+                min-width: 95px;
+                max-width: 120px;
             }
             .schedule-table tr.separator-row td .separator-text {
-                font-size: clamp(8px, 1.8vw, 12px);
+                font-size: clamp(8.8px, 1.98vw, 13.2px);
                 padding: 1px 4px;
             }
             .schedule-table input[type="radio"] {
-                width: clamp(16px, 3.5vw, 22px);
-                height: clamp(16px, 3.5vw, 22px);
+                width: clamp(17.6px, 3.85vw, 24.2px);
+                height: clamp(17.6px, 3.85vw, 24.2px);
             }
-            .week-nav-btn { padding: 4px 8px; font-size: 11px; }
-            .today-btn { padding: 4px 8px; font-size: 11px; }
-            .week-info { font-size: 11px; min-width: 50px; }
+            .week-nav-btn { padding: 4px 8px; font-size: 12.1px; }
+            .today-btn { padding: 4px 8px; font-size: 12.1px; }
+            .week-info { font-size: 12.1px; min-width: 50px; }
             .container { padding: 5px 3px; }
             .scroll-indicators button { width: 24px; height: 24px; font-size: 12px; }
-            .cookie-notice p { font-size: 11px; }
-            .cookie-notice button { font-size: 11px; padding: 4px 12px; }
+            .cookie-notice p { font-size: 12.1px; }
+            .cookie-notice button { font-size: 12.1px; padding: 4px 12px; }
         }
 
         @media (min-width: 769px) {
