@@ -377,6 +377,7 @@
             outline: none;
             width: 100%;
             color: #e0e0e0;
+            height: 43px;
         }
 
         .field-group input::placeholder {
@@ -503,6 +504,9 @@
                 gap: 0.8rem;
                 padding: 1rem;
             }
+            .field-group input {
+                height: 40px;
+            }
             .btn-submit {
                 height: 40px;
                 font-size: 0.85rem;
@@ -593,6 +597,7 @@
                 padding: 0.4rem 0.6rem;
                 font-size: 0.8rem;
                 border-radius: 10px;
+                height: 36px;
             }
             .field-group label {
                 font-size: 0.65rem;
@@ -689,7 +694,7 @@
                 </div>
                 <div class="field-group btn-wrapper">
                     <button type="submit" class="btn-submit">
-                        <i class="fas fa-paper-plane"></i> Enviar
+                        <i class="fas fa-calendar-check"></i> Reservar
                     </button>
                 </div>
             </div>
@@ -817,8 +822,7 @@
 
             function formatDate(date) {
                 const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                return `${day}/${month}`;
+                return day;
             }
 
             function getMonthName(monthIndex) {
@@ -856,9 +860,9 @@
                 for (let i = 0; i < daysOfWeek.length; i++) {
                     const date = getDateForWeekday(currentWeekStart, i);
                     const dayLabel = daysOfWeek[i];
-                    const dateStr = formatDate(date);
+                    const dayNumber = formatDate(date);
                     const isTodayClass = isToday(date) ? 'today-header' : '';
-                    headerHtml += `<th class="${isTodayClass}">${dayLabel} ${dateStr}</th>`;
+                    headerHtml += `<th class="${isTodayClass}">${dayLabel} ${dayNumber}</th>`;
                 }
                 headerRow.innerHTML = headerHtml;
 
@@ -868,9 +872,9 @@
                     bodyHtml += `<tr><td class="time-slot"><i class="far fa-clock"></i> ${hour}:00</td>`;
                     for (let i = 0; i < daysOfWeek.length; i++) {
                         const date = getDateForWeekday(currentWeekStart, i);
-                        const dateStr = formatDate(date);
+                        const dayNumber = formatDate(date);
                         const dayLabel = daysOfWeek[i];
-                        const value = `${dayLabel} ${dateStr} ${hour}:00`;
+                        const value = `${dayLabel} ${dayNumber} ${hour}:00`;
                         const isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, hour);
                         const disabled = isPastOrCurrent ? 'disabled' : '';
                         
@@ -917,9 +921,9 @@
                     bodyHtml += `<tr><td class="time-slot"><i class="far fa-clock"></i> ${hour}:00</td>`;
                     for (let i = 0; i < daysOfWeek.length; i++) {
                         const date = getDateForWeekday(currentWeekStart, i);
-                        const dateStr = formatDate(date);
+                        const dayNumber = formatDate(date);
                         const dayLabel = daysOfWeek[i];
-                        const value = `${dayLabel} ${dateStr} ${hour}:00`;
+                        const value = `${dayLabel} ${dayNumber} ${hour}:00`;
                         const isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, hour);
                         const disabled = isPastOrCurrent ? 'disabled' : '';
                         
