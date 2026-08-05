@@ -1,226 +1,416 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservas Semanales</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Formulario de Reservas</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0b0b0b; color: #e0e0e0; display: flex; justify-content: center; padding: 20px; min-height: 100vh; }
-        .container { width: 100%; max-width: 800px; background-color: #141414; border-radius: 30px; padding: 30px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 1px solid #2a2a2a; }
-        h1 { text-align: center; color: #f2c94c; font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 5px; }
-        h1 span { font-size: 1.8rem; }
-        .subtitle { text-align: center; color: #b0b0b0; margin-bottom: 30px; font-size: 1.1rem; }
-        
-        .week-controls { display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 25px; }
-        .week-controls h2 { font-size: 1.5rem; font-weight: 400; color: #e0e0e0; }
-        .week-controls button { background: none; border: none; color: #f2c94c; font-size: 2rem; cursor: pointer; padding: 0 15px; }
-        
-        .day-row { display: flex; justify-content: space-between; align-items: center; background-color: #1e1e1e; border-radius: 15px; padding: 15px 20px; margin-bottom: 10px; border: 1px solid transparent; }
-        .day-row.today { border-color: #f2c94c; background-color: #252525; }
-        .day-label { font-weight: bold; color: #f2c94c; width: 120px; font-size: 1.1rem; }
-        .slots-group { display: flex; flex-wrap: wrap; gap: 8px; flex: 1; justify-content: flex-end; }
-        .slot-btn { background-color: #2a2a2a; border: none; color: #888; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; cursor: default; transition: 0.2s; }
-        .slot-btn.available { background-color: #f2c94c; color: #0b0b0b; cursor: pointer; font-weight: bold; }
-        .slot-btn.available:hover { background-color: #ffda66; }
-        
-        #modalReserva { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: #141414; padding: 30px; border-radius: 20px; max-width: 400px; width: 90%; border: 1px solid #333; }
-        .modal-content h3 { margin-bottom: 15px; color: #f2c94c; }
-        .modal-content input, .modal-content textarea { width: 100%; padding: 12px; margin: 8px 0; background: #1e1e1e; border: 1px solid #333; border-radius: 10px; color: #e0e0e0; }
-        .modal-content button { width: 100%; padding: 12px; background: #f2c94c; border: none; border-radius: 10px; font-weight: bold; color: #0b0b0b; margin-top: 10px; cursor: pointer; }
-        .close-modal { background: transparent !important; color: #888 !important; border: 1px solid #333 !important; }
-        
-        @media (max-width: 600px) { 
-            .day-row { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .day-label { width: 100%; }
-            .slots-group { justify-content: flex-start; width: 100%; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e2b3a;
+            font-weight: 600;
+            font-size: 28px;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6b7a8a;
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
+
+        /* === TABLA DE HORARIOS === */
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 14px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .schedule-table th {
+            background: #1e2b3a;
+            color: white;
+            padding: 12px 5px;
+            font-weight: 600;
+            text-transform: capitalize;
+            font-size: 15px;
+        }
+
+        .schedule-table td {
+            padding: 8px 4px;
+            text-align: center;
+            border-bottom: 1px solid #eaeef2;
+            background: #fafbfc;
+        }
+
+        .schedule-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .schedule-table .time-col {
+            font-weight: 600;
+            color: #1e2b3a;
+            background: #f0f3f7;
+            width: 70px;
+            font-size: 13px;
+        }
+
+        .schedule-table input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #2a7de1;
+            cursor: pointer;
+            transform: scale(1);
+            transition: transform 0.15s;
+        }
+
+        .schedule-table input[type="checkbox"]:hover {
+            transform: scale(1.2);
+        }
+
+        /* === FORMULARIO DE RESERVA === */
+        .reservation-form {
+            background: #f8faff;
+            padding: 22px 20px;
+            border-radius: 16px;
+            border: 1px solid #e0e8f0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 18px 20px;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 160px;
+            min-width: 140px;
+            position: relative;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 1.5px solid #dce3ec;
+            border-radius: 10px;
+            font-size: 14px;
+            background: white;
+            transition: border 0.2s, box-shadow 0.2s;
+            outline: none;
+            width: 100%;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #2a7de1;
+            box-shadow: 0 0 0 3px rgba(42, 125, 225, 0.15);
+        }
+
+        .form-group input::placeholder {
+            color: #aab3c0;
+        }
+
+        /* Estilo para datalist (sugerencias) */
+        .form-group input[list]::-webkit-calendar-picker-indicator {
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        .btn-reserve {
+            background: #1e2b3a;
+            color: white;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.25s, transform 0.1s;
+            margin-left: auto;
+            height: 44px;
+            align-self: flex-end;
+            letter-spacing: 0.5px;
+            min-width: 130px;
+        }
+
+        .btn-reserve:hover {
+            background: #2a7de1;
+        }
+
+        .btn-reserve:active {
+            transform: scale(0.96);
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 14px 18px;
+            background: #e5f4e5;
+            border-left: 5px solid #1f9a4a;
+            color: #1a6e34;
+            border-radius: 10px;
+            font-weight: 500;
+            display: none;
+            font-size: 15px;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        @media (max-width: 700px) {
+            .container { padding: 18px 12px; }
+            .schedule-table { font-size: 12px; }
+            .schedule-table th { padding: 10px 3px; font-size: 13px; }
+            .schedule-table td { padding: 6px 2px; }
+            .schedule-table .time-col { width: 50px; font-size: 12px; }
+            .schedule-table input[type="checkbox"] { width: 16px; height: 16px; }
+            .reservation-form { flex-direction: column; align-items: stretch; gap: 12px; }
+            .btn-reserve { margin-left: 0; width: 100%; align-self: center; }
+            .form-group { flex: 1 1 auto; }
+        }
+
+        @media (max-width: 480px) {
+            .schedule-table th { font-size: 11px; padding: 8px 2px; }
+            .schedule-table td { padding: 5px 2px; }
+            .schedule-table .time-col { width: 40px; font-size: 11px; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1><span>✦</span> RESERVAS <span>✦</span></h1>
-    <p class="subtitle">Seleccioná un día y horario disponible</p>
+    <h1>📅 Reserva tu Horario</h1>
+    <p class="subtitle">Selecciona los días y horas disponibles</p>
 
-    <div class="week-controls">
-        <button onclick="cambiarSemana(-7)">&#10094;</button>
-        <h2 id="semanaTexto">Semana del 03 al 09 de Agosto</h2>
-        <button onclick="cambiarSemana(7)">&#10095;</button>
-    </div>
+    <!-- TABLA DE HORARIOS -->
+    <table class="schedule-table">
+        <thead>
+            <tr>
+                <th>Hora</th>
+                <th>Lunes</th>
+                <th>Martes</th>
+                <th>Miércoles</th>
+                <th>Jueves</th>
+                <th>Viernes</th>
+                <th>Sábado</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td class="time-col">9:00</td><td><input type="checkbox" class="slot" data-day="lunes" data-time="9:00"></td><td><input type="checkbox" class="slot" data-day="martes" data-time="9:00"></td><td><input type="checkbox" class="slot" data-day="miercoles" data-time="9:00"></td><td><input type="checkbox" class="slot" data-day="jueves" data-time="9:00"></td><td><input type="checkbox" class="slot" data-day="viernes" data-time="9:00"></td><td><input type="checkbox" class="slot" data-day="sabado" data-time="9:00"></td></tr>
+            <tr><td class="time-col">10:00</td><td><input type="checkbox" class="slot" data-day="lunes" data-time="10:00"></td><td><input type="checkbox" class="slot" data-day="martes" data-time="10:00"></td><td><input type="checkbox" class="slot" data-day="miercoles" data-time="10:00"></td><td><input type="checkbox" class="slot" data-day="jueves" data-time="10:00"></td><td><input type="checkbox" class="slot" data-day="viernes" data-time="10:00"></td><td><input type="checkbox" class="slot" data-day="sabado" data-time="10:00"></td></tr>
+            <tr><td class="time-col">11:00</td><td><input type="checkbox" class="slot" data-day="lunes" data-time="11:00"></td><td><input type="checkbox" class="slot" data-day="martes" data-time="11:00"></td><td><input type="checkbox" class="slot" data-day="miercoles" data-time="11:00"></td><td><input type="checkbox" class="slot" data-day="jueves" data-time="11:00"></td><td><input type="checkbox" class="slot" data-day="viernes" data-time="11:00"></td><td><input type="checkbox" class="slot" data-day="sabado" data-time="11:00"></td></tr>
+            <tr><td class="time-col">12:00</td><td><input type="checkbox" class="slot" data-day="lunes" data-time="12:00"></td><td><input type="checkbox" class="slot" data-day="martes" data-time="12:00"></td><td><input type="checkbox" class="slot" data-day="miercoles" data-time="12:00"></td><td><input type="checkbox" class="slot" data-day="jueves" data-time="12:00"></td><td><input type="checkbox" class="slot" data-day="viernes" data-time="12:00"></td><td><input type="checkbox" class="slot" data-day="sabado" data-time="12:00"></td></tr>
+            <tr><td class="time-col">13:00</td><td><input type="checkbox" class="slot" data-day="lunes" data-time="13:00"></td><td><input type="checkbox" class="slot" data-day="martes" data-time="13:00"></td><td><input type="checkbox" class="slot" data-day="miercoles" data-time="13:00"></td><td><input type="checkbox" class="slot" data-day="jueves" data-time="13:00"></td><td><input type="checkbox" class="slot" data-day="viernes" data-time="13:00"></td><td><input type="checkbox" class="slot" data-day="sabado" data-time="13:00"></td></tr>
+            <tr><td class="time-col">16:00</td><td><input type="checkbox" class="slot" data-day="lunes" data-time="16:00"></td><td><input type="checkbox" class="slot" data-day="martes" data-time="16:00"></td><td><input type="checkbox" class="slot" data-day="miercoles" data-time="16:00"></td><td><input type="checkbox" class="slot" data-day="jueves" data-time="16:00"></td><td><input type="checkbox" class="slot" data-day="viernes" data-time="16:00"></td><td><input type="checkbox" class="slot" data-day="sabado" data-time="16:00"></td></tr>
+            <tr><td class="time-col">17:00</td><td><input type="checkbox" class="slot" data-day="lunes" data-time="17:00"></td><td><input type="checkbox" class="slot" data-day="martes" data-time="17:00"></td><td><input type="checkbox" class="slot" data-day="miercoles" data-time="17:00"></td><td><input type="checkbox" class="slot" data-day="jueves" data-time="17:00"></td><td><input type="checkbox" class="slot" data-day="viernes" data-time="17:00"></td><td><input type="checkbox" class="slot" data-day="sabado" data-time="17:00"></td></tr>
+            <tr><td class="time-col">18:00</td><td><input type="checkbox" class="slot" data-day="lunes" data-time="18:00"></td><td><input type="checkbox" class="slot" data-day="martes" data-time="18:00"></td><td><input type="checkbox" class="slot" data-day="miercoles" data-time="18:00"></td><td><input type="checkbox" class="slot" data-day="jueves" data-time="18:00"></td><td><input type="checkbox" class="slot" data-day="viernes" data-time="18:00"></td><td><input type="checkbox" class="slot" data-day="sabado" data-time="18:00"></td></tr>
+            <tr><td class="time-col">19:00</td><td><input type="checkbox" class="slot" data-day="lunes" data-time="19:00"></td><td><input type="checkbox" class="slot" data-day="martes" data-time="19:00"></td><td><input type="checkbox" class="slot" data-day="miercoles" data-time="19:00"></td><td><input type="checkbox" class="slot" data-day="jueves" data-time="19:00"></td><td><input type="checkbox" class="slot" data-day="viernes" data-time="19:00"></td><td><input type="checkbox" class="slot" data-day="sabado" data-time="19:00"></td></tr>
+            <tr><td class="time-col">20:00</td><td><input type="checkbox" class="slot" data-day="lunes" data-time="20:00"></td><td><input type="checkbox" class="slot" data-day="martes" data-time="20:00"></td><td><input type="checkbox" class="slot" data-day="miercoles" data-time="20:00"></td><td><input type="checkbox" class="slot" data-day="jueves" data-time="20:00"></td><td><input type="checkbox" class="slot" data-day="viernes" data-time="20:00"></td><td><input type="checkbox" class="slot" data-day="sabado" data-time="20:00"></td></tr>
+        </tbody>
+    </table>
 
-    <div id="listaSemanal">
-        <!-- Aquí se generarán los días con sus horarios -->
-    </div>
-</div>
+    <!-- FORMULARIO CON AUTOCOMPLETADO Y SUGERENCIAS -->
+    <form id="reservationForm" class="reservation-form">
+        <div class="form-group">
+            <label for="nombre">Nombre completo</label>
+            <input 
+                type="text" 
+                id="nombre" 
+                name="nombre"
+                list="nombres-sugeridos"
+                placeholder="Ej: Ana Pérez" 
+                autocomplete="name"
+                required
+            >
+            <datalist id="nombres-sugeridos">
+                <option value="Ana Pérez">
+                <option value="Carlos Gómez">
+                <option value="María Rodríguez">
+                <option value="Juan Martínez">
+                <option value="Laura Fernández">
+                <option value="Pedro Sánchez">
+                <option value="Elena López">
+                <option value="Miguel Torres">
+            </datalist>
+        </div>
 
-<!-- Modal -->
-<div id="modalReserva">
-    <div class="modal-content">
-        <h3>Confirmar Reserva</h3>
-        <p id="modalInfo" style="color: #aaa; margin-bottom: 15px;"></p>
-        <input type="text" id="inputCliente" placeholder="Tu nombre completo">
-        <input type="text" id="inputTelefono" placeholder="Tu teléfono (ej. 3518692251)">
-        <textarea id="inputNotas" rows="2" placeholder="Notas adicionales (opcional)"></textarea>
-        <button onclick="guardarReserva()">Confirmar Reserva</button>
-        <button class="close-modal" onclick="cerrarModal()">Cancelar</button>
-    </div>
+        <div class="form-group">
+            <label for="email">Correo electrónico</label>
+            <input 
+                type="email" 
+                id="email" 
+                name="email"
+                list="emails-sugeridos"
+                placeholder="ana@email.com" 
+                autocomplete="email"
+                required
+            >
+            <datalist id="emails-sugeridos">
+                <option value="ana.perez@email.com">
+                <option value="carlos.gomez@email.com">
+                <option value="maria.rodriguez@email.com">
+                <option value="juan.martinez@email.com">
+                <option value="laura.fernandez@email.com">
+                <option value="pedro.sanchez@email.com">
+                <option value="elena.lopez@email.com">
+                <option value="miguel.torres@email.com">
+            </datalist>
+        </div>
+
+        <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input 
+                type="tel" 
+                id="telefono" 
+                name="telefono"
+                placeholder="+34 600 000 000" 
+                autocomplete="tel"
+            >
+        </div>
+
+        <button type="submit" class="btn-reserve">Confirmar Reserva</button>
+    </form>
+
+    <div id="message" class="message"></div>
 </div>
 
 <script>
-    // CONFIGURACIÓN
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzYYE99_wIL7BJTPjMcuCTaL5w-rcsJAIu_MC2D__IYmRfX1sjVeYFopjrDvJFrju4rRQ/exec';
-    const ALL_SLOTS = ['09:00','10:00','11:00','12:00','13:00','16:00','17:00','18:00','19:00','20:00','21:00'];
+    (function() {
+        const form = document.getElementById('reservationForm');
+        const messageDiv = document.getElementById('message');
+        const checkboxes = document.querySelectorAll('.slot');
 
-    let reservasGlobal = {};
-    let fechaInicioSemana = new Date(); // Empieza en la fecha actual
-
-    async function cargarReservas() {
-        try {
-            const response = await fetch(API_URL + '?action=getReservas');
-            const data = await response.json();
-            if (data.status === 'ok') {
-                reservasGlobal = data.reservas || {};
-                renderizarSemana();
-            } else {
-                console.error('Error:', data.mensaje);
-            }
-        } catch (error) {
-            console.error('Error de conexión:', error);
-        }
-    }
-
-    function formatearFechaServidor(date) {
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const d = String(date.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
-    }
-
-    function renderizarSemana() {
-        const container = document.getElementById('listaSemanal');
-        container.innerHTML = '';
-        
-        const hoy = new Date();
-        const nombreDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-
-        // Calcular el inicio de semana (Lunes)
-        let diaSemana = fechaInicioSemana.getDay();
-        let diff = fechaInicioSemana.getDate() - (diaSemana === 0 ? 6 : diaSemana - 1); // Ajuste para que empiece en Lunes
-        let lunes = new Date(fechaInicioSemana);
-        lunes.setDate(diff);
-
-        let domingo = new Date(lunes);
-        domingo.setDate(lunes.getDate() + 6);
-
-        document.getElementById('semanaTexto').textContent = 
-            `Semana del ${String(lunes.getDate()).padStart(2,'0')} al ${String(domingo.getDate()).padStart(2,'0')} de ${domingo.toLocaleString('default', { month: 'long' })}`;
-
-        for(let i = 0; i < 7; i++) {
-            let fechaActual = new Date(lunes);
-            fechaActual.setDate(lunes.getDate() + i);
-            
-            let fechaStr = formatearFechaServidor(fechaActual);
-            let reservasDelDia = reservasGlobal[fechaStr] || [];
-            let disponibles = ALL_SLOTS.filter(h => !reservasDelDia.includes(h));
-
-            let row = document.createElement('div');
-            row.className = 'day-row';
-            
-            // Resaltar el día de hoy
-            if(fechaActual.toDateString() === hoy.toDateString()) {
-                row.classList.add('today');
-            }
-
-            let label = document.createElement('div');
-            label.className = 'day-label';
-            label.textContent = `${nombreDias[i]} ${fechaActual.getDate()}`;
-
-            let slotsGroup = document.createElement('div');
-            slotsGroup.className = 'slots-group';
-
-            ALL_SLOTS.forEach(hora => {
-                let btn = document.createElement('button');
-                btn.className = 'slot-btn';
-                btn.textContent = hora;
-                
-                if(disponibles.includes(hora)) {
-                    btn.classList.add('available');
-                    btn.onclick = () => abrirModal(fechaStr, hora);
+        function getSelectedSlots() {
+            const selected = [];
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    const day = cb.getAttribute('data-day');
+                    const time = cb.getAttribute('data-time');
+                    const dayMap = {
+                        'lunes': 'Lunes',
+                        'martes': 'Martes',
+                        'miercoles': 'Miércoles',
+                        'jueves': 'Jueves',
+                        'viernes': 'Viernes',
+                        'sabado': 'Sábado'
+                    };
+                    selected.push(`${dayMap[day] || day} a las ${time}`);
                 }
-                slotsGroup.appendChild(btn);
             });
-
-            row.appendChild(label);
-            row.appendChild(slotsGroup);
-            container.appendChild(row);
-        }
-    }
-
-    function cambiarSemana(dias) {
-        fechaInicioSemana.setDate(fechaInicioSemana.getDate() + dias);
-        renderizarSemana();
-    }
-
-    // Modal y Reserva
-    let fechaReservaSeleccionada = '';
-    let horaReservaSeleccionada = '';
-
-    function abrirModal(fecha, hora) {
-        fechaReservaSeleccionada = fecha;
-        horaReservaSeleccionada = hora;
-        document.getElementById('modalInfo').textContent = `📆 ${fecha} - 🕒 ${hora}`;
-        document.getElementById('modalReserva').style.display = 'flex';
-    }
-
-    function cerrarModal() {
-        document.getElementById('modalReserva').style.display = 'none';
-    }
-
-    async function guardarReserva() {
-        const cliente = document.getElementById('inputCliente').value.trim();
-        const telefono = document.getElementById('inputTelefono').value.trim();
-        const notas = document.getElementById('inputNotas').value.trim();
-
-        if (!cliente || !telefono) {
-            alert('Completá tu nombre y teléfono.');
-            return;
+            return selected;
         }
 
-        const formData = new FormData();
-        formData.append('fecha', fechaReservaSeleccionada);
-        formData.append('hora', horaReservaSeleccionada);
-        formData.append('cliente', cliente);
-        formData.append('telefono', telefono);
-        formData.append('notas', notas);
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
 
-        try {
-            const response = await fetch(API_URL, { method: 'POST', body: formData });
-            const text = await response.text();
-            
-            if (text === 'OK') {
-                alert('✅ ¡Reserva confirmada!');
-                cerrarModal();
-                // Espera 2 segundos y recarga
-                setTimeout(() => cargarReservas(), 2000);
-            } else {
-                alert('❌ Error: ' + text);
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            if (!nombre || nombre.length < 2) {
+                messageDiv.textContent = '⚠️ Por favor, ingresa un nombre válido.';
+                messageDiv.style.borderLeftColor = '#d32f2f';
+                messageDiv.style.background = '#fde8e8';
+                messageDiv.style.color = '#a11f2a';
+                messageDiv.classList.add('show');
+                return;
             }
-        } catch (error) {
-            alert('Error de conexión: ' + error.message);
-        }
-    }
 
-    // Inicializar
-    // Para que la semana empiece en la fecha actual, pero calcule el lunes actual:
-    let hoy = new Date();
-    let dia = hoy.getDay();
-    let diffHoy = hoy.getDate() - (dia === 0 ? 6 : dia - 1);
-    fechaInicioSemana = new Date(hoy);
-    fechaInicioSemana.setDate(diffHoy);
+            if (!email || !email.includes('@') || !email.includes('.')) {
+                messageDiv.textContent = '⚠️ Ingresa un correo electrónico válido.';
+                messageDiv.style.borderLeftColor = '#d32f2f';
+                messageDiv.style.background = '#fde8e8';
+                messageDiv.style.color = '#a11f2a';
+                messageDiv.classList.add('show');
+                return;
+            }
 
-    cargarReservas();
+            const selected = getSelectedSlots();
+
+            if (selected.length === 0) {
+                messageDiv.textContent = '⚠️ Debes seleccionar al menos un horario.';
+                messageDiv.style.borderLeftColor = '#d32f2f';
+                messageDiv.style.background = '#fde8e8';
+                messageDiv.style.color = '#a11f2a';
+                messageDiv.classList.add('show');
+                return;
+            }
+
+            const horariosStr = selected.join('; ');
+            messageDiv.style.borderLeftColor = '#1f9a4a';
+            messageDiv.style.background = '#e5f4e5';
+            messageDiv.style.color = '#1a6e34';
+
+            messageDiv.innerHTML = `
+                ✅ <strong>¡Reserva confirmada!</strong><br>
+                <span style="font-weight:400;">${nombre}, hemos registrado tu reserva para:</span><br>
+                <span style="font-weight:500;">${horariosStr}</span><br>
+                <span style="font-size:14px; opacity:0.8;">Te enviaremos un correo a ${email} con los detalles.</span>
+            `;
+            messageDiv.classList.add('show');
+
+            console.log('Reserva:', {
+                nombre,
+                email,
+                telefono: document.getElementById('telefono').value.trim(),
+                horarios: selected
+            });
+        });
+
+        // Ocultar mensaje al interactuar
+        form.addEventListener('change', function() {
+            if (messageDiv.classList.contains('show')) {
+                messageDiv.classList.remove('show');
+            }
+        });
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                if (messageDiv.classList.contains('show')) {
+                    messageDiv.classList.remove('show');
+                }
+            });
+        });
+    })();
 </script>
+
 </body>
 </html>
