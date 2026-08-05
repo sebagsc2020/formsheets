@@ -535,36 +535,6 @@
             cursor: not-allowed;
         }
 
-        .debug-panel {
-            background: #111;
-            border: 1px solid #2a2a2a;
-            border-radius: 8px;
-            padding: 8px 12px;
-            margin-top: 10px;
-            font-family: monospace;
-            font-size: 11px;
-            color: #888;
-            max-height: 150px;
-            overflow-y: auto;
-            display: none;
-        }
-        .debug-panel.show {
-            display: block;
-        }
-        .debug-panel .debug-line {
-            padding: 2px 0;
-            border-bottom: 1px solid #1a1a1a;
-        }
-        .debug-panel .debug-line.error {
-            color: #ff6b6b;
-        }
-        .debug-panel .debug-line.success {
-            color: #4caf50;
-        }
-        .debug-panel .debug-line.info {
-            color: #64b5f6;
-        }
-
         @media (max-width: 768px) {
             .schedule-table th {
                 min-width: 120px;
@@ -769,19 +739,15 @@
     </form>
 
     <div id="message" class="message"></div>
-
-    <div class="debug-panel" id="debugPanel">
-        <div id="debugContent"></div>
-    </div>
 </div>
 
 <script>
     (function() {
         // ============================================================
-        // 🔴 REEMPLAZA CON TU URL DE APPS SCRIPT 🔴
+        // 🔴 REEMPLAZA CON TU URL DE APPS SCRIPT (la que funcione)
         // ============================================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwVpBwhnGwB4fBYdtm7n-MyH7YwsRwzB-FnuvFMd5m04MYkyde_ZftazvjeLaMWYMqSLQ/exec';
-        
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzuqy7ihf3bl-snsQk5Dm7LGqAEa5nTm6nS2sPD2L9nl_gRh9U8MGJQp3FpfWK3lFRHDw/exec';
+
         // ============================================================
         // CONFIGURACIÓN
         // ============================================================
@@ -815,72 +781,6 @@
         const tableWrapper = document.getElementById('tableWrapper');
         const scrollLeft = document.getElementById('scrollLeft');
         const scrollRight = document.getElementById('scrollRight');
-        const debugPanel = document.getElementById('debugPanel');
-        const debugContent = document.getElementById('debugContent');
-
-        // ============================================================
-        // FUNCIONES PARA FORMATEAR FECHA Y HORA
-        // ============================================================
-        function parseDateFromAPI(dateStr) {
-            if (!dateStr) return '';
-            // Si ya está en formato YYYY-MM-DD, devolverlo
-            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
-            
-            // Intentar parsear como Date
-            const date = new Date(dateStr);
-            if (!isNaN(date.getTime())) {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            }
-            return dateStr;
-        }
-
-        function parseTimeFromAPI(timeStr) {
-            if (!timeStr) return '';
-            // Si ya está en formato HH:MM, devolverlo
-            if (/^\d{1,2}:\d{2}$/.test(timeStr)) return timeStr;
-            
-            // Intentar parsear como Date
-            const date = new Date(timeStr);
-            if (!isNaN(date.getTime())) {
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                return `${parseInt(hours)}:${minutes}`;
-            }
-            return timeStr;
-        }
-
-        // ============================================================
-        // DEPURACIÓN
-        // ============================================================
-        function addDebug(message, type = 'info') {
-            debugPanel.classList.add('show');
-            const colors = {
-                info: '#64b5f6',
-                success: '#4caf50',
-                error: '#ff6b6b',
-                warning: '#ffa726'
-            };
-            const icons = {
-                info: 'ℹ️',
-                success: '✅',
-                error: '❌',
-                warning: '⚠️'
-            };
-            const line = document.createElement('div');
-            line.className = `debug-line ${type}`;
-            line.textContent = `${icons[type] || '•'} ${message}`;
-            debugContent.appendChild(line);
-            debugContent.scrollTop = debugContent.scrollHeight;
-            console.log(`[${type.toUpperCase()}] ${message}`);
-        }
-
-        function clearDebug() {
-            debugContent.innerHTML = '';
-            debugPanel.classList.remove('show');
-        }
 
         // ============================================================
         // SCROLL INDICATORS
@@ -889,7 +789,6 @@
             if (!tableWrapper) return;
             const scrollLeftPos = tableWrapper.scrollLeft;
             const maxScroll = tableWrapper.scrollWidth - tableWrapper.clientWidth;
-            
             if (scrollLeft) scrollLeft.disabled = scrollLeftPos <= 2;
             if (scrollRight) scrollRight.disabled = scrollLeftPos >= maxScroll - 2;
         }
@@ -897,20 +796,12 @@
         function scrollWrapper(direction) {
             if (!tableWrapper) return;
             const scrollAmount = tableWrapper.clientWidth * 0.5;
-            tableWrapper.scrollBy({
-                left: direction * scrollAmount,
-                behavior: 'smooth'
-            });
+            tableWrapper.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
             setTimeout(updateScrollButtons, 400);
         }
 
-        if (scrollLeft) {
-            scrollLeft.addEventListener('click', () => scrollWrapper(-1));
-        }
-        if (scrollRight) {
-            scrollRight.addEventListener('click', () => scrollWrapper(1));
-        }
-
+        if (scrollLeft) scrollLeft.addEventListener('click', () => scrollWrapper(-1));
+        if (scrollRight) scrollRight.addEventListener('click', () => scrollWrapper(1));
         if (tableWrapper) {
             tableWrapper.addEventListener('scroll', updateScrollButtons);
             window.addEventListener('resize', updateScrollButtons);
@@ -995,52 +886,27 @@
         // ============================================================
         async function cargarReservasDesdeAPI() {
             try {
-                clearDebug();
-                addDebug('🔄 Cargando reservas desde Google Sheets...', 'info');
-                addDebug(`📡 URL: ${API_URL}`, 'info');
-                
                 mostrarLoading(true);
                 const response = await fetch(API_URL + '?t=' + Date.now());
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
-                addDebug(`📦 Respuesta recibida (${Object.keys(data).length} campos)`, 'info');
-                
                 if (data.success) {
                     reservas = {};
                     data.reservas.forEach(r => {
-                        // 🔴 AQUÍ ESTÁ LA MAGIA - Formateamos fecha y hora
-                        const fechaRaw = String(r.fecha || '').trim();
-                        const horaRaw = String(r.hora || '').trim();
-                        
-                        const fecha = parseDateFromAPI(fechaRaw);
-                        const hora = parseTimeFromAPI(horaRaw);
-                        
+                        const fecha = String(r.fecha).trim();
+                        const hora = String(r.hora).trim();
                         const key = `${fecha}_${hora}`;
-                        if (fecha && hora) {
-                            reservas[key] = {
-                                nombre: r.nombre || '',
-                                email: r.email || '',
-                                telefono: r.telefono || ''
-                            };
-                            addDebug(`📌 ${key} → ${r.nombre}`, 'success');
-                        } else {
-                            addDebug(`⚠️ Skip: fecha=${fechaRaw}, hora=${horaRaw}`, 'warning');
-                        }
+                        reservas[key] = {
+                            nombre: r.nombre || '',
+                            email: r.email || '',
+                            telefono: r.telefono || ''
+                        };
                     });
-                    addDebug(`📊 Total: ${Object.keys(reservas).length} reservas`, 'success');
                     return true;
-                } else {
-                    addDebug(`❌ Error en API: ${data.error || 'Error desconocido'}`, 'error');
-                    return false;
                 }
+                return false;
             } catch (error) {
-                addDebug(`❌ Error de conexión: ${error.message}`, 'error');
-                addDebug('💡 Verifica que la URL del Apps Script sea correcta', 'warning');
-                addDebug('💡 La URL debe terminar en /exec', 'warning');
+                console.error('Error cargando reservas:', error);
                 return false;
             } finally {
                 mostrarLoading(false);
@@ -1049,24 +915,15 @@
 
         async function guardarReservaEnAPI(fecha, hora, nombre, email, telefono) {
             try {
-                addDebug(`📤 Enviando reserva: ${fecha} ${hora} - ${nombre}`, 'info');
-                
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ fecha, hora, nombre, email, telefono: telefono || '' })
                 });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
                 const data = await response.json();
-                addDebug(`📦 Respuesta: ${data.success ? 'OK' : 'ERROR'}`, data.success ? 'success' : 'error');
                 return data;
-                
             } catch (error) {
-                addDebug(`❌ Error al guardar: ${error.message}`, 'error');
+                console.error('Error guardando reserva:', error);
                 return { success: false, error: error.message };
             }
         }
@@ -1093,7 +950,7 @@
             const startDate = new Date(weekStart);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            
+
             let theadHTML = '<tr><th class="time-col">Hora</th>';
             for (let i = 0; i < 6; i++) {
                 const date = getDateForDay(startDate, i);
@@ -1102,7 +959,6 @@
                 const isWeekend = (i === 5) ? 'weekend' : '';
                 const isToday = isSameDate(date, today);
                 const todayClass = isToday ? 'today-header' : '';
-                
                 theadHTML += `<th class="${isWeekend} ${todayClass}">${dayName}<span class="day-date">${dateStr}</span>`;
                 if (isToday) theadHTML += ` <span class="today-badge">✦ HOY</span>`;
                 theadHTML += `</th>`;
@@ -1111,11 +967,9 @@
             tableHead.innerHTML = theadHTML;
 
             let tbodyHTML = '';
-            
             HORAS_MANANA.forEach(hora => {
                 tbodyHTML += generarFilaHora(hora, startDate, today);
             });
-            
             tbodyHTML += `<tr class="separator-row">`;
             tbodyHTML += `<td class="time-col" style="background:#111; text-align:center;">⏰</td>`;
             for (let i = 0; i < 6; i++) {
@@ -1127,11 +981,9 @@
                 </td>`;
             }
             tbodyHTML += `</tr>`;
-            
             HORAS_TARDE.forEach(hora => {
                 tbodyHTML += generarFilaHora(hora, startDate, today);
             });
-            
             tableBody.innerHTML = tbodyHTML;
 
             const endDate = addWeeks(startDate, 1);
@@ -1147,7 +999,6 @@
 
             updateSubmitButton();
             attachRadioEvents();
-            
             setTimeout(updateScrollButtons, 100);
         }
 
@@ -1161,15 +1012,14 @@
                 const isReserved = reservas[radioId] !== undefined;
                 const isSelected = selectedSlot && selectedSlot.dateKey === dateKey && selectedSlot.time === hora;
                 const isToday = isSameDate(date, today);
-                
+
                 let tdClass = '';
                 if (isPast) tdClass += 'past ';
                 if (isReserved) tdClass += 'reserved ';
                 if (isSelected) tdClass += 'selected ';
                 if (isToday) tdClass += 'today-column ';
-                
+
                 html += `<td class="${tdClass}">`;
-                
                 if (isPast) {
                     html += `<span class="past-text">—</span>`;
                 } else if (isReserved) {
@@ -1177,10 +1027,8 @@
                 } else {
                     const checked = isSelected ? 'checked' : '';
                     html += `<input type="radio" class="slot-radio" name="slot" id="${radioId}" 
-                                   data-date="${dateKey}" data-time="${hora}" 
-                                   ${checked}>`;
+                                   data-date="${dateKey}" data-time="${hora}" ${checked}>`;
                 }
-                
                 html += '</td>';
             }
             html += '</tr>';
@@ -1199,7 +1047,6 @@
             if (radio.checked) {
                 const dateKey = radio.getAttribute('data-date');
                 const time = radio.getAttribute('data-time');
-                
                 if (selectedSlot) {
                     const prevId = `${selectedSlot.dateKey}_${selectedSlot.time}`;
                     const prevRadio = document.getElementById(prevId);
@@ -1209,7 +1056,6 @@
                         if (parentTd) parentTd.classList.remove('selected');
                     }
                 }
-                
                 selectedSlot = { dateKey, time };
                 const parentTd = radio.closest('td');
                 if (parentTd) parentTd.classList.add('selected');
@@ -1268,7 +1114,6 @@
                 mostrarMensaje('⚠️ Debes seleccionar un horario.', 'error');
                 return;
             }
-
             if (isLoading) {
                 mostrarMensaje('⏳ Espera...', 'error');
                 return;
@@ -1282,14 +1127,12 @@
                 mostrarMensaje('⚠️ Ingresa un nombre válido.', 'error');
                 return;
             }
-
             if (!email || !email.includes('@') || !email.includes('.')) {
                 mostrarMensaje('⚠️ Ingresa un correo válido.', 'error');
                 return;
             }
 
             const slotId = `${selectedSlot.dateKey}_${selectedSlot.time}`;
-            
             if (reservas[slotId]) {
                 mostrarMensaje('⚠️ Este horario ya fue reservado.', 'error');
                 selectedSlot = null;
@@ -1299,7 +1142,6 @@
             }
 
             mostrarLoading(true);
-            
             const result = await guardarReservaEnAPI(
                 selectedSlot.dateKey,
                 selectedSlot.time,
@@ -1307,30 +1149,25 @@
                 email,
                 telefono
             );
-            
-            if (result && result.success) {
+
+            if (result.success) {
                 reservas[slotId] = { nombre, email, telefono };
                 saveToCookies();
-                
                 await cargarReservasDesdeAPI();
-                
+
                 const [year, month, day] = selectedSlot.dateKey.split('-');
                 const dateObj = new Date(year, month - 1, day);
                 const dateStr = formatDateFull(dateObj);
-                
+
                 mostrarMensaje(`✦ ¡Reserva confirmada! ${nombre}, tu reserva para el ${dateStr} a las ${selectedSlot.time} ha sido registrada.`, 'success');
-                
+
                 selectedSlot = null;
                 renderTable(currentWeekStart);
             } else {
-                const errorMsg = result?.error || 'Error desconocido';
-                mostrarMensaje(`⚠️ Error al guardar: ${errorMsg}`, 'error');
-                addDebug(`❌ Error en respuesta: ${errorMsg}`, 'error');
-                
+                mostrarMensaje('⚠️ Error al guardar. Intenta de nuevo.', 'error');
                 await cargarReservasDesdeAPI();
                 renderTable(currentWeekStart);
             }
-            
             mostrarLoading(false);
         });
 
@@ -1378,16 +1215,12 @@
         // INICIALIZAR
         // ============================================================
         async function init() {
-            addDebug('🚀 Iniciando aplicación...', 'info');
-            addDebug(`📡 Conectando a: ${API_URL}`, 'info');
-            
             const savedData = getCookie('reservas_data');
             if (savedData) {
                 cookiesAccepted = true;
                 cookieNotice.style.display = 'none';
                 loadFromCookies();
                 autoSaveUserData();
-                addDebug('🍪 Datos de cookies cargados', 'success');
             }
 
             await cargarReservasDesdeAPI();
@@ -1395,9 +1228,7 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             currentWeekStart = today < FECHA_INICIO ? getWeekStart(FECHA_INICIO) : getWeekStart(today);
-            
             renderTable(currentWeekStart);
-            addDebug('✅ Aplicación lista', 'success');
         }
 
         // ============================================================
