@@ -13,7 +13,7 @@
         }
 
         body {
-            background: #f2f2f2;
+            background: #1a1a1a;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -22,17 +22,18 @@
         }
 
         .container {
-            background: white;
+            background: #2a2a2a;
             padding: 30px 25px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             max-width: 1100px;
             width: 100%;
+            border: 1px solid #3a3a3a;
         }
 
         h1 {
             text-align: center;
-            color: #1e2b3a;
+            color: #e0e0e0;
             font-weight: 600;
             font-size: 28px;
             letter-spacing: 1px;
@@ -41,7 +42,7 @@
 
         .subtitle {
             text-align: center;
-            color: #6b7a8a;
+            color: #999;
             margin-bottom: 20px;
             font-size: 15px;
         }
@@ -51,32 +52,33 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f8faff;
+            background: #222;
             padding: 12px 20px;
             border-radius: 12px;
             margin-bottom: 20px;
-            border: 1px solid #e0e8f0;
+            border: 1px solid #3a3a3a;
             flex-wrap: wrap;
             gap: 10px;
         }
 
         .week-nav-btn {
-            background: #1e2b3a;
-            color: white;
-            border: none;
+            background: #333;
+            color: #e0e0e0;
+            border: 1px solid #444;
             padding: 8px 20px;
             border-radius: 20px;
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
-            transition: background 0.25s, transform 0.1s;
+            transition: background 0.25s, transform 0.1s, border-color 0.25s;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
         .week-nav-btn:hover:not(:disabled) {
-            background: #2a7de1;
+            background: #444;
+            border-color: #666;
         }
 
         .week-nav-btn:active:not(:disabled) {
@@ -84,7 +86,7 @@
         }
 
         .week-nav-btn:disabled {
-            opacity: 0.4;
+            opacity: 0.3;
             cursor: not-allowed;
             transform: none;
         }
@@ -92,18 +94,18 @@
         .week-info {
             font-size: 18px;
             font-weight: 600;
-            color: #1e2b3a;
+            color: #e0e0e0;
             text-align: center;
         }
 
         .week-info span {
-            color: #2a7de1;
+            color: #ffffff;
         }
 
         .today-btn {
-            background: #e8edf5;
-            color: #1e2b3a;
-            border: 1.5px solid #d0d9e6;
+            background: #333;
+            color: #e0e0e0;
+            border: 1px solid #444;
             padding: 8px 18px;
             border-radius: 20px;
             font-weight: 600;
@@ -113,11 +115,12 @@
         }
 
         .today-btn:hover:not(:disabled) {
-            background: #d0d9e6;
+            background: #444;
+            border-color: #666;
         }
 
         .today-btn:disabled {
-            opacity: 0.4;
+            opacity: 0.3;
             cursor: not-allowed;
         }
 
@@ -129,44 +132,60 @@
             font-size: 14px;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
         .schedule-table th {
-            background: #1e2b3a;
-            color: white;
+            background: #1a1a1a;
+            color: #d0d0d0;
             padding: 12px 5px;
             font-weight: 600;
             font-size: 14px;
+            border-bottom: 2px solid #333;
         }
 
         .schedule-table th .day-date {
             display: block;
             font-size: 12px;
             font-weight: 400;
-            opacity: 0.8;
+            opacity: 0.7;
             margin-top: 2px;
         }
 
         .schedule-table th.weekend {
-            background: #2a3a4a;
+            background: #151515;
         }
 
+        /* Día actual destacado - BLANCO Y ROJO */
         .schedule-table th.today-header {
-            background: #2a7de1;
-            box-shadow: inset 0 -3px 0 #ffd700;
+            background: #ffffff;
+            color: #1a1a1a;
+            border-bottom: 3px solid #cc0000;
+            box-shadow: 0 0 20px rgba(204, 0, 0, 0.15);
         }
 
         .schedule-table th.today-header .day-date {
-            color: #ffd700;
+            color: #666;
             opacity: 1;
+        }
+
+        .schedule-table th.today-header .today-badge {
+            background: #cc0000;
+            color: #ffffff;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 3px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
         .schedule-table td {
             padding: 8px 4px;
             text-align: center;
-            border-bottom: 1px solid #eaeef2;
-            background: #fafbfc;
+            border-bottom: 1px solid #333;
+            background: #2a2a2a;
             transition: background 0.2s;
         }
 
@@ -176,36 +195,40 @@
 
         .schedule-table .time-col {
             font-weight: 600;
-            color: #1e2b3a;
-            background: #f0f3f7;
+            color: #b0b0b0;
+            background: #1f1f1f;
             width: 70px;
             font-size: 13px;
+            border-right: 1px solid #333;
         }
 
         /* Fila separadora */
         .schedule-table tr.separator-row td {
-            background: #e8edf5;
-            border-bottom: 3px solid #c0c8d4;
+            background: #1a1a1a;
+            border-bottom: 3px solid #444;
             padding: 4px 4px;
             height: 20px;
         }
 
         .schedule-table tr.separator-row td .separator-text {
             font-size: 11px;
-            color: #6b7a8a;
+            color: #888;
             font-weight: 600;
             letter-spacing: 2px;
             text-transform: uppercase;
-            background: #dce3ec;
+            background: #222;
             padding: 2px 16px;
             border-radius: 12px;
             display: inline-block;
+            border: 1px solid #333;
         }
 
-        /* Columna del día actual - fondo difuminado */
+        /* Columna del día actual - BLANCO Y ROJO */
         .schedule-table td.today-column {
-            background: linear-gradient(135deg, #e8f0fe 0%, #d4e4ff 100%);
+            background: #f5f5f5;
             position: relative;
+            border-left: 1px solid #cc0000;
+            border-right: 1px solid #cc0000;
         }
 
         .schedule-table td.today-column::before {
@@ -215,32 +238,47 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at center, rgba(42, 125, 225, 0.05) 0%, transparent 70%);
+            background: radial-gradient(circle at center, rgba(204, 0, 0, 0.06) 0%, transparent 70%);
             pointer-events: none;
         }
 
         .schedule-table td.today-column.past {
-            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            background: #e8e8e8;
+            opacity: 0.7;
         }
 
         .schedule-table td.today-column.reserved {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            background: #ffebeb;
+            border-left: 2px solid #cc0000;
+            border-right: 2px solid #cc0000;
+        }
+
+        .schedule-table td.today-column.reserved::after {
+            content: '📌';
+            font-size: 12px;
+            margin-left: 4px;
         }
 
         .schedule-table td.today-column.selected {
-            background: linear-gradient(135deg, #b5d4ff 0%, #8bb8f5 100%);
-            box-shadow: inset 0 0 0 2px #2a7de1;
+            background: #ffffff;
+            box-shadow: inset 0 0 0 2px #cc0000, 0 0 20px rgba(204, 0, 0, 0.1);
+        }
+
+        .schedule-table td.today-column .slot-radio:checked {
+            accent-color: #cc0000;
         }
 
         /* Separador en día actual */
         .schedule-table tr.separator-row td.today-column {
-            background: linear-gradient(135deg, #d4e0f5 0%, #c0d4f0 100%);
+            background: #e8e8e8;
+            border-left: 2px solid #cc0000;
+            border-right: 2px solid #cc0000;
         }
 
         .schedule-table input[type="radio"] {
             width: 18px;
             height: 18px;
-            accent-color: #2a7de1;
+            accent-color: #555;
             cursor: pointer;
             transition: transform 0.15s;
             position: relative;
@@ -252,13 +290,14 @@
         }
 
         .schedule-table input[type="radio"]:disabled {
-            accent-color: #b0b8c4;
+            accent-color: #444;
             cursor: not-allowed;
-            opacity: 0.5;
+            opacity: 0.4;
         }
 
+        /* Estilos generales de celdas */
         .schedule-table td.reserved {
-            background: #e8f0fe;
+            background: #3a3a3a;
             position: relative;
         }
 
@@ -266,24 +305,25 @@
             content: '📌';
             font-size: 12px;
             margin-left: 4px;
-        }
-
-        .schedule-table td.past {
-            background: #f5f5f5;
             opacity: 0.6;
         }
 
+        .schedule-table td.past {
+            background: #222;
+            opacity: 0.5;
+        }
+
         .schedule-table td.selected {
-            background: #d4e4ff;
-            box-shadow: inset 0 0 0 2px #2a7de1;
+            background: #444;
+            box-shadow: inset 0 0 0 2px #666;
         }
 
         /* === FORMULARIO === */
         .reservation-form {
-            background: #f8faff;
+            background: #222;
             padding: 22px 20px;
             border-radius: 16px;
-            border: 1px solid #e0e8f0;
+            border: 1px solid #3a3a3a;
             display: flex;
             flex-wrap: wrap;
             align-items: flex-end;
@@ -302,41 +342,47 @@
         .form-group label {
             font-size: 13px;
             font-weight: 600;
-            color: #2c3e50;
+            color: #b0b0b0;
             margin-bottom: 5px;
             letter-spacing: 0.3px;
         }
 
         .form-group input {
             padding: 10px 12px;
-            border: 1.5px solid #dce3ec;
+            border: 1.5px solid #3a3a3a;
             border-radius: 10px;
             font-size: 14px;
-            background: white;
+            background: #1a1a1a;
+            color: #e0e0e0;
             transition: border 0.2s, box-shadow 0.2s;
             outline: none;
             width: 100%;
         }
 
-        .form-group input:focus {
-            border-color: #2a7de1;
-            box-shadow: 0 0 0 3px rgba(42, 125, 225, 0.15);
+        .form-group input::placeholder {
+            color: #666;
         }
 
-        .form-group input::placeholder {
-            color: #aab3c0;
+        .form-group input:focus {
+            border-color: #888;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
+        }
+
+        .form-group input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px #1a1a1a inset !important;
+            -webkit-text-fill-color: #e0e0e0 !important;
         }
 
         .btn-reserve {
-            background: #1e2b3a;
-            color: white;
-            border: none;
+            background: #333;
+            color: #e0e0e0;
+            border: 1px solid #444;
             padding: 10px 28px;
             border-radius: 30px;
             font-weight: 600;
             font-size: 15px;
             cursor: pointer;
-            transition: background 0.25s, transform 0.1s;
+            transition: background 0.25s, transform 0.1s, border-color 0.25s;
             margin-left: auto;
             height: 44px;
             align-self: flex-end;
@@ -345,7 +391,8 @@
         }
 
         .btn-reserve:hover:not(:disabled) {
-            background: #2a7de1;
+            background: #444;
+            border-color: #666;
         }
 
         .btn-reserve:active:not(:disabled) {
@@ -353,16 +400,16 @@
         }
 
         .btn-reserve:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
         }
 
         .message {
             margin-top: 20px;
             padding: 14px 18px;
-            background: #e5f4e5;
-            border-left: 5px solid #1f9a4a;
-            color: #1a6e34;
+            background: #1a1a1a;
+            border-left: 5px solid #4a4a4a;
+            color: #d0d0d0;
             border-radius: 10px;
             font-weight: 500;
             display: none;
@@ -374,14 +421,20 @@
         }
 
         .message.error {
-            border-left-color: #d32f2f;
-            background: #fde8e8;
-            color: #a11f2a;
+            border-left-color: #cc0000;
+            background: #2a1a1a;
+            color: #ff6b6b;
+        }
+
+        .message.success {
+            border-left-color: #4a4a4a;
+            background: #1a1a1a;
+            color: #d0d0d0;
         }
 
         .cookie-notice {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
+            background: #1a1a1a;
+            border: 1px solid #333;
             border-radius: 10px;
             padding: 12px 18px;
             margin-bottom: 20px;
@@ -395,23 +448,24 @@
         .cookie-notice p {
             margin: 0;
             font-size: 14px;
-            color: #856404;
+            color: #999;
         }
 
         .cookie-notice button {
-            background: #1e2b3a;
-            color: white;
-            border: none;
+            background: #333;
+            color: #e0e0e0;
+            border: 1px solid #444;
             padding: 6px 18px;
             border-radius: 20px;
             cursor: pointer;
             font-weight: 600;
             font-size: 13px;
-            transition: background 0.25s;
+            transition: all 0.25s;
         }
 
         .cookie-notice button:hover {
-            background: #2a7de1;
+            background: #444;
+            border-color: #666;
         }
 
         /* Responsive */
@@ -546,9 +600,7 @@
         }
 
         // === CONFIGURACIÓN ===
-        // Horarios de mañana
         const HORAS_MANANA = ['9:00', '10:00', '11:00', '12:00', '13:00'];
-        // Horarios de tarde
         const HORAS_TARDE = ['16:00', '17:00', '18:00', '19:00', '20:00'];
         const DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
         
@@ -671,7 +723,7 @@
             });
         }
 
-        // === GENERAR TABLA CON SEPARADOR ===
+        // === GENERAR TABLA ===
         function renderTable(weekStart) {
             const startDate = new Date(weekStart);
             const today = new Date();
@@ -690,7 +742,7 @@
                 
                 theadHTML += `<th class="${weekendClass} ${todayClass}">${dayName}<span class="day-date">${dateStr}</span>`;
                 if (isToday) {
-                    theadHTML += ` <span style="font-size:10px; background:#ffd700; color:#1e2b3a; padding:1px 8px; border-radius:10px; display:inline-block; margin-top:3px;">HOY</span>`;
+                    theadHTML += ` <span class="today-badge">● HOY</span>`;
                 }
                 theadHTML += `</th>`;
             }
@@ -707,12 +759,12 @@
             
             // FILA SEPARADORA
             tbodyHTML += `<tr class="separator-row">`;
-            tbodyHTML += `<td class="time-col" style="background:#e8edf5; text-align:center; font-size:11px; color:#6b7a8a; font-weight:600;">⏰</td>`;
+            tbodyHTML += `<td class="time-col" style="background:#1a1a1a; text-align:center; font-size:11px; color:#888; font-weight:600;">⏰</td>`;
             for (let i = 0; i < 6; i++) {
                 const date = getDateForDay(startDate, i);
                 const isToday = isSameDate(date, today);
                 const todayClass = isToday ? 'today-column' : '';
-                tbodyHTML += `<td class="${todayClass}" style="background:#e8edf5; border-bottom: 3px solid #c0c8d4; text-align:center; font-size:10px; color:#6b7a8a; font-weight:500; letter-spacing:1px;">
+                tbodyHTML += `<td class="${todayClass}" style="background:#1a1a1a; border-bottom: 3px solid #444; text-align:center; font-size:10px; color:#888; font-weight:500; letter-spacing:1px;">
                     <span class="separator-text">⏳ TARDE</span>
                 </td>`;
             }
@@ -772,6 +824,7 @@
                 const checked = isSelected ? 'checked' : '';
                 
                 html += `<input type="radio" 
+                               class="slot-radio"
                                name="slot" 
                                id="${radioId}" 
                                data-date="${dateKey}" 
@@ -857,7 +910,7 @@
             if (tipo === 'error') {
                 messageDiv.classList.add('error');
             } else {
-                messageDiv.classList.remove('error');
+                messageDiv.classList.add('success');
             }
         }
 
@@ -904,13 +957,12 @@
             const dateObj = new Date(year, month - 1, day);
             const dateStr = formatDate(dateObj);
             
-            messageDiv.className = 'message show';
+            messageDiv.className = 'message show success';
             messageDiv.innerHTML = `
                 ✅ <strong>¡Reserva confirmada!</strong><br>
                 <span style="font-weight:400;">${nombre}, tu reserva para el <strong>${dateStr}</strong> a las <strong>${selectedSlot.time}</strong> ha sido registrada.</span><br>
-                <span style="font-size:14px; opacity:0.8;">Te enviaremos un correo a ${email} con los detalles.</span>
+                <span style="font-size:14px; opacity:0.7;">Te enviaremos un correo a ${email} con los detalles.</span>
             `;
-            messageDiv.classList.remove('error');
 
             console.log('Reserva confirmada:', {
                 nombre,
