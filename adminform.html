@@ -65,12 +65,48 @@
             z-index: 10;
         }
         
+        /* ✅ AGENDA DE HOY */
+        .today-agenda {
+            background: linear-gradient(135deg, #2a2a2a 0%, #2e2818 100%);
+            border: 1px solid #8b7424;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .today-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .today-header h2 { font-size: 1.3rem; color: #e8e8e8; }
+        .today-header h2 i { color: #d4af37; margin-right: 8px; }
+        .today-date { color: #b0a070; font-size: 0.9rem; font-weight: 500; }
+        .today-count { background: #d4af37; color: #1a1a1a; font-weight: 700; font-size: 0.8rem; padding: 0.2rem 0.8rem; border-radius: 20px; }
+        .today-list { display: flex; flex-direction: column; gap: 0.6rem; }
+        .today-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #222;
+            border: 1px solid #353535;
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
+            transition: 0.15s;
+        }
+        .today-item:hover { background: #262626; }
+        .today-item.next { border-color: #d4af37; box-shadow: 0 0 12px rgba(212, 175, 55, 0.2); }
+        .today-item.past { opacity: 0.45; }
+        .today-time { font-size: 1.3rem; font-weight: 700; color: #d4af37; min-width: 65px; }
+        .today-info { flex: 1; display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+        .today-name { color: #e8e8e8; font-weight: 600; display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; }
+        .today-phone { color: #888; font-size: 0.8rem; }
+        .today-tag { font-size: 0.6rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .today-tag.next-tag { background: #d4af37; color: #1a1a1a; }
+        .today-tag.past-tag { background: #444; color: #aaa; }
+        .today-empty { text-align: center; color: #777; padding: 1.5rem 1rem; }
+        .today-empty i { font-size: 2.5rem; color: #55482a; margin-bottom: 0.6rem; display: block; }
+        
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
         .stat-card { background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 16px; padding: 1.2rem; text-align: center; }
         .stat-card .number { font-size: 2rem; font-weight: 700; color: #d4af37; display: block; }
         .stat-card .number.small { font-size: 1.6rem; padding-top: 0.3rem; }
         .stat-card .label { font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.3rem; }
-        /* Tarjeta destacada de próxima reserva */
         .stat-card.next-card { border-color: #8b7424; background: linear-gradient(135deg, #2a2a2a 0%, #332b1a 100%); }
         .stat-card.next-card .number { color: #e5c147; }
         
@@ -145,6 +181,8 @@
             .donut-center .percentage { font-size: 2rem; }
             .action-btn { width: 28px; height: 28px; font-size: 0.8rem; }
             .stat-card .number.small { font-size: 1.3rem; }
+            .today-item { flex-wrap: wrap; gap: 0.6rem; }
+            .today-time { font-size: 1.1rem; min-width: 55px; }
         }
     </style>
 </head>
@@ -173,6 +211,16 @@
                     <i class="fas fa-sign-out-alt"></i> Salir
                 </button>
             </div>
+        </div>
+
+        <!-- ✅ AGENDA DE HOY (primero en pantalla) -->
+        <div class="today-agenda">
+            <div class="today-header">
+                <h2><i class="fas fa-sun"></i>Agenda de Hoy</h2>
+                <span class="today-date" id="todayDateLabel"></span>
+                <span class="today-count" id="todayCount">0 citas</span>
+            </div>
+            <div class="today-list" id="todayList"></div>
         </div>
 
         <!-- ESTADÍSTICAS + CUENTA REGRESIVA -->
@@ -224,7 +272,7 @@
             </table>
         </div>
 
-        <!-- ✅ DASHBOARD MENSUAL MOVIDO AL FINAL -->
+        <!-- DASHBOARD MENSUAL (al final) -->
         <div class="monthly-dashboard">
             <div class="dashboard-header">
                 <h2><i class="fas fa-chart-pie" style="color: #d4af37; margin-right: 8px;"></i>Estadísticas Mensuales</h2>
@@ -307,8 +355,9 @@
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwDFvAKsIT2tVmuIWcyJ3duNBNCDEriYuCvDOBATRyTatUJNkSiAmQH3xisg3v74srM1g/exec';
         const HOURS_PER_DAY = 9;
         const MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        const LONG_DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
         const DAY_INDEX = { 'Dom': 0, 'Lun': 1, 'Mar': 2, 'Mié': 3, 'Jue': 4, 'Vie': 5, 'Sáb': 6 };
-        const STUDIO_NAME = 'LG Tattoo'; // ⚠️ Cambia por el nombre de tu estudio
+        const STUDIO_NAME = 'Estudio de Tatuajes'; // ⚠️ Cambia por el nombre de tu estudio
         const DEFAULT_COUNTRY_CODE = '54';
         
         let adminPassword = '';
@@ -387,6 +436,7 @@
             document.getElementById('statPasadas').textContent = stats.pasadas;
             document.getElementById('statCanceladas').textContent = stats.canceladas;
             
+            renderTodayAgenda();
             renderTable();
             updateMonthlyDashboard();
             updateCountdown();
@@ -418,7 +468,69 @@
             } catch (e) { return null; }
         }
 
-        // Ordena próximas primero (cronológico) y pasadas al final (más reciente primero)
+        // ✅ NUEVO: Agenda del día actual
+        function renderTodayAgenda() {
+            const now = new Date();
+            const listEl = document.getElementById('todayList');
+            const dateLabel = document.getElementById('todayDateLabel');
+            const countEl = document.getElementById('todayCount');
+            
+            dateLabel.textContent = `${LONG_DAYS[now.getDay()]} ${String(now.getDate()).padStart(2, '0')} de ${MONTH_NAMES[now.getMonth()]}, ${now.getFullYear()}`;
+            
+            const todayRes = allReservations
+                .filter(r => r.estado === 'ACTIVA')
+                .map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }))
+                .filter(x => x.d &&
+                    x.d.getDate() === now.getDate() &&
+                    x.d.getMonth() === now.getMonth() &&
+                    x.d.getFullYear() === now.getFullYear())
+                .sort((a, b) => a.d - b.d);
+            
+            countEl.textContent = todayRes.length === 1 ? '1 cita' : todayRes.length + ' citas';
+            
+            if (todayRes.length === 0) {
+                listEl.innerHTML = `
+                    <div class="today-empty">
+                        <i class="fas fa-mug-hot"></i>
+                        No hay reservas para hoy. ¡Día libre! 🎉
+                    </div>
+                `;
+                return;
+            }
+            
+            const nextIndex = todayRes.findIndex(x => x.d >= now);
+            
+            listEl.innerHTML = todayRes.map((item, idx) => {
+                const isPast = item.d < now;
+                const isNext = idx === nextIndex;
+                const timeStr = String(item.d.getHours()).padStart(2, '0') + ':' + String(item.d.getMinutes()).padStart(2, '0');
+                
+                let tag = '';
+                if (isNext) tag = '<span class="today-tag next-tag">Siguiente</span>';
+                else if (isPast) tag = '<span class="today-tag past-tag">Pasada</span>';
+                
+                return `
+                    <div class="today-item ${isNext ? 'next' : ''} ${isPast ? 'past' : ''}">
+                        <div class="today-time">${timeStr}</div>
+                        <div class="today-info">
+                            <span class="today-name">${item.r.nombre} ${tag}</span>
+                            <span class="today-phone"><i class="fas fa-phone-alt"></i> ${item.r.telefono}</span>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${item.r.id}')" title="Enviar WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                            ${!isPast ? `
+                            <button class="action-btn btn-success" onclick="markCompleted('${item.r.id}')" title="Completada">
+                                <i class="fas fa-check"></i>
+                            </button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Ordena próximas primero y pasadas al final
         function getSortedReservations() {
             const now = new Date();
             const withDates = allReservations.map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }));
@@ -431,7 +543,6 @@
             return upcoming.concat(past).map(x => x.r);
         }
 
-        // Obtiene la próxima reserva activa
         function getNextUpcoming() {
             const now = new Date();
             const candidates = allReservations
@@ -442,7 +553,6 @@
             return candidates.length ? candidates[0] : null;
         }
 
-        // Formatea la cuenta regresiva
         function formatCountdown(ms) {
             if (ms <= 0) return '¡Ahora!';
             const mins = Math.floor(ms / 60000);
@@ -454,7 +564,6 @@
             return `${minutes}m`;
         }
 
-        // Actualiza la tarjeta de cuenta regresiva
         function updateCountdown() {
             const numberEl = document.getElementById('statCountdown');
             const labelEl = document.getElementById('statNextInfo');
@@ -564,7 +673,7 @@
                 `Te contactamos desde *${STUDIO_NAME}* sobre tu reserva:\n\n` +
                 `📅 *Fecha:* ${reserva.fecha}\n` +
                 `🕐 *Hora:* ${reserva.hora}\n\n` +
-                `Confirmamos tu asistencia!!!. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n` +
+                `Por favor confirma tu asistencia. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n` +
                 `¡Te esperamos! 🎨`;
             
             const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
@@ -714,8 +823,11 @@
             a.click();
         }
 
-        // Actualiza la cuenta regresiva cada 60 segundos automáticamente
-        setInterval(updateCountdown, 60000);
+        // Actualiza cuenta regresiva Y agenda de hoy cada 60 segundos
+        setInterval(function() {
+            updateCountdown();
+            renderTodayAgenda();
+        }, 60000);
     </script>
 </body>
 </html>
