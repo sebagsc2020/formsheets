@@ -687,7 +687,7 @@
         (function() {
             // ===== CONFIGURACIÓN =====
             const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwDFvAKsIT2tVmuIWcyJ3duNBNCDEriYuCvDOBATRyTatUJNkSiAmQH3xisg3v74srM1g/exec';
-            const TIMEZONE = 'Europe/Madrid'; // ✅ Zona horaria de Santander/España
+            const TIMEZONE = 'America/Argentina/Buenos_Aires'; // ✅ Zona horaria de Argentina
 
             const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
             const morningHours = [9, 10, 11, 12];
@@ -855,7 +855,7 @@
                 window.open(url, '_blank');
             }
 
-            // ✅ FUNCIÓN AUXILIAR: Obtiene las partes de una fecha en la zona horaria de Madrid
+            // ✅ Obtiene las partes de una fecha en la zona horaria de Argentina
             function getDatePartsInTimezone(date) {
                 const formatter = new Intl.DateTimeFormat('en-GB', {
                     timeZone: TIMEZONE,
@@ -879,21 +879,21 @@
                 };
             }
 
-            // ✅ Obtiene la fecha "hoy" en la zona horaria de Madrid
+            // ✅ Obtiene la fecha "hoy" en la zona horaria de Argentina
             function getToday() {
                 const now = new Date();
                 const parts = getDatePartsInTimezone(now);
                 return new Date(parts.year, parts.month, parts.day, 0, 0, 0, 0);
             }
 
-            // ✅ Obtiene el "ahora" en la zona horaria de Madrid
+            // ✅ Obtiene el "ahora" en la zona horaria de Argentina
             function getNowInTimezone() {
                 const now = new Date();
                 const parts = getDatePartsInTimezone(now);
                 return new Date(parts.year, parts.month, parts.day, parts.hour, parts.minute, parts.second);
             }
 
-            // ✅ Calcula el lunes de la semana actual en Madrid
+            // ✅ Calcula el lunes de la semana actual en Argentina
             function getMonday(date) {
                 const parts = getDatePartsInTimezone(date);
                 var d = new Date(parts.year, parts.month, parts.day);
@@ -921,7 +921,7 @@
                 return d;
             }
 
-            // ✅ Determina si un slot ya pasó en la zona horaria de Madrid
+            // ✅ Determina si un slot ya pasó en la zona horaria de Argentina
             function isPastOrCurrentSlot(weekStart, weekdayIndex, hour) {
                 var slotDate = getDateForWeekday(weekStart, weekdayIndex);
                 slotDate.setHours(hour, 0, 0, 0);
@@ -929,7 +929,7 @@
                 return slotDate <= nowInTimezone;
             }
 
-            // ✅ Compara si una fecha es "hoy" en la zona horaria de Madrid
+            // ✅ Compara si una fecha es "hoy" en la zona horaria de Argentina
             function isToday(date) {
                 var today = getToday();
                 return date.getFullYear() === today.getFullYear() &&
