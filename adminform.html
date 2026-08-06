@@ -21,19 +21,54 @@
         .btn { background: linear-gradient(135deg, #e5c147 0%, #d4af37 50%, #b8941f 100%); border: none; color: #1a1a1a; padding: 0.8rem 1.5rem; border-radius: 40px; font-weight: 700; font-size: 0.95rem; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; }
         .btn:hover { transform: scale(1.02); }
         .btn-secondary { background: #444; color: #e8e8e8; border: 1px solid #555; }
-        .btn-danger { background: #a33; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; cursor: pointer; margin-right: 0.3rem; }
-        .btn-danger:hover { background: #c44; }
-        .btn-success { background: #2a7; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; cursor: pointer; margin-right: 0.3rem; }
+        
+        /* ✅ BOTONES DE ACCIÓN REDISEÑADOS (todos cuadrados con solo íconos) */
+        .action-buttons { display: flex; gap: 0.4rem; align-items: center; }
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        .action-btn:hover { transform: scale(1.1); }
+        .action-btn:active { transform: scale(0.95); }
+        
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+        .btn-whatsapp:hover { background: #20ba5a; box-shadow: 0 0 8px rgba(37, 211, 102, 0.5); }
+        
+        .btn-success {
+            background: #2a7;
+            color: white;
+        }
         .btn-success:hover { background: #3b8; }
-        .btn-whatsapp { background: #25d366; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; cursor: pointer; margin-right: 0.3rem; transition: 0.15s; }
-        .btn-whatsapp:hover { background: #20ba5a; transform: scale(1.05); }
-        .btn-whatsapp i { margin-right: 4px; }
+        
+        .btn-danger {
+            background: #a33;
+            color: white;
+        }
+        .btn-danger:hover { background: #c44; }
+        
+        .btn-neutral {
+            background: #555;
+            color: white;
+        }
+        .btn-neutral:hover { background: #666; }
+        
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
         .stat-card { background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 16px; padding: 1.2rem; text-align: center; }
         .stat-card .number { font-size: 2rem; font-weight: 700; color: #d4af37; display: block; }
         .stat-card .label { font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.3rem; }
         
-        /* Dashboard mensual */
         .monthly-dashboard { background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; }
         .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
         .dashboard-header h2 { font-size: 1.3rem; color: #e8e8e8; }
@@ -45,7 +80,6 @@
         
         .dashboard-content { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
         
-        /* Gráfico circular */
         .chart-container { background: #222; border-radius: 16px; padding: 1.5rem; border: 1px solid #353535; }
         .chart-title { font-size: 0.9rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; text-align: center; }
         .donut-chart { position: relative; width: 200px; height: 200px; margin: 0 auto 1rem; }
@@ -59,14 +93,12 @@
         .legend-label { color: #ccc; flex: 1; }
         .legend-value { color: #d4af37; font-weight: 600; }
         
-        /* Métricas adicionales */
         .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .metric-card { background: #222; border-radius: 12px; padding: 1rem; border: 1px solid #353535; }
         .metric-card .metric-icon { font-size: 1.5rem; color: #d4af37; margin-bottom: 0.5rem; }
         .metric-card .metric-value { font-size: 1.5rem; font-weight: 700; color: #e8e8e8; margin-bottom: 0.2rem; }
         .metric-card .metric-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
         
-        /* Distribución por día */
         .distribution-chart { margin-top: 1rem; }
         .bar-chart { display: flex; align-items: flex-end; gap: 0.3rem; height: 100px; padding: 0.5rem 0; }
         .bar { flex: 1; background: linear-gradient(to top, #b8941f, #d4af37); border-radius: 4px 4px 0 0; position: relative; min-height: 4px; transition: all 0.3s; }
@@ -82,7 +114,7 @@
         .table-wrap { background: #222; border-radius: 16px; border: 1px solid #3a3a3a; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         th { background: #2a2a2a; color: #d0d0d0; font-weight: 600; padding: 0.8rem 0.6rem; text-align: left; border-bottom: 2px solid #3a3a3a; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
-        td { padding: 0.8rem 0.6rem; border-bottom: 1px solid #333; }
+        td { padding: 0.8rem 0.6rem; border-bottom: 1px solid #333; vertical-align: middle; }
         tr:hover { background: #2a2a2a; }
         .badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
         .badge-activa { background: #1a3a1a; color: #4caf50; }
@@ -96,6 +128,26 @@
         .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
         .user-info { font-size: 0.85rem; color: #888; }
         .user-info strong { color: #d4af37; }
+        
+        /* Tooltip para los botones */
+        .action-btn { position: relative; }
+        .action-btn[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            margin-bottom: 6px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
         @media (max-width: 968px) {
             .dashboard-content { grid-template-columns: 1fr; }
         }
@@ -105,7 +157,7 @@
             .metrics-grid { grid-template-columns: 1fr; }
             .donut-chart { width: 160px; height: 160px; }
             .donut-center .percentage { font-size: 2rem; }
-            .btn-danger, .btn-success, .btn-whatsapp { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
+            .action-btn { width: 28px; height: 28px; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -124,7 +176,7 @@
         <p id="loginError" style="color: #ff6b6b; text-align: center; margin-top: 1rem; font-size: 0.85rem; display: none;"></p>
     </div>
 
-    <!-- PANTALLA PRINCIPAL (oculta hasta login) -->
+    <!-- PANTALLA PRINCIPAL -->
     <div id="adminPanel" class="container" style="display: none;">
         <div class="header-actions">
             <h1><i class="fas fa-user-shield"></i> Panel de Administración</h1>
@@ -136,7 +188,6 @@
             </div>
         </div>
 
-        <!-- ESTADÍSTICAS GENERALES -->
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card"><span class="number" id="statTotal">0</span><span class="label">Total</span></div>
             <div class="stat-card"><span class="number" id="statActivas">0</span><span class="label">Activas</span></div>
@@ -145,7 +196,6 @@
             <div class="stat-card"><span class="number" id="statCanceladas">0</span><span class="label">Canceladas</span></div>
         </div>
 
-        <!-- DASHBOARD MENSUAL -->
         <div class="monthly-dashboard">
             <div class="dashboard-header">
                 <h2><i class="fas fa-chart-pie" style="color: #d4af37; margin-right: 8px;"></i>Estadísticas Mensuales</h2>
@@ -157,7 +207,6 @@
             </div>
             
             <div class="dashboard-content">
-                <!-- Gráfico circular de ocupación -->
                 <div class="chart-container">
                     <div class="chart-title">Ocupación del Mes</div>
                     <div class="donut-chart">
@@ -189,7 +238,6 @@
                     </div>
                 </div>
                 
-                <!-- Métricas adicionales -->
                 <div>
                     <div class="metrics-grid">
                         <div class="metric-card">
@@ -214,7 +262,6 @@
                         </div>
                     </div>
                     
-                    <!-- Distribución por día de la semana -->
                     <div class="chart-container" style="margin-top: 1rem;">
                         <div class="chart-title">Distribución por Día</div>
                         <div class="distribution-chart">
@@ -225,7 +272,6 @@
             </div>
         </div>
 
-        <!-- TOOLBAR -->
         <div class="toolbar">
             <div class="toolbar-left">
                 <button class="filter-btn active" data-filter="all">Todas</button>
@@ -244,7 +290,6 @@
             </div>
         </div>
 
-        <!-- TABLA -->
         <div class="table-wrap">
             <table>
                 <thead>
@@ -271,8 +316,9 @@
         const HOURS_PER_DAY = 9;
         const DAYS_OF_WEEK = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
         const MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        const STUDIO_NAME = 'LG Tattoo'; // ⚠️ Cambia esto por el nombre de tu estudio
-        const WHATSAPP_NUMBER = '5493518692251'; // ⚠️ Cambia esto por tu número de WhatsApp (sin + ni espacios)
+        const STUDIO_NAME = 'Estudio de Tatuajes'; // ⚠️ Cambia por el nombre de tu estudio
+        const STUDIO_WHATSAPP = '5493518692251'; // ⚠️ Tu número (para el formulario público)
+        const DEFAULT_COUNTRY_CODE = '54'; // ⚠️ Código de país por defecto si el cliente no lo puso
         
         let adminPassword = '';
         let allReservations = [];
@@ -323,7 +369,6 @@
             document.getElementById('passwordInput').value = '';
         }
 
-        // ===== CARGA DE DATOS =====
         async function loadData() {
             const tbody = document.getElementById('reservasBody');
             tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Actualizando...</td></tr>';
@@ -374,6 +419,32 @@
                 const badgeClass = r.estado === 'ACTIVA' ? (esFutura(r.fecha, r.hora) ? 'badge-activa' : 'badge-completada') : 'badge-cancelada';
                 const estadoLabel = r.estado === 'ACTIVA' ? (esFutura(r.fecha, r.hora) ? 'Activa' : 'Pasada') : 'Cancelada';
                 
+                let actionsHtml = '';
+                
+                if (r.estado === 'ACTIVA') {
+                    actionsHtml = `
+                        <div class="action-buttons">
+                            <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${r.id}')" title="Enviar WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                            <button class="action-btn btn-success" onclick="markCompleted('${r.id}')" title="Completada">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="action-btn btn-danger" onclick="cancelReservation('${r.id}')" title="Cancelar">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    actionsHtml = `
+                        <div class="action-buttons">
+                            <button class="action-btn btn-neutral" onclick="reactivate('${r.id}')" title="Reactivar">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+                
                 return `
                     <tr>
                         <td><strong>${r.fecha}</strong></td>
@@ -382,23 +453,7 @@
                         <td class="hide-mobile">${r.telefono}</td>
                         <td class="hide-mobile">${r.email}</td>
                         <td><span class="badge ${badgeClass}">${estadoLabel}</span></td>
-                        <td>
-                            ${r.estado === 'ACTIVA' ? `
-                                <button class="btn-whatsapp" onclick="sendWhatsApp('${r.id}')" title="Enviar WhatsApp">
-                                    <i class="fab fa-whatsapp"></i> WhatsApp
-                                </button>
-                                <button class="btn-success" onclick="markCompleted('${r.id}')" title="Marcar como completada">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                <button class="btn-danger" onclick="cancelReservation('${r.id}')" title="Cancelar reserva">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            ` : `
-                                <button class="btn-success" onclick="reactivate('${r.id}')" title="Reactivar">
-                                    <i class="fas fa-undo"></i>
-                                </button>
-                            `}
-                        </td>
+                        <td>${actionsHtml}</td>
                     </tr>
                 `;
             }).join('');
@@ -424,36 +479,70 @@
             } catch (e) { return true; }
         }
 
-        // ===== WHATSAPP =====
+        // ✅ FUNCIÓN DE WHATSAPP MEJORADA
         function sendWhatsApp(id) {
             const reserva = allReservations.find(r => r.id === id);
             if (!reserva) {
-                alert('Reserva no encontrada');
+                alert('❌ Reserva no encontrada');
                 return;
             }
             
-            // Limpiar número de teléfono (quitar espacios, guiones, etc.)
-            let phone = reserva.telefono.replace(/\D/g, '');
+            // Limpiar número: quitar todo excepto dígitos y el signo +
+            let phone = (reserva.telefono || '').toString().trim();
             
-            // Si no tiene código de país, asumir Argentina (54)
-            if (!phone.startsWith('54') && phone.length === 10) {
-                phone = '54' + phone;
+            if (!phone) {
+                alert('⚠️ Este cliente no cargó un número de teléfono');
+                return;
             }
             
-            // Mensaje pre-cargado
+            // Quitar todo excepto dígitos
+            phone = phone.replace(/\D/g, '');
+            
+            // Si está vacío después de limpiar
+            if (phone.length < 8) {
+                alert('⚠️ El número de teléfono es inválido: ' + reserva.telefono);
+                return;
+            }
+            
+            // Si empieza con 0 (código de área local), quitarlo
+            if (phone.startsWith('0')) {
+                phone = phone.substring(1);
+            }
+            
+            // Si empieza con 15 (celular Argentina sin código país), quitarlo
+            if (phone.startsWith('15') && phone.length >= 10) {
+                phone = phone.substring(2);
+            }
+            
+            // Si no tiene código de país, agregar el predeterminado
+            // Detectar si ya tiene código de país (más de 10 dígitos normalmente)
+            if (phone.length <= 10) {
+                phone = DEFAULT_COUNTRY_CODE + phone;
+            } else if (phone.length === 11 && phone.startsWith('9')) {
+                // Caso Argentina: 9 351 1234567 (sin 54)
+                phone = DEFAULT_COUNTRY_CODE + phone;
+            }
+            
+            // Construir mensaje
             const message = `Hola ${reserva.nombre}! 👋\n\n` +
-                `Te contactamos desde *${STUDIO_NAME}* para confirmar tu reserva:\n\n` +
+                `Te contactamos desde *${STUDIO_NAME}* sobre tu reserva:\n\n` +
                 `📅 *Fecha:* ${reserva.fecha}\n` +
                 `🕐 *Hora:* ${reserva.hora}\n\n` +
-                `Por favor confirma tu asistencia respondiendo a este mensaje. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n` +
+                `Por favor confirma tu asistencia. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n` +
                 `¡Te esperamos! 🎨`;
             
-            // Abrir WhatsApp
+            // Abrir WhatsApp en nueva pestaña
             const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-            window.open(url, '_blank');
+            
+            // Usar window.open con características para evitar bloqueo
+            const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+            
+            // Si el navegador bloqueó el popup, abrir en la misma ventana
+            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                window.location.href = url;
+            }
         }
 
-        // ===== DASHBOARD MENSUAL =====
         function updateMonthlyDashboard() {
             const year = selectedMonth.getFullYear();
             const month = selectedMonth.getMonth();
@@ -554,7 +643,6 @@
             updateMonthlyDashboard();
         });
 
-        // ===== ACCIONES =====
         async function cancelReservation(id) {
             if (!confirm('¿Cancelar esta reserva?')) return;
             await updateEstado(id, 'CANCELADA');
@@ -583,7 +671,6 @@
             }
         }
 
-        // ===== FILTROS =====
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -593,7 +680,6 @@
             });
         });
 
-        // ===== EXPORTAR CSV =====
         function exportCSV() {
             const headers = ['ID', 'Fecha', 'Hora', 'Nombre', 'Email', 'Teléfono', 'Fecha Reserva', 'Estado'];
             const rows = allReservations.map(r => [r.id, r.fecha, r.hora, r.nombre, r.email, r.telefono, r.fechaReserva, r.estado]);
