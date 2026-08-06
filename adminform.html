@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Reservas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #1a1a1a; min-height: 100vh; padding: 2rem 1rem; color: #e8e8e8; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { font-size: 1.8rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px; }
+        h1 i { color: #d4af37; }
+        .login-box { max-width: 400px; margin: 10vh auto; background: #2a2a2a; padding: 2rem; border-radius: 20px; border: 1px solid #3a3a3a; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .login-box h2 { text-align: center; margin-bottom: 1.5rem; color: #e8e8e8; }
+        .login-box i.lock { display: block; text-align: center; font-size: 3rem; color: #d4af37; margin-bottom: 1rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; color: #999; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.03em; }
+        .form-group input { width: 100%; padding: 0.7rem 1rem; background: #1e1e1e; border: 1px solid #3d3d3d; border-radius: 10px; color: #e0e0e0; font-size: 1rem; outline: none; }
+        .form-group input:focus { border-color: #d4af37; }
+        .btn { background: linear-gradient(135deg, #e5c147 0%, #d4af37 50%, #b8941f 100%); border: none; color: #1a1a1a; padding: 0.8rem 1.5rem; border-radius: 40px; font-weight: 700; font-size: 0.95rem; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; }
+        .btn:hover { transform: scale(1.02); }
+        .btn-secondary { background: #444; color: #e8e8e8; border: 1px solid #555; }
+        .btn-danger { background: #a33; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; cursor: pointer; }
+        .btn-danger:hover { background: #c44; }
+        .btn-success { background: #2a7; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; cursor: pointer; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 16px; padding: 1.2rem; text-align: center; }
+        .stat-card .number { font-size: 2rem; font-weight: 700; color: #d4af37; display: block; }
+        .stat-card .label { font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.3rem; }
+        .toolbar { display: flex; gap: 0.8rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+        .toolbar-left, .toolbar-right { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+        .filter-btn { background: #333; border: 1px solid #444; color: #ccc; padding: 0.4rem 1rem; border-radius: 30px; cursor: pointer; font-size: 0.85rem; transition: 0.15s; }
+        .filter-btn:hover { background: #3d3d3d; }
+        .filter-btn.active { background: #d4af37; color: #1a1a1a; border-color: #d4af37; font-weight: 600; }
+        .table-wrap { background: #222; border-radius: 16px; border: 1px solid #3a3a3a; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { background: #2a2a2a; color: #d0d0d0; font-weight: 600; padding: 0.8rem 0.6rem; text-align: left; border-bottom: 2px solid #3a3a3a; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        td { padding: 0.8rem 0.6rem; border-bottom: 1px solid #333; }
+        tr:hover { background: #2a2a2a; }
+        .badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+        .badge-activa { background: #1a3a1a; color: #4caf50; }
+        .badge-cancelada { background: #3a1a1a; color: #ff6b6b; }
+        .badge-completada { background: #1a2a3a; color: #4a9eff; }
+        .empty-state { text-align: center; padding: 3rem 1rem; color: #666; }
+        .empty-state i { font-size: 3rem; margin-bottom: 1rem; color: #444; }
+        .loading { text-align: center; padding: 3rem; color: #888; }
+        .loading i { font-size: 2rem; color: #d4af37; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .user-info { font-size: 0.85rem; color: #888; }
+        .user-info strong { color: #d4af37; }
+        @media (max-width: 768px) {
+            th, td { padding: 0.5rem 0.3rem; font-size: 0.8rem; }
+            .hide-mobile { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- PANTALLA DE LOGIN -->
+    <div id="loginScreen" class="login-box">
+        <i class="fas fa-lock lock"></i>
+        <h2>Panel de Administración</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label><i class="fas fa-key"></i> Contraseña</label>
+                <input type="password" id="passwordInput" placeholder="Ingresa la contraseña" required autofocus>
+            </div>
+            <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> Ingresar</button>
+        </form>
+        <p id="loginError" style="color: #ff6b6b; text-align: center; margin-top: 1rem; font-size: 0.85rem; display: none;"></p>
+    </div>
+
+    <!-- PANTALLA PRINCIPAL (oculta hasta login) -->
+    <div id="adminPanel" class="container" style="display: none;">
+        <div class="header-actions">
+            <h1><i class="fas fa-user-shield"></i> Panel de Administración</h1>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <span class="user-info">Hola, <strong>Admin</strong></span>
+                <button class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </button>
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><span class="number" id="statTotal">0</span><span class="label">Total</span></div>
+            <div class="stat-card"><span class="number" id="statActivas">0</span><span class="label">Activas</span></div>
+            <div class="stat-card"><span class="number" id="statFuturas">0</span><span class="label">Futuras</span></div>
+            <div class="stat-card"><span class="number" id="statPasadas">0</span><span class="label">Pasadas</span></div>
+            <div class="stat-card"><span class="number" id="statCanceladas">0</span><span class="label">Canceladas</span></div>
+        </div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <button class="filter-btn active" data-filter="all">Todas</button>
+                <button class="filter-btn" data-filter="activas">Activas</button>
+                <button class="filter-btn" data-filter="futuras">Futuras</button>
+                <button class="filter-btn" data-filter="pasadas">Pasadas</button>
+                <button class="filter-btn" data-filter="canceladas">Canceladas</button>
+            </div>
+            <div class="toolbar-right">
+                <button class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="loadData()">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+                <button class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="exportCSV()">
+                    <i class="fas fa-file-csv"></i> Exportar CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- TABLA -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Nombre</th>
+                        <th class="hide-mobile">Teléfono</th>
+                        <th class="hide-mobile">Email</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="reservasBody">
+                    <tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Cargando reservas...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // ===== CONFIGURACIÓN =====
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwDFvAKsIT2tVmuIWcyJ3duNBNCDEriYuCvDOBATRyTatUJNkSiAmQH3xisg3v74srM1g/exec';
+        
+        let adminPassword = '';
+        let allReservations = [];
+        let currentFilter = 'all';
+        let stats = { total: 0, activas: 0, canceladas: 0, futuras: 0, pasadas: 0 };
+
+        // ===== LOGIN =====
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const password = document.getElementById('passwordInput').value;
+            const errorEl = document.getElementById('loginError');
+            errorEl.style.display = 'none';
+            
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL + '?action=admin&password=' + encodeURIComponent(password));
+                const result = await response.json();
+                
+                if (result.success) {
+                    adminPassword = password;
+                    sessionStorage.setItem('admin_password', password);
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'block';
+                    renderData(result);
+                } else {
+                    errorEl.textContent = '❌ Contraseña incorrecta';
+                    errorEl.style.display = 'block';
+                }
+            } catch (err) {
+                errorEl.textContent = '❌ Error de conexión';
+                errorEl.style.display = 'block';
+            }
+        });
+
+        // Auto-login si hay sesión guardada
+        window.addEventListener('load', async function() {
+            const saved = sessionStorage.getItem('admin_password');
+            if (saved) {
+                document.getElementById('passwordInput').value = saved;
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        function logout() {
+            sessionStorage.removeItem('admin_password');
+            adminPassword = '';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('passwordInput').value = '';
+        }
+
+        // ===== CARGA DE DATOS =====
+        async function loadData() {
+            const tbody = document.getElementById('reservasBody');
+            tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Actualizando...</td></tr>';
+            
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL + '?action=admin&password=' + encodeURIComponent(adminPassword));
+                const result = await response.json();
+                if (result.success) {
+                    renderData(result);
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Error al cargar datos</td></tr>';
+                }
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Error de conexión</td></tr>';
+            }
+        }
+
+        function renderData(result) {
+            allReservations = result.reservas || [];
+            stats = result.estadisticas || { total: 0, activas: 0, canceladas: 0, futuras: 0, pasadas: 0 };
+            
+            document.getElementById('statTotal').textContent = stats.total;
+            document.getElementById('statActivas').textContent = stats.activas;
+            document.getElementById('statFuturas').textContent = stats.futuras;
+            document.getElementById('statPasadas').textContent = stats.pasadas;
+            document.getElementById('statCanceladas').textContent = stats.canceladas;
+            
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('reservasBody');
+            
+            // Ordenar por fecha descendente
+            let filtered = allReservations.slice().reverse();
+            
+            if (currentFilter === 'activas') filtered = filtered.filter(r => r.estado === 'ACTIVA');
+            else if (currentFilter === 'canceladas') filtered = filtered.filter(r => r.estado === 'CANCELADA');
+            else if (currentFilter === 'futuras') filtered = filtered.filter(r => r.estado === 'ACTIVA' && esFutura(r.fecha, r.hora));
+            else if (currentFilter === 'pasadas') filtered = filtered.filter(r => r.estado === 'ACTIVA' && !esFutura(r.fecha, r.hora));
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-calendar-times"></i><br>No hay reservas en esta categoría</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(r => {
+                const badgeClass = r.estado === 'ACTIVA' ? (esFutura(r.fecha, r.hora) ? 'badge-activa' : 'badge-completada') : 'badge-cancelada';
+                const estadoLabel = r.estado === 'ACTIVA' ? (esFutura(r.fecha, r.hora) ? 'Activa' : 'Pasada') : 'Cancelada';
+                
+                return `
+                    <tr>
+                        <td><strong>${r.fecha}</strong></td>
+                        <td>${r.hora}</td>
+                        <td>${r.nombre}</td>
+                        <td class="hide-mobile">${r.telefono}</td>
+                        <td class="hide-mobile">${r.email}</td>
+                        <td><span class="badge ${badgeClass}">${estadoLabel}</span></td>
+                        <td>
+                            ${r.estado === 'ACTIVA' ? `
+                                <button class="btn-success" onclick="markCompleted('${r.id}')"><i class="fas fa-check"></i> ✓</button>
+                                <button class="btn-danger" onclick="cancelReservation('${r.id}')"><i class="fas fa-times"></i> ✕</button>
+                            ` : `
+                                <button class="btn-success" onclick="reactivate('${r.id}')"><i class="fas fa-undo"></i></button>
+                            `}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function esFutura(fecha, hora) {
+            try {
+                const partesFecha = fecha.split(' ');
+                if (partesFecha.length < 2) return true;
+                const diaNum = parseInt(partesFecha[1], 10);
+                const partesHora = hora.split(':');
+                const h = parseInt(partesHora[0], 10);
+                const ahora = new Date();
+                const año = ahora.getFullYear();
+                
+                for (let offset = 0; offset <= 1; offset++) {
+                    for (let mes = 0; mes < 12; mes++) {
+                        const testDate = new Date(año + offset, mes, diaNum, h, 0, 0);
+                        if (testDate.getDate() === diaNum && testDate >= ahora) return true;
+                    }
+                }
+                return false;
+            } catch (e) { return true; }
+        }
+
+        // ===== ACCIONES =====
+        async function cancelReservation(id) {
+            if (!confirm('¿Cancelar esta reserva?')) return;
+            await updateEstado(id, 'CANCELADA');
+        }
+
+        async function markCompleted(id) {
+            if (!confirm('¿Marcar como completada?')) return;
+            await updateEstado(id, 'COMPLETADA');
+        }
+
+        async function reactivate(id) {
+            if (!confirm('¿Reactivar esta reserva?')) return;
+            await updateEstado(id, 'ACTIVA');
+        }
+
+        async function updateEstado(id, estado) {
+            try {
+                await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'update', id, estado, password: adminPassword }),
+                    redirect: 'follow'
+                });
+                loadData();
+            } catch (err) {
+                alert('Error al actualizar');
+            }
+        }
+
+        // ===== FILTROS =====
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderTable();
+            });
+        });
+
+        // ===== EXPORTAR CSV =====
+        function exportCSV() {
+            const headers = ['ID', 'Fecha', 'Hora', 'Nombre', 'Email', 'Teléfono', 'Fecha Reserva', 'Estado'];
+            const rows = allReservations.map(r => [r.id, r.fecha, r.hora, r.nombre, r.email, r.telefono, r.fechaReserva, r.estado]);
+            const csv = [headers, ...rows].map(row => row.map(cell => `"${(cell || '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'reservas_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+        }
+    </script>
+</body>
+</html>
