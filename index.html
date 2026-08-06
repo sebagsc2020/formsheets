@@ -622,11 +622,7 @@
     <script>
         (function() {
             // ===== CONFIGURACIÓN =====
-            // URL DE GOOGLE SHEETS
             const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz-I_UJRHKey7YvLheKSE8fFEoToouvGiuQsGeHpt7zcspuInmxzms9u0Nk0Nbt-Iae3Q/exec';
-            
-            // Usar proxy CORS para evitar problemas
-            const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
 
             const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
             const morningHours = [9, 10, 11, 12];
@@ -653,16 +649,16 @@
 
             // ===== COOKIES =====
             function setCookie(name, value, days) {
-                const date = new Date();
+                var date = new Date();
                 date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
                 document.cookie = name + "=" + encodeURIComponent(value) + ";expires=" + date.toUTCString() + ";path=/";
             }
 
             function getCookie(name) {
-                const nameEQ = name + "=";
-                const ca = document.cookie.split(';');
-                for (let i = 0; i < ca.length; i++) {
-                    let c = ca[i];
+                var nameEQ = name + "=";
+                var ca = document.cookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
                     while (c.charAt(0) === ' ') c = c.substring(1, c.length);
                     if (c.indexOf(nameEQ) === 0) {
                         return decodeURIComponent(c.substring(nameEQ.length, c.length));
@@ -675,66 +671,43 @@
                 document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             }
 
-            // ===== GOOGLE SHEETS CON PROXY =====
+            // ===== GOOGLE SHEETS =====
             async function saveToGoogleSheets(data) {
                 try {
-                    // Intentar primero sin proxy
-                    let response = await fetch(GOOGLE_SHEETS_URL, {
+                    var response = await fetch(GOOGLE_SHEETS_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data)
                     });
-                    let result = await response.json();
+                    var result = await response.json();
                     return result;
                 } catch (error) {
-                    console.warn('Error sin proxy, intentando con CORS proxy...');
-                    try {
-                        // Intentar con proxy                        const proxyResponse = await fetch(PROXY_URL + GOOGLE_SHEETS_URL, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(data)
-                        });
-                        const result = await proxyResponse.json();
-                        return result;
-                    } catch (proxyError) {
-                        console.error('Error con proxy:', proxyError);
-                        return { success: false, error: 'No se pudo conectar con el servidor' };
-                    }
+                    console.error('Error al guardar:', error);
+                    return { success: false, error: error.message };
                 }
             }
 
             async function loadReservationsFromSheets() {
                 try {
-                    let response = await fetch(GOOGLE_SHEETS_URL, {
+                    var response = await fetch(GOOGLE_SHEETS_URL, {
                         method: 'GET',
                         headers: { 'Content-Type': 'application/json' }
                     });
                     if (!response.ok) throw new Error('Error al cargar reservas');
-                    const result = await response.json();
+                    var result = await response.json();
                     return result.success ? result.reservas || [] : [];
                 } catch (error) {
-                    console.warn('Error sin proxy, intentando con CORS proxy...');
-                    try {
-                        const proxyResponse = await fetch(PROXY_URL + GOOGLE_SHEETS_URL, {
-                            method: 'GET',
-                            headers: { 'Content-Type': 'application/json' }
-                        });
-                        if (!proxyResponse.ok) throw new Error('Error al cargar reservas con proxy');
-                        const result = await proxyResponse.json();
-                        return result.success ? result.reservas || [] : [];
-                    } catch (proxyError) {
-                        console.error('Error con proxy:', proxyError);
-                        return [];
-                    }
+                    console.error('Error al cargar reservas:', error);
+                    return [];
                 }
             }
 
             // ===== FUNCIONES DEL FORMULARIO =====
             function saveFormDataToCookies() {
-                const nombre = nombreInput.value.trim();
-                const email = emailInput.value.trim();
-                const telefono = telefonoInput.value.trim();
-                const selected = document.querySelector('input[name="slot"]:checked');
+                var nombre = nombreInput.value.trim();
+                var email = emailInput.value.trim();
+                var telefono = telefonoInput.value.trim();
+                var selected = document.querySelector('input[name="slot"]:checked');
 
                 if (nombre) setCookie('reserva_nombre', nombre, COOKIE_EXPIRY_DAYS);
                 else deleteCookie('reserva_nombre');
@@ -747,19 +720,19 @@
             }
 
             function loadFormDataFromCookies() {
-                const nombre = getCookie('reserva_nombre');
-                const email = getCookie('reserva_email');
-                const telefono = getCookie('reserva_telefono');
-                const horario = getCookie('reserva_horario');
+                var nombre = getCookie('reserva_nombre');
+                var email = getCookie('reserva_email');
+                var telefono = getCookie('reserva_telefono');
+                var horario = getCookie('reserva_horario');
 
                 if (nombre) nombreInput.value = nombre;
                 if (email) emailInput.value = email;
                 if (telefono) telefonoInput.value = telefono;
 
                 if (horario) {
-                    setTimeout(() => {
-                        const radios = document.querySelectorAll('input[name="slot"]');
-                        radios.forEach(radio => {
+                    setTimeout(function() {
+                        var radios = document.querySelectorAll('input[name="slot"]');
+                        radios.forEach(function(radio) {
                             if (radio.value === horario && !radio.disabled) {
                                 radio.checked = true;
                                 updateFeedback();
@@ -770,7 +743,7 @@
             }
 
             function updateFeedback() {
-                const checked = document.querySelector('input[name="slot"]:checked');
+                var checked = document.querySelector('input[name="slot"]:checked');
                 if (checked && !checked.disabled) {
                     infoText.style.display = 'none';
                     selectedDisplay.classList.add('show');
@@ -783,17 +756,18 @@
 
             function showConfirmationPopup(nombre, email, telefono, horario) {
                 popupDetails.innerHTML = '';
-                const fields = [
+                var fields = [
                     { label: 'Nombre', value: nombre },
                     { label: 'Email', value: email },
                     { label: 'Teléfono', value: telefono },
                     { label: 'Horario', value: horario }
                 ];
-                fields.forEach(field => {
-                    const row = document.createElement('div');
+                fields.forEach(function(field) {
+                    var row = document.createElement('div');
                     row.className = 'detail-row';
                     row.innerHTML =
-                        `<span class="label">${field.label}</span><span class="value">${field.value || '—'}</span>`;
+                        '<span class="label">' + field.label + '</span><span class="value">' + (field.value || '—') +
+                        '</span>';
                     popupDetails.appendChild(row);
                 });
                 popupOverlay.classList.add('show');
@@ -806,26 +780,26 @@
             }
 
             function sendWhatsAppMessage(nombre, email, telefono, horario) {
-                const message = `📋 *NUEVA RESERVA*\n\n` +
-                    `👤 *Nombre:* ${nombre}\n` +
-                    `📧 *Email:* ${email}\n` +
-                    `📞 *Teléfono:* ${telefono}\n` +
-                    `📅 *Horario:* ${horario}\n\n` +
-                    `📍 *Reserva confirmada*`;
-                const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+                var message = '📋 *NUEVA RESERVA*\n\n' +
+                    '👤 *Nombre:* ' + nombre + '\n' +
+                    '📧 *Email:* ' + email + '\n' +
+                    '📞 *Teléfono:* ' + telefono + '\n' +
+                    '📅 *Horario:* ' + horario + '\n\n' +
+                    '📍 *Reserva confirmada*';
+                var url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message);
                 window.open(url, '_blank');
             }
 
             // ===== CALENDARIO =====
             function getToday() {
-                const now = new Date();
+                var now = new Date();
                 return new Date(now.getFullYear(), now.getMonth(), now.getDate());
             }
 
             function getMonday(date) {
-                const d = new Date(date);
-                const day = d.getDay();
-                const diff = (day === 0 ? 6 : day - 1);
+                var d = new Date(date);
+                var day = d.getDay();
+                var diff = (day === 0 ? 6 : day - 1);
                 d.setDate(d.getDate() - diff);
                 d.setHours(0, 0, 0, 0);
                 return d;
@@ -836,43 +810,43 @@
             }
 
             function getMonthName(monthIndex) {
-                const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                var months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
                     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
                 ];
                 return months[monthIndex];
             }
 
             function getDateForWeekday(weekStart, weekdayIndex) {
-                const d = new Date(weekStart);
+                var d = new Date(weekStart);
                 d.setDate(d.getDate() + weekdayIndex);
                 return d;
             }
 
             function isPastOrCurrentSlot(weekStart, weekdayIndex, hour) {
-                const slotDate = getDateForWeekday(weekStart, weekdayIndex);
+                var slotDate = getDateForWeekday(weekStart, weekdayIndex);
                 slotDate.setHours(hour, 0, 0, 0);
                 return slotDate <= new Date();
             }
 
             function isToday(date) {
-                const today = getToday();
+                var today = getToday();
                 return date.getFullYear() === today.getFullYear() &&
                     date.getMonth() === today.getMonth() &&
                     date.getDate() === today.getDate();
             }
 
             function updateTableWithReservations(reservas) {
-                const reservados = new Set();
-                reservas.forEach(r => {
-                    const clave = `${r.fecha} ${r.hora}`;
+                var reservados = new Set();
+                reservas.forEach(function(r) {
+                    var clave = r.fecha + ' ' + r.hora;
                     reservados.add(clave);
                 });
 
-                const radios = document.querySelectorAll('input[name="slot"]');
-                radios.forEach(radio => {
+                var radios = document.querySelectorAll('input[name="slot"]');
+                radios.forEach(function(radio) {
                     if (reservados.has(radio.value)) {
                         radio.disabled = true;
-                        const cell = radio.closest('td');
+                        var cell = radio.closest('td');
                         if (cell) {
                             cell.classList.remove('available-cell', 'today-cell');
                             cell.classList.add('reserved-cell');
@@ -883,105 +857,109 @@
 
             // ===== RENDERIZAR TABLA =====
             async function renderTable() {
-                const today = getToday();
+                var today = getToday();
 
-                let headerHtml = '<th>Hora</th>';
-                for (let i = 0; i < daysOfWeek.length; i++) {
-                    const date = getDateForWeekday(currentWeekStart, i);
-                    const dayLabel = daysOfWeek[i];
-                    const dayNumber = formatDate(date);
-                    const isTodayClass = isToday(date) ? 'today-header' : '';
-                    headerHtml += `<th class="${isTodayClass}">${dayLabel} ${dayNumber}</th>`;
+                var headerHtml = '<th>Hora</th>';
+                for (var i = 0; i < daysOfWeek.length; i++) {
+                    var date = getDateForWeekday(currentWeekStart, i);
+                    var dayLabel = daysOfWeek[i];
+                    var dayNumber = formatDate(date);
+                    var isTodayClass = isToday(date) ? 'today-header' : '';
+                    headerHtml += '<th class="' + isTodayClass + '">' + dayLabel + ' ' + dayNumber + '</th>';
                 }
                 headerRow.innerHTML = headerHtml;
 
-                let bodyHtml = '';
+                var bodyHtml = '';
 
-                morningHours.forEach(hour => {
-                    bodyHtml += `<tr><td class="time-slot"><i class="far fa-clock"></i> ${hour}:00</td>`;
-                    for (let i = 0; i < daysOfWeek.length; i++) {
-                        const date = getDateForWeekday(currentWeekStart, i);
-                        const dayNumber = formatDate(date);
-                        const dayLabel = daysOfWeek[i];
-                        const value = `${dayLabel} ${dayNumber} ${hour}:00`;
-                        const isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, hour);
-                        const disabled = isPastOrCurrent ? 'disabled' : '';
+                morningHours.forEach(function(hour) {
+                    bodyHtml += '<tr><td class="time-slot"><i class="far fa-clock"></i> ' + hour + ':00</td>';
+                    for (var i = 0; i < daysOfWeek.length; i++) {
+                        var date = getDateForWeekday(currentWeekStart, i);
+                        var dayNumber = formatDate(date);
+                        var dayLabel = daysOfWeek[i];
+                        var value = dayLabel + ' ' + dayNumber + ' ' + hour + ':00';
+                        var isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, hour);
+                        var disabled = isPastOrCurrent ? 'disabled' : '';
 
-                        let cellClass = '';
+                        var cellClass = '';
                         if (isToday(date)) cellClass = 'today-cell';
                         else if (!isPastOrCurrent) cellClass = 'available-cell';
                         else cellClass = 'disabled-cell';
 
                         bodyHtml +=
-                            `<td class="${cellClass}"><div class="slot-cell"><input type="radio" name="slot" value="${value}" ${disabled}></div></td>`;
+                            '<td class="' + cellClass +
+                            '"><div class="slot-cell"><input type="radio" name="slot" value="' + value + '" ' +
+                            disabled + '></div></td>';
                     }
-                    bodyHtml += `</tr>`;
+                    bodyHtml += '</tr>';
                 });
 
-                bodyHtml += `<tr class="afternoon-row">`;
-                for (let i = 0; i <= 6; i++) {
-                    const date = getDateForWeekday(currentWeekStart, i);
-                    const isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, 16);
+                bodyHtml += '<tr class="afternoon-row">';
+                for (var i = 0; i <= 6; i++) {
+                    var date = getDateForWeekday(currentWeekStart, i);
+                    var isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, 16);
 
-                    let cellClass = '';
+                    var cellClass = '';
                     if (isToday(date)) cellClass = 'today-cell';
                     else if (!isPastOrCurrent) cellClass = 'available-cell';
                     else cellClass = 'disabled-cell';
 
                     if (i === 0) {
-                        bodyHtml += `<td class="${cellClass}" style="text-align: center; letter-spacing: 2px; font-weight: 600; color: #b0b0b0; font-size: 0.75rem;">
-                            <i class="fas fa-sun" style="margin-right: 4px; color: #777777;"></i> TARDE
-                        </td>`;
+                        bodyHtml += '<td class="' + cellClass +
+                            '" style="text-align: center; letter-spacing: 2px; font-weight: 600; color: #b0b0b0; font-size: 0.75rem;">' +
+                            '<i class="fas fa-sun" style="margin-right: 4px; color: #777777;"></i> TARDE</td>';
                     } else {
-                        bodyHtml += `<td class="${cellClass}"></td>`;
+                        bodyHtml += '<td class="' + cellClass + '"></td>';
                     }
                 }
-                bodyHtml += `</tr>`;
+                bodyHtml += '</tr>';
 
-                afternoonHours.forEach(hour => {
-                    bodyHtml += `<tr><td class="time-slot"><i class="far fa-clock"></i> ${hour}:00</td>`;
-                    for (let i = 0; i < daysOfWeek.length; i++) {
-                        const date = getDateForWeekday(currentWeekStart, i);
-                        const dayNumber = formatDate(date);
-                        const dayLabel = daysOfWeek[i];
-                        const value = `${dayLabel} ${dayNumber} ${hour}:00`;
-                        const isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, hour);
-                        const disabled = isPastOrCurrent ? 'disabled' : '';
+                afternoonHours.forEach(function(hour) {
+                    bodyHtml += '<tr><td class="time-slot"><i class="far fa-clock"></i> ' + hour + ':00</td>';
+                    for (var i = 0; i < daysOfWeek.length; i++) {
+                        var date = getDateForWeekday(currentWeekStart, i);
+                        var dayNumber = formatDate(date);
+                        var dayLabel = daysOfWeek[i];
+                        var value = dayLabel + ' ' + dayNumber + ' ' + hour + ':00';
+                        var isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, hour);
+                        var disabled = isPastOrCurrent ? 'disabled' : '';
 
-                        let cellClass = '';
+                        var cellClass = '';
                         if (isToday(date)) cellClass = 'today-cell';
                         else if (!isPastOrCurrent) cellClass = 'available-cell';
                         else cellClass = 'disabled-cell';
 
                         bodyHtml +=
-                            `<td class="${cellClass}"><div class="slot-cell"><input type="radio" name="slot" value="${value}" ${disabled}></div></td>`;
+                            '<td class="' + cellClass +
+                            '"><div class="slot-cell"><input type="radio" name="slot" value="' + value + '" ' +
+                            disabled + '></div></td>';
                     }
-                    bodyHtml += `</tr>`;
+                    bodyHtml += '</tr>';
                 });
 
                 tbody.innerHTML = bodyHtml;
 
-                const monthName = getMonthName(currentWeekStart.getMonth());
-                weekLabel.textContent = `${monthName} ${currentWeekStart.getFullYear()}`;
+                var monthName = getMonthName(currentWeekStart.getMonth());
+                weekLabel.textContent = monthName + ' ' + currentWeekStart.getFullYear();
 
                 try {
-                    const reservas = await loadReservationsFromSheets();
+                    var reservas = await loadReservationsFromSheets();
                     updateTableWithReservations(reservas);
                 } catch (error) {
                     console.error('Error al cargar reservas:', error);
                 }
 
-                const radios = document.querySelectorAll('input[name="slot"]');
-                radios.forEach(radio => {
+                var radios = document.querySelectorAll('input[name="slot"]');
+                radios.forEach(function(radio) {
                     radio.addEventListener('change', function() {
                         updateFeedback();
                         saveFormDataToCookies();
                     });
                 });
 
-                const horarioGuardado = getCookie('reserva_horario');
+                var horarioGuardado = getCookie('reserva_horario');
                 if (horarioGuardado) {
-                    radios.forEach(radio => {
+                    radios.forEach(function(radio) {
                         if (radio.value === horarioGuardado && !radio.disabled) {
                             radio.checked = true;
                         }
@@ -1014,14 +992,14 @@
             });
 
             document.getElementById('clearCookiesBtn').addEventListener('click', function() {
-                const cookies = ['reserva_nombre', 'reserva_email', 'reserva_telefono', 'reserva_horario',
+                var cookies = ['reserva_nombre', 'reserva_email', 'reserva_telefono', 'reserva_horario',
                     'cookies_aceptadas'
                 ];
-                cookies.forEach(name => deleteCookie(name));
+                cookies.forEach(function(name) { deleteCookie(name); });
                 nombreInput.value = '';
                 emailInput.value = '';
                 telefonoInput.value = '';
-                document.querySelectorAll('input[name="slot"]').forEach(radio => radio.checked = false);
+                document.querySelectorAll('input[name="slot"]').forEach(function(radio) { radio.checked = false; });
                 updateFeedback();
                 alert('🗑️ Cookies eliminadas. Los datos han sido borrados.');
             });
@@ -1042,10 +1020,10 @@
             document.getElementById('reservationForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
 
-                const nombre = nombreInput.value.trim();
-                const email = emailInput.value.trim();
-                const telefono = telefonoInput.value.trim();
-                const selected = document.querySelector('input[name="slot"]:checked');
+                var nombre = nombreInput.value.trim();
+                var email = emailInput.value.trim();
+                var telefono = telefonoInput.value.trim();
+                var selected = document.querySelector('input[name="slot"]:checked');
 
                 if (!nombre || !email || !telefono) {
                     alert('⚠️ Por favor, completa todos los campos del formulario.');
@@ -1062,18 +1040,18 @@
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
                 try {
-                    const parts = selected.value.split(' ');
-                    const fecha = parts[0] + ' ' + parts[1];
-                    const hora = parts[2];
+                    var parts = selected.value.split(' ');
+                    var fecha = parts[0] + ' ' + parts[1];
+                    var hora = parts[2];
 
-                    const data = { fecha, hora, nombre, email, telefono };
-                    const result = await saveToGoogleSheets(data);
+                    var data = { fecha: fecha, hora: hora, nombre: nombre, email: email, telefono: telefono };
+                    var result = await saveToGoogleSheets(data);
 
                     if (result.success) {
                         saveFormDataToCookies();
                         sendWhatsAppMessage(nombre, email, telefono, selected.value);
                         showConfirmationPopup(nombre, email, telefono, selected.value);
-                        setTimeout(() => renderTable(), 2000);
+                        setTimeout(function() { renderTable(); }, 2000);
                     } else {
                         alert('❌ Error al guardar la reserva: ' + (result.error || 'Intenta nuevamente.'));
                     }
