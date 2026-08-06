@@ -40,7 +40,6 @@
             gap: 12px;
         }
         h1 i { color: #d4af37; margin-right: 0; }
-        /* ✅ INDICADOR DE ACTUALIZACIÓN */
         .update-indicator {
             display: none;
             align-items: center;
@@ -299,7 +298,7 @@
             border-radius: 28px;
             margin-top: 0.5rem;
             border: 1px solid #353535;
-            align-items: end;
+            align-items: stretch; /* ✅ CAMBIADO: stretch en vez de end */
         }
         .field-group {
             display: flex;
@@ -333,11 +332,23 @@
             box-shadow: 0 0 0 3px rgba(136, 136, 136, 0.12);
         }
         .field-group .hint { font-size: 0.7rem; color: #666666; margin-top: 3px; }
+        /* ✅ BOTÓN RESERVAR: Alineado con los inputs */
         .btn-wrapper {
             display: flex;
-            align-items: flex-end;
+            flex-direction: column;
             justify-content: flex-end;
+            gap: 0.25rem;
             width: 100%;
+        }
+        /* Label invisible para mantener la alineación con los otros fields */
+        .btn-wrapper .btn-label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: transparent;
+            visibility: hidden;
+            line-height: 1.2;
         }
         .btn-submit {
             background: linear-gradient(135deg, #e5c147 0%, #d4af37 50%, #b8941f 100%);
@@ -528,7 +539,6 @@
             .subhead { flex-direction: column; align-items: stretch; gap: 0.4rem; min-height: auto; padding-bottom: 0.5rem; }
             .subhead .info-text { font-size: 0.8rem; padding: 0.15rem 0.6rem; text-align: center; }
             .subhead .selected-display { font-size: 0.8rem; padding: 0.2rem 0.8rem; justify-content: center; }
-            .btn-wrapper { justify-content: stretch; }
             .popup-container { padding: 1.8rem 1.5rem; max-height: 90vh; }
             .popup-container .popup-details .detail-row { font-size: 0.8rem; flex-direction: column; align-items: flex-start; gap: 0.2rem; }
             .popup-container .popup-details .detail-row .value { text-align: left; max-width: 100%; }
@@ -636,7 +646,9 @@
                     <input type="tel" id="telefono" placeholder="+34 600 000 000" autocomplete="off" required>
                     <span class="hint">Incluye código de país</span>
                 </div>
-                <div class="field-group btn-wrapper">
+                <!-- ✅ Botón con estructura similar a field-group para alineación perfecta -->
+                <div class="btn-wrapper">
+                    <label class="btn-label" aria-hidden="true">Reservar</label>
                     <button type="submit" class="btn-submit" id="submitBtn">
                         <i class="fas fa-calendar-check"></i> Reservar
                     </button>
@@ -684,10 +696,11 @@
             const afternoonHours = [16, 17, 18, 19, 20];
             const COOKIE_EXPIRY_DAYS = 30;
             const WHATSAPP_NUMBER = '5493518692251';
-            const AUTO_REFRESH_INTERVAL = 60000; // ✅ 60 segundos
+            const AUTO_REFRESH_INTERVAL = 60000;
+            const MIN_INDICATOR_DURATION = 800; // ✅ Tiempo mínimo que el indicador debe verse
 
             let currentWeekStart = getMonday(new Date());
-            let isAutoUpdating = false; // ✅ Evitar actualizaciones simultáneas
+            let isAutoUpdating = false;
 
             const tbody = document.getElementById('tablaHorarios');
             const headerRow = document.getElementById('headerRow');
@@ -702,7 +715,7 @@
             const popupOverlay = document.getElementById('popupOverlay');
             const popupDetails = document.getElementById('popupDetails');
             const popupCloseBtn = document.getElementById('popupCloseBtn');
-            const updateIndicator = document.getElementById('updateIndicator'); // ✅ Nuevo
+            const updateIndicator = document.getElementById('updateIndicator');
 
             function setCookie(name, value, days) {
                 var date = new Date();
@@ -888,7 +901,6 @@
                     date.getDate() === today.getDate();
             }
 
-            // ✅ FUNCIÓN MEJORADA: Actualiza celdas reservadas y rehabilita las liberadas
             function updateTableWithReservations(reservas) {
                 var reservados = new Set();
                 reservas.forEach(function(r) {
@@ -903,14 +915,12 @@
                     var isTodayCell = cell && cell.getAttribute('data-is-today') === 'true';
 
                     if (reservados.has(radio.value)) {
-                        // Slot reservado: deshabilitar y marcar
                         radio.disabled = true;
                         if (cell) {
                             cell.classList.remove('available-cell', 'today-cell');
                             cell.classList.add('reserved-cell');
                         }
                     } else if (!isPast) {
-                        // Slot libre y no es pasado: rehabilitar
                         radio.disabled = false;
                         if (cell) {
                             cell.classList.remove('reserved-cell');
@@ -923,7 +933,6 @@
                     }
                 });
 
-                // ✅ Si el usuario tenía seleccionado un slot que ahora está reservado, deseleccionarlo
                 var selected = document.querySelector('input[name="slot"]:checked');
                 if (selected && selected.disabled) {
                     selected.checked = false;
@@ -933,13 +942,14 @@
                 }
             }
 
-            // ✅ NUEVA FUNCIÓN: Actualización automática sin recargar toda la tabla
+            // ✅ FUNCIÓN MEJORADA: Siempre muestra el indicador con tiempo mínimo garantizado
             async function autoRefreshReservations() {
-                if (isAutoUpdating) return;
                 if (popupOverlay.classList.contains('show')) return;
+                if (isAutoUpdating) return;
                 
                 isAutoUpdating = true;
                 updateIndicator.classList.add('show');
+                const startTime = Date.now();
 
                 try {
                     var reservas = await loadReservationsFromSheets();
@@ -947,14 +957,21 @@
                 } catch (error) {
                     console.error('Error en actualización automática:', error);
                 } finally {
-                    isAutoUpdating = false;
+                    // ✅ Garantizar tiempo mínimo de visualización (800ms)
+                    const elapsed = Date.now() - startTime;
+                    const remaining = Math.max(0, MIN_INDICATOR_DURATION - elapsed);
+                    
                     setTimeout(function() {
                         updateIndicator.classList.remove('show');
-                    }, 600);
+                        isAutoUpdating = false;
+                    }, remaining);
                 }
             }
 
             async function renderTable() {
+                updateIndicator.classList.add('show');
+                const startTime = Date.now();
+                
                 var today = getToday();
 
                 var headerHtml = '<th>Hora</th>';
@@ -993,8 +1010,6 @@
                     bodyHtml += '</tr>';
                 });
 
-                // ✅ FILA TARDE CORREGIDA: la celda 0 es la etiqueta (usa lunes),
-                // el resto se atrasa 1 posición (i - 1) para alinearse con las columnas
                 bodyHtml += '<tr class="afternoon-row">';
                 for (var i = 0; i <= 6; i++) {
                     var dayIndex = (i === 0) ? 0 : i - 1;
@@ -1070,6 +1085,13 @@
                 }
 
                 updateFeedback();
+                
+                // ✅ Tiempo mínimo de visualización del indicador
+                const elapsed = Date.now() - startTime;
+                const remaining = Math.max(0, MIN_INDICATOR_DURATION - elapsed);
+                setTimeout(function() {
+                    updateIndicator.classList.remove('show');
+                }, remaining);
             }
 
             nombreInput.addEventListener('input', saveFormDataToCookies);
@@ -1172,7 +1194,6 @@
                 document.getElementById('cookieNotice').style.display = 'none';
             }
 
-            // ✅ INICIAR ACTUALIZACIÓN AUTOMÁTICA CADA 60 SEGUNDOS
             setInterval(autoRefreshReservations, AUTO_REFRESH_INTERVAL);
 
         })();
