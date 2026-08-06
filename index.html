@@ -298,7 +298,7 @@
             border-radius: 28px;
             margin-top: 0.5rem;
             border: 1px solid #353535;
-            align-items: stretch; /* ✅ CAMBIADO: stretch en vez de end */
+            align-items: stretch;
         }
         .field-group {
             display: flex;
@@ -332,7 +332,6 @@
             box-shadow: 0 0 0 3px rgba(136, 136, 136, 0.12);
         }
         .field-group .hint { font-size: 0.7rem; color: #666666; margin-top: 3px; }
-        /* ✅ BOTÓN RESERVAR: Alineado con los inputs */
         .btn-wrapper {
             display: flex;
             flex-direction: column;
@@ -340,7 +339,6 @@
             gap: 0.25rem;
             width: 100%;
         }
-        /* Label invisible para mantener la alineación con los otros fields */
         .btn-wrapper .btn-label {
             font-weight: 500;
             font-size: 0.85rem;
@@ -646,7 +644,6 @@
                     <input type="tel" id="telefono" placeholder="+34 600 000 000" autocomplete="off" required>
                     <span class="hint">Incluye código de país</span>
                 </div>
-                <!-- ✅ Botón con estructura similar a field-group para alineación perfecta -->
                 <div class="btn-wrapper">
                     <label class="btn-label" aria-hidden="true">Reservar</label>
                     <button type="submit" class="btn-submit" id="submitBtn">
@@ -690,6 +687,7 @@
         (function() {
             // ===== CONFIGURACIÓN =====
             const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwDFvAKsIT2tVmuIWcyJ3duNBNCDEriYuCvDOBATRyTatUJNkSiAmQH3xisg3v74srM1g/exec';
+            const TIMEZONE = 'Europe/Madrid'; // ✅ Zona horaria de Santander/España
 
             const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
             const morningHours = [9, 10, 11, 12];
@@ -697,7 +695,7 @@
             const COOKIE_EXPIRY_DAYS = 30;
             const WHATSAPP_NUMBER = '5493518692251';
             const AUTO_REFRESH_INTERVAL = 60000;
-            const MIN_INDICATOR_DURATION = 800; // ✅ Tiempo mínimo que el indicador debe verse
+            const MIN_INDICATOR_DURATION = 800;
 
             let currentWeekStart = getMonday(new Date());
             let isAutoUpdating = false;
@@ -857,13 +855,48 @@
                 window.open(url, '_blank');
             }
 
-            function getToday() {
-                var now = new Date();
-                return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            // ✅ FUNCIÓN AUXILIAR: Obtiene las partes de una fecha en la zona horaria de Madrid
+            function getDatePartsInTimezone(date) {
+                const formatter = new Intl.DateTimeFormat('en-GB', {
+                    timeZone: TIMEZONE,
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                const parts = formatter.formatToParts(date);
+                const get = (type) => parts.find(p => p.type === type)?.value;
+                return {
+                    year: parseInt(get('year')),
+                    month: parseInt(get('month')) - 1, // 0-indexed
+                    day: parseInt(get('day')),
+                    hour: parseInt(get('hour')),
+                    minute: parseInt(get('minute')),
+                    second: parseInt(get('second'))
+                };
             }
 
+            // ✅ Obtiene la fecha "hoy" en la zona horaria de Madrid
+            function getToday() {
+                const now = new Date();
+                const parts = getDatePartsInTimezone(now);
+                return new Date(parts.year, parts.month, parts.day, 0, 0, 0, 0);
+            }
+
+            // ✅ Obtiene el "ahora" en la zona horaria de Madrid
+            function getNowInTimezone() {
+                const now = new Date();
+                const parts = getDatePartsInTimezone(now);
+                return new Date(parts.year, parts.month, parts.day, parts.hour, parts.minute, parts.second);
+            }
+
+            // ✅ Calcula el lunes de la semana actual en Madrid
             function getMonday(date) {
-                var d = new Date(date);
+                const parts = getDatePartsInTimezone(date);
+                var d = new Date(parts.year, parts.month, parts.day);
                 var day = d.getDay();
                 var diff = (day === 0 ? 6 : day - 1);
                 d.setDate(d.getDate() - diff);
@@ -888,12 +921,15 @@
                 return d;
             }
 
+            // ✅ Determina si un slot ya pasó en la zona horaria de Madrid
             function isPastOrCurrentSlot(weekStart, weekdayIndex, hour) {
                 var slotDate = getDateForWeekday(weekStart, weekdayIndex);
                 slotDate.setHours(hour, 0, 0, 0);
-                return slotDate <= new Date();
+                const nowInTimezone = getNowInTimezone();
+                return slotDate <= nowInTimezone;
             }
 
+            // ✅ Compara si una fecha es "hoy" en la zona horaria de Madrid
             function isToday(date) {
                 var today = getToday();
                 return date.getFullYear() === today.getFullYear() &&
@@ -942,7 +978,6 @@
                 }
             }
 
-            // ✅ FUNCIÓN MEJORADA: Siempre muestra el indicador con tiempo mínimo garantizado
             async function autoRefreshReservations() {
                 if (popupOverlay.classList.contains('show')) return;
                 if (isAutoUpdating) return;
@@ -957,7 +992,6 @@
                 } catch (error) {
                     console.error('Error en actualización automática:', error);
                 } finally {
-                    // ✅ Garantizar tiempo mínimo de visualización (800ms)
                     const elapsed = Date.now() - startTime;
                     const remaining = Math.max(0, MIN_INDICATOR_DURATION - elapsed);
                     
@@ -1086,7 +1120,6 @@
 
                 updateFeedback();
                 
-                // ✅ Tiempo mínimo de visualización del indicador
                 const elapsed = Date.now() - startTime;
                 const remaining = Math.max(0, MIN_INDICATOR_DURATION - elapsed);
                 setTimeout(function() {
