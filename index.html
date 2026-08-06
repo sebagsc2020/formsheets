@@ -622,7 +622,8 @@
     <script>
         (function() {
             // ===== CONFIGURACIÓN =====
-            const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxTQ_1htkApDGeRZEcO3ljOf_TA6Ots4U0e_SWERexUeh353g5vbpYJafrs_q88VkFg/exec';
+            // ⚠️ IMPORTANTE: Reemplaza esta URL con la de tu despliegue de Apps Script
+            const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxB5Al0uLhO6Y7y6DRB8XgXnlHQxwnTMMR7Z9S78ySfzjEDWAeZ54vh_pObbNWDrTzZ9Q/exec';
 
             const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
             const morningHours = [9, 10, 11, 12];
@@ -672,12 +673,14 @@
             }
 
             // ===== GOOGLE SHEETS =====
+            // ✅ CORREGIDO: Se eliminó el header Content-Type que causaba errores de CORS
             async function saveToGoogleSheets(data) {
                 try {
                     var response = await fetch(GOOGLE_SHEETS_URL, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
+                        // Sin header Content-Type para evitar bloqueo CORS
+                        body: JSON.stringify(data),
+                        redirect: 'follow'
                     });
                     var result = await response.json();
                     return result;
@@ -691,7 +694,7 @@
                 try {
                     var response = await fetch(GOOGLE_SHEETS_URL, {
                         method: 'GET',
-                        headers: { 'Content-Type': 'application/json' }
+                        redirect: 'follow'
                     });
                     if (!response.ok) throw new Error('Error al cargar reservas');
                     var result = await response.json();
