@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Reservas</title>
+    <title>Panel Admin - Reservas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
@@ -70,11 +70,11 @@
         .stat-card .number { font-size: 2rem; font-weight: 700; color: #d4af37; display: block; }
         .stat-card .number.small { font-size: 1.6rem; padding-top: 0.3rem; }
         .stat-card .label { font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.3rem; }
-        /* ✅ Tarjeta destacada de próxima reserva */
+        /* Tarjeta destacada de próxima reserva */
         .stat-card.next-card { border-color: #8b7424; background: linear-gradient(135deg, #2a2a2a 0%, #332b1a 100%); }
         .stat-card.next-card .number { color: #e5c147; }
         
-        .monthly-dashboard { background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; }
+        .monthly-dashboard { background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 20px; padding: 1.5rem; margin-top: 2rem; }
         .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
         .dashboard-header h2 { font-size: 1.3rem; color: #e8e8e8; }
         .month-selector { display: flex; gap: 0.5rem; align-items: center; }
@@ -175,7 +175,7 @@
             </div>
         </div>
 
-        <!-- ✅ ESTADÍSTICAS + NUEVA TARJETA DE CUENTA REGRESIVA -->
+        <!-- ESTADÍSTICAS + CUENTA REGRESIVA -->
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card next-card"><span class="number small" id="statCountdown">—</span><span class="label" id="statNextInfo">Próxima reserva</span></div>
             <div class="stat-card"><span class="number" id="statTotal">0</span><span class="label">Total</span></div>
@@ -185,6 +185,46 @@
             <div class="stat-card"><span class="number" id="statCanceladas">0</span><span class="label">Canceladas</span></div>
         </div>
 
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <button class="filter-btn active" data-filter="all">Todas</button>
+                <button class="filter-btn" data-filter="activas">Activas</button>
+                <button class="filter-btn" data-filter="futuras">Futuras</button>
+                <button class="filter-btn" data-filter="pasadas">Pasadas</button>
+                <button class="filter-btn" data-filter="canceladas">Canceladas</button>
+            </div>
+            <div class="toolbar-right">
+                <button class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="loadData()">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+                <button class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="exportCSV()">
+                    <i class="fas fa-file-csv"></i> Exportar CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- TABLA DE RESERVAS -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Nombre</th>
+                        <th class="hide-mobile">Teléfono</th>
+                        <th class="hide-mobile">Email</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="reservasBody">
+                    <tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Cargando reservas...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ✅ DASHBOARD MENSUAL MOVIDO AL FINAL -->
         <div class="monthly-dashboard">
             <div class="dashboard-header">
                 <h2><i class="fas fa-chart-pie" style="color: #d4af37; margin-right: 8px;"></i>Estadísticas Mensuales</h2>
@@ -260,43 +300,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="toolbar">
-            <div class="toolbar-left">
-                <button class="filter-btn active" data-filter="all">Todas</button>
-                <button class="filter-btn" data-filter="activas">Activas</button>
-                <button class="filter-btn" data-filter="futuras">Futuras</button>
-                <button class="filter-btn" data-filter="pasadas">Pasadas</button>
-                <button class="filter-btn" data-filter="canceladas">Canceladas</button>
-            </div>
-            <div class="toolbar-right">
-                <button class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="loadData()">
-                    <i class="fas fa-sync-alt"></i> Actualizar
-                </button>
-                <button class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="exportCSV()">
-                    <i class="fas fa-file-csv"></i> Exportar CSV
-                </button>
-            </div>
-        </div>
-
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Hora</th>
-                        <th>Nombre</th>
-                        <th class="hide-mobile">Teléfono</th>
-                        <th class="hide-mobile">Email</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="reservasBody">
-                    <tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Cargando reservas...</td></tr>
-                </tbody>
-            </table>
-        </div>
     </div>
 
     <script>
@@ -305,7 +308,7 @@
         const HOURS_PER_DAY = 9;
         const MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
         const DAY_INDEX = { 'Dom': 0, 'Lun': 1, 'Mar': 2, 'Mié': 3, 'Jue': 4, 'Vie': 5, 'Sáb': 6 };
-        const STUDIO_NAME = 'Estudio de Tatuajes'; // ⚠️ Cambia por el nombre de tu estudio
+        const STUDIO_NAME = 'LG Tattoo'; // ⚠️ Cambia por el nombre de tu estudio
         const DEFAULT_COUNTRY_CODE = '54';
         
         let adminPassword = '';
@@ -389,7 +392,7 @@
             updateCountdown();
         }
 
-        // ✅ NUEVO: Convierte "Lun 06" + "16:00" en un objeto Date real
+        // Convierte "Lun 06" + "16:00" en un objeto Date real
         function parseReservaDate(fecha, hora) {
             try {
                 const partes = fecha.split(' ');
@@ -403,7 +406,6 @@
                 if (targetDow === undefined || isNaN(dayNum)) return null;
                 
                 const now = new Date();
-                // Ventana de búsqueda: 62 días atrás hasta ~408 días adelante
                 const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 62);
                 for (let i = 0; i < 470; i++) {
                     const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
@@ -416,7 +418,7 @@
             } catch (e) { return null; }
         }
 
-        // ✅ NUEVO: Ordena próximas primero (cronológico) y pasadas al final (más reciente primero)
+        // Ordena próximas primero (cronológico) y pasadas al final (más reciente primero)
         function getSortedReservations() {
             const now = new Date();
             const withDates = allReservations.map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }));
@@ -429,7 +431,7 @@
             return upcoming.concat(past).map(x => x.r);
         }
 
-        // ✅ NUEVO: Obtiene la próxima reserva activa
+        // Obtiene la próxima reserva activa
         function getNextUpcoming() {
             const now = new Date();
             const candidates = allReservations
@@ -440,7 +442,7 @@
             return candidates.length ? candidates[0] : null;
         }
 
-        // ✅ NUEVO: Formatea la cuenta regresiva
+        // Formatea la cuenta regresiva
         function formatCountdown(ms) {
             if (ms <= 0) return '¡Ahora!';
             const mins = Math.floor(ms / 60000);
@@ -452,7 +454,7 @@
             return `${minutes}m`;
         }
 
-        // ✅ NUEVO: Actualiza la tarjeta de cuenta regresiva
+        // Actualiza la tarjeta de cuenta regresiva
         function updateCountdown() {
             const numberEl = document.getElementById('statCountdown');
             const labelEl = document.getElementById('statNextInfo');
@@ -469,7 +471,6 @@
         function renderTable() {
             const tbody = document.getElementById('reservasBody');
             
-            // ✅ Ahora parte de la lista ordenada (próxima primero)
             let filtered = getSortedReservations();
             
             if (currentFilter === 'activas') filtered = filtered.filter(r => r.estado === 'ACTIVA');
@@ -563,7 +564,7 @@
                 `Te contactamos desde *${STUDIO_NAME}* sobre tu reserva:\n\n` +
                 `📅 *Fecha:* ${reserva.fecha}\n` +
                 `🕐 *Hora:* ${reserva.hora}\n\n` +
-                `Por favor confirma tu asistencia. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n` +
+                `Confirmamos tu asistencia!!!. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n` +
                 `¡Te esperamos! 🎨`;
             
             const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
@@ -713,7 +714,7 @@
             a.click();
         }
 
-        // ✅ Actualiza la cuenta regresiva cada 60 segundos automáticamente
+        // Actualiza la cuenta regresiva cada 60 segundos automáticamente
         setInterval(updateCountdown, 60000);
     </script>
 </body>
