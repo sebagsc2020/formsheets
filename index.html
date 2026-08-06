@@ -40,6 +40,7 @@
             gap: 12px;
         }
         h1 i { color: #d4af37; margin-right: 0; }
+        /* ✅ INDICADOR DE ACTUALIZACIÓN */
         .update-indicator {
             display: none;
             align-items: center;
@@ -683,10 +684,10 @@
             const afternoonHours = [16, 17, 18, 19, 20];
             const COOKIE_EXPIRY_DAYS = 30;
             const WHATSAPP_NUMBER = '5493518692251';
-            const AUTO_REFRESH_INTERVAL = 60000;
+            const AUTO_REFRESH_INTERVAL = 60000; // ✅ 60 segundos
 
             let currentWeekStart = getMonday(new Date());
-            let isAutoUpdating = false;
+            let isAutoUpdating = false; // ✅ Evitar actualizaciones simultáneas
 
             const tbody = document.getElementById('tablaHorarios');
             const headerRow = document.getElementById('headerRow');
@@ -701,18 +702,7 @@
             const popupOverlay = document.getElementById('popupOverlay');
             const popupDetails = document.getElementById('popupDetails');
             const popupCloseBtn = document.getElementById('popupCloseBtn');
-            const updateIndicator = document.getElementById('updateIndicator');
-
-            // ✅ FUNCIONES CENTRALIZADAS PARA MOSTRAR/OCULTAR EL INDICADOR
-            function showUpdateIndicator() {
-                updateIndicator.classList.add('show');
-            }
-
-            function hideUpdateIndicator() {
-                setTimeout(function() {
-                    updateIndicator.classList.remove('show');
-                }, 500);
-            }
+            const updateIndicator = document.getElementById('updateIndicator'); // ✅ Nuevo
 
             function setCookie(name, value, days) {
                 var date = new Date();
@@ -898,6 +888,7 @@
                     date.getDate() === today.getDate();
             }
 
+            // ✅ FUNCIÓN MEJORADA: Actualiza celdas reservadas y rehabilita las liberadas
             function updateTableWithReservations(reservas) {
                 var reservados = new Set();
                 reservas.forEach(function(r) {
@@ -912,12 +903,14 @@
                     var isTodayCell = cell && cell.getAttribute('data-is-today') === 'true';
 
                     if (reservados.has(radio.value)) {
+                        // Slot reservado: deshabilitar y marcar
                         radio.disabled = true;
                         if (cell) {
                             cell.classList.remove('available-cell', 'today-cell');
                             cell.classList.add('reserved-cell');
                         }
                     } else if (!isPast) {
+                        // Slot libre y no es pasado: rehabilitar
                         radio.disabled = false;
                         if (cell) {
                             cell.classList.remove('reserved-cell');
@@ -930,6 +923,7 @@
                     }
                 });
 
+                // ✅ Si el usuario tenía seleccionado un slot que ahora está reservado, deseleccionarlo
                 var selected = document.querySelector('input[name="slot"]:checked');
                 if (selected && selected.disabled) {
                     selected.checked = false;
@@ -939,12 +933,13 @@
                 }
             }
 
+            // ✅ NUEVA FUNCIÓN: Actualización automática sin recargar toda la tabla
             async function autoRefreshReservations() {
                 if (isAutoUpdating) return;
                 if (popupOverlay.classList.contains('show')) return;
                 
                 isAutoUpdating = true;
-                showUpdateIndicator();
+                updateIndicator.classList.add('show');
 
                 try {
                     var reservas = await loadReservationsFromSheets();
@@ -953,14 +948,13 @@
                     console.error('Error en actualización automática:', error);
                 } finally {
                     isAutoUpdating = false;
-                    hideUpdateIndicator();
+                    setTimeout(function() {
+                        updateIndicator.classList.remove('show');
+                    }, 600);
                 }
             }
 
-            // ✅ RENDER TABLE AHORA TAMBIÉN MUESTRA EL INDICADOR (actualización manual)
             async function renderTable() {
-                showUpdateIndicator();
-                
                 var today = getToday();
 
                 var headerHtml = '<th>Hora</th>';
@@ -999,10 +993,13 @@
                     bodyHtml += '</tr>';
                 });
 
+                // ✅ FILA TARDE CORREGIDA: la celda 0 es la etiqueta (usa lunes),
+                // el resto se atrasa 1 posición (i - 1) para alinearse con las columnas
                 bodyHtml += '<tr class="afternoon-row">';
                 for (var i = 0; i <= 6; i++) {
-                    var date = getDateForWeekday(currentWeekStart, i);
-                    var isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, 16);
+                    var dayIndex = (i === 0) ? 0 : i - 1;
+                    var date = getDateForWeekday(currentWeekStart, dayIndex);
+                    var isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, dayIndex, 16);
 
                     var cellClass = '';
                     if (isToday(date)) cellClass = 'today-cell';
@@ -1073,7 +1070,6 @@
                 }
 
                 updateFeedback();
-                hideUpdateIndicator();
             }
 
             nombreInput.addEventListener('input', saveFormDataToCookies);
@@ -1176,6 +1172,7 @@
                 document.getElementById('cookieNotice').style.display = 'none';
             }
 
+            // ✅ INICIAR ACTUALIZACIÓN AUTOMÁTICA CADA 60 SEGUNDOS
             setInterval(autoRefreshReservations, AUTO_REFRESH_INTERVAL);
 
         })();
