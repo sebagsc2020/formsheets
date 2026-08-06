@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservas</title>
+    <title>Reserva tu Horario</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -27,8 +27,8 @@
             width: 100%;
             background: #2a2a2a;
             border-radius: 32px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 8px 20px rgba(0, 0, 0, 0.4);
-            padding: 2rem 2rem 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            padding: 2rem;
             border: 1px solid #3a3a3a;
         }
 
@@ -350,11 +350,6 @@
             background: #1a1a1a;
         }
 
-        .slot-cell input[type="radio"]:disabled:hover {
-            border-color: #3a3a3a;
-            background: #1a1a1a;
-        }
-
         .afternoon-row td {
             background: #282828;
             font-weight: 500;
@@ -377,7 +372,7 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 0.8rem 1.2rem;
             background: #262626;
-            padding: 1.2rem 1.2rem 1.5rem;
+            padding: 1.2rem;
             border-radius: 28px;
             margin-top: 0.5rem;
             border: 1px solid #353535;
@@ -388,7 +383,6 @@
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
-            position: relative;
             width: 100%;
         }
 
@@ -513,8 +507,14 @@
         }
 
         @keyframes popupFadeIn {
-            from { opacity: 0; transform: scale(0.9) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
         .popup-container .popup-header {
@@ -685,73 +685,259 @@
             .form-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 0.6rem 1rem;
-                padding: 1rem 1rem 1.2rem;
+                padding: 1rem;
             }
         }
 
         @media (max-width: 768px) {
-            .card { padding: 1rem 0.8rem 1.2rem; }
-            table { font-size: 0.8rem; min-width: 420px; }
-            th { padding: 0.4rem 0.08rem; font-size: 0.75rem; }
-            td { padding: 0.15rem 0.03rem; }
-            .slot-cell { height: 28px; }
-            .slot-cell input[type="radio"] { width: 14px; height: 14px; }
-            .time-slot { font-size: 0.75rem; }
-            .afternoon-row td { font-size: 0.65rem; padding: 0.2rem 0.03rem; }
-            .form-grid { grid-template-columns: 1fr; gap: 0.6rem; padding: 0.8rem; align-items: stretch; }
-            .field-group input { height: 36px; padding: 0.4rem 0.6rem; font-size: 0.8rem; }
-            .btn-submit { height: 36px; font-size: 0.8rem; padding: 0.4rem 1.2rem; min-height: 36px; }
-            h1 { font-size: 1.3rem; }
-            .week-navigation { flex-direction: column; align-items: stretch; gap: 0.4rem; }
-            .week-nav-buttons { justify-content: center; }
-            .week-label { font-size: 0.8rem; padding: 0.2rem 0.8rem; text-align: center; }
-            .cookie-notice { flex-direction: column; align-items: stretch; text-align: center; padding: 0.5rem 0.6rem; gap: 0.5rem; }
-            .cookie-notice .cookie-btn { width: 100%; margin: 2px 0; font-size: 0.8rem; padding: 0.3rem 0.8rem; }
-            #clearCookiesBtn { margin-left: 0 !important; }
-            .subhead { flex-direction: column; align-items: stretch; gap: 0.4rem; min-height: auto; padding-bottom: 0.5rem; }
-            .subhead .info-text { font-size: 0.8rem; padding: 0.15rem 0.6rem; text-align: center; }
-            .subhead .selected-display { font-size: 0.8rem; padding: 0.2rem 0.8rem; justify-content: center; }
-            .btn-wrapper { justify-content: stretch; }
-            .popup-container { padding: 1.8rem 1.5rem; max-height: 90vh; }
-            .popup-container .popup-details .detail-row { font-size: 0.8rem; flex-direction: column; align-items: flex-start; gap: 0.2rem; }
-            .popup-container .popup-details .detail-row .value { text-align: left; max-width: 100%; }
-            .popup-container .popup-notice { font-size: 0.8rem; }
-            .popup-container .popup-whatsapp { font-size: 0.8rem; flex-wrap: wrap; }
+            .card {
+                padding: 1rem 0.8rem 1.2rem;
+            }
+            table {
+                font-size: 0.8rem;
+                min-width: 420px;
+            }
+            th {
+                padding: 0.4rem 0.08rem;
+                font-size: 0.75rem;
+            }
+            td {
+                padding: 0.15rem 0.03rem;
+            }
+            .slot-cell {
+                height: 28px;
+            }
+            .slot-cell input[type="radio"] {
+                width: 14px;
+                height: 14px;
+            }
+            .time-slot {
+                font-size: 0.75rem;
+            }
+            .afternoon-row td {
+                font-size: 0.65rem;
+                padding: 0.2rem 0.03rem;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
+                padding: 0.8rem;
+                align-items: stretch;
+            }
+            .field-group input {
+                height: 36px;
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+            }
+            .btn-submit {
+                height: 36px;
+                font-size: 0.8rem;
+                padding: 0.4rem 1.2rem;
+                min-height: 36px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+            .week-navigation {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.4rem;
+            }
+            .week-nav-buttons {
+                justify-content: center;
+            }
+            .week-label {
+                font-size: 0.8rem;
+                padding: 0.2rem 0.8rem;
+                text-align: center;
+            }
+            .cookie-notice {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+                padding: 0.5rem 0.6rem;
+                gap: 0.5rem;
+            }
+            .cookie-notice .cookie-btn {
+                width: 100%;
+                margin: 2px 0;
+                font-size: 0.8rem;
+                padding: 0.3rem 0.8rem;
+            }
+            #clearCookiesBtn {
+                margin-left: 0 !important;
+            }
+            .subhead {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.4rem;
+                min-height: auto;
+                padding-bottom: 0.5rem;
+            }
+            .subhead .info-text {
+                font-size: 0.8rem;
+                padding: 0.15rem 0.6rem;
+                text-align: center;
+            }
+            .subhead .selected-display {
+                font-size: 0.8rem;
+                padding: 0.2rem 0.8rem;
+                justify-content: center;
+            }
+            .btn-wrapper {
+                justify-content: stretch;
+            }
+            .popup-container {
+                padding: 1.8rem 1.5rem;
+                max-height: 90vh;
+            }
+            .popup-container .popup-details .detail-row {
+                font-size: 0.8rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.2rem;
+            }
+            .popup-container .popup-details .detail-row .value {
+                text-align: left;
+                max-width: 100%;
+            }
+            .popup-container .popup-notice {
+                font-size: 0.8rem;
+            }
+            .popup-container .popup-whatsapp {
+                font-size: 0.8rem;
+                flex-wrap: wrap;
+            }
         }
 
         @media (max-width: 480px) {
-            .card { padding: 0.6rem 0.4rem 0.8rem; border-radius: 16px; }
-            table { font-size: 0.7rem; min-width: 350px; }
-            th { padding: 0.3rem 0.06rem; font-size: 0.65rem; }
-            th:first-child { min-width: 35px; padding: 0.3rem 0.04rem; }
-            td { padding: 0.1rem 0.02rem; }
-            .slot-cell { height: 24px; }
-            .slot-cell input[type="radio"] { width: 12px; height: 12px; border-width: 1.5px; }
-            .time-slot { font-size: 0.65rem; padding: 0.1rem 0.03rem; }
-            .afternoon-row td { font-size: 0.55rem; padding: 0.15rem 0.02rem; }
-            .form-grid { padding: 0.6rem; gap: 0.4rem; border-radius: 12px; }
-            .field-group input { padding: 0.3rem 0.5rem; font-size: 0.75rem; border-radius: 8px; height: 32px; }
-            .field-group label { font-size: 0.6rem; }
-            .field-group .hint { font-size: 0.5rem; }
-            .btn-submit { height: 32px; font-size: 0.75rem; padding: 0.3rem 0.8rem; min-height: 32px; border-radius: 25px; }
-            h1 { font-size: 1.1rem; }
-            .subhead .info-text { font-size: 0.7rem; padding: 0.1rem 0.4rem; }
-            .subhead .selected-display { font-size: 0.7rem; padding: 0.15rem 0.6rem; }
-            .week-label { font-size: 0.7rem; padding: 0.15rem 0.6rem; }
-            .week-nav-buttons button { font-size: 0.7rem; padding: 0.25rem 0.6rem; gap: 4px; }
-            .cookie-notice p { font-size: 0.75rem; }
-            .cookie-notice .cookie-btn { font-size: 0.7rem; padding: 0.25rem 0.6rem; }
-            .popup-container { padding: 1.2rem 1rem; border-radius: 24px; max-height: 92vh; max-width: 95%; }
-            .popup-container h2 { font-size: 1.2rem; }
-            .popup-container .popup-icon { font-size: 2.8rem; }
-            .popup-container .popup-subtitle { font-size: 0.8rem; }
-            .popup-container .popup-details { padding: 0.8rem 1rem; }
-            .popup-container .popup-details .detail-row { font-size: 0.75rem; padding: 0.3rem 0; }
-            .popup-container .popup-notice { font-size: 0.75rem; padding: 0.6rem 0.8rem; }
-            .popup-container .popup-whatsapp { font-size: 0.75rem; padding: 0.6rem 0.8rem; }
-            .popup-container .popup-close-btn { font-size: 0.8rem; padding: 0.5rem 1.5rem; }
-            .popup-container .popup-body { padding-right: 0.3rem; margin-right: -0.3rem; }
-            .popup-container .popup-body::-webkit-scrollbar { width: 4px; }
+            .card {
+                padding: 0.6rem 0.4rem 0.8rem;
+                border-radius: 16px;
+            }
+            table {
+                font-size: 0.7rem;
+                min-width: 350px;
+            }
+            th {
+                padding: 0.3rem 0.06rem;
+                font-size: 0.65rem;
+            }
+            th:first-child {
+                min-width: 35px;
+                padding: 0.3rem 0.04rem;
+            }
+            td {
+                padding: 0.1rem 0.02rem;
+            }
+            .slot-cell {
+                height: 24px;
+            }
+            .slot-cell input[type="radio"] {
+                width: 12px;
+                height: 12px;
+                border-width: 1.5px;
+            }
+            .time-slot {
+                font-size: 0.65rem;
+                padding: 0.1rem 0.03rem;
+            }
+            .afternoon-row td {
+                font-size: 0.55rem;
+                padding: 0.15rem 0.02rem;
+            }
+            .form-grid {
+                padding: 0.6rem;
+                gap: 0.4rem;
+                border-radius: 12px;
+            }
+            .field-group input {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.75rem;
+                border-radius: 8px;
+                height: 32px;
+            }
+            .field-group label {
+                font-size: 0.6rem;
+            }
+            .field-group .hint {
+                font-size: 0.5rem;
+            }
+            .btn-submit {
+                height: 32px;
+                font-size: 0.75rem;
+                padding: 0.3rem 0.8rem;
+                min-height: 32px;
+                border-radius: 25px;
+            }
+            h1 {
+                font-size: 1.1rem;
+            }
+            .subhead .info-text {
+                font-size: 0.7rem;
+                padding: 0.1rem 0.4rem;
+            }
+            .subhead .selected-display {
+                font-size: 0.7rem;
+                padding: 0.15rem 0.6rem;
+            }
+            .week-label {
+                font-size: 0.7rem;
+                padding: 0.15rem 0.6rem;
+            }
+            .week-nav-buttons button {
+                font-size: 0.7rem;
+                padding: 0.25rem 0.6rem;
+                gap: 4px;
+            }
+            .cookie-notice p {
+                font-size: 0.75rem;
+            }
+            .cookie-notice .cookie-btn {
+                font-size: 0.7rem;
+                padding: 0.25rem 0.6rem;
+            }
+            .popup-container {
+                padding: 1.2rem 1rem;
+                border-radius: 24px;
+                max-height: 92vh;
+                max-width: 95%;
+            }
+            .popup-container h2 {
+                font-size: 1.2rem;
+            }
+            .popup-container .popup-icon {
+                font-size: 2.8rem;
+            }
+            .popup-container .popup-subtitle {
+                font-size: 0.8rem;
+            }
+            .popup-container .popup-details {
+                padding: 0.8rem 1rem;
+            }
+            .popup-container .popup-details .detail-row {
+                font-size: 0.75rem;
+                padding: 0.3rem 0;
+            }
+            .popup-container .popup-notice {
+                font-size: 0.75rem;
+                padding: 0.6rem 0.8rem;
+            }
+            .popup-container .popup-whatsapp {
+                font-size: 0.75rem;
+                padding: 0.6rem 0.8rem;
+            }
+            .popup-container .popup-close-btn {
+                font-size: 0.8rem;
+                padding: 0.5rem 1.5rem;
+            }
+            .popup-container .popup-body {
+                padding-right: 0.3rem;
+                margin-right: -0.3rem;
+            }
+            .popup-container .popup-body::-webkit-scrollbar {
+                width: 4px;
+            }
         }
     </style>
 </head>
@@ -852,9 +1038,10 @@
 
     <script>
         (function() {
-            // CONFIGURACIÓN
-            const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxIcCsnFieVmMzGZecvxMQ8whlflZ7oCCno2hPzlBhdQ2AjePZNTKQ15J0OkEutscmjow/exec';
-            
+            // ===== CONFIGURACIÓN =====
+            // URL DE GOOGLE SHEETS - ACTUALIZADA CON LA NUEVA URL
+            const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz-I_UJRHKey7YvLheKSE8fFEoToouvGiuQsGeHpt7zcspuInmxzms9u0Nk0Nbt-Iae3Q/exec';
+
             const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
             const morningHours = [9, 10, 11, 12];
             const afternoonHours = [16, 17, 18, 19, 20];
@@ -863,7 +1050,7 @@
 
             let currentWeekStart = getMonday(new Date());
 
-            // Elementos DOM
+            // ===== ELEMENTOS DOM =====
             const tbody = document.getElementById('tablaHorarios');
             const headerRow = document.getElementById('headerRow');
             const weekLabel = document.getElementById('weekLabel');
@@ -884,7 +1071,7 @@
             const cookieNotice = document.getElementById('cookieNotice');
             const reservationForm = document.getElementById('reservationForm');
 
-            // FUNCIONES DE COOKIES
+            // ===== COOKIES =====
             function setCookie(name, value, days) {
                 const date = new Date();
                 date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -908,7 +1095,7 @@
                 document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             }
 
-            // GUARDAR EN GOOGLE SHEETS
+            // ===== GOOGLE SHEETS =====
             async function saveToGoogleSheets(data) {
                 try {
                     const response = await fetch(GOOGLE_SHEETS_URL, {
@@ -916,14 +1103,14 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data)
                     });
-                    return await response.json();
+                    const result = await response.json();
+                    return result;
                 } catch (error) {
                     console.error('Error al guardar:', error);
                     return { success: false, error: error.message };
                 }
             }
 
-            // CARGAR RESERVAS
             async function loadReservationsFromSheets() {
                 try {
                     const response = await fetch(GOOGLE_SHEETS_URL, {
@@ -939,27 +1126,7 @@
                 }
             }
 
-            // ACTUALIZAR TABLA CON RESERVAS
-            function updateTableWithReservations(reservas) {
-                const reservados = new Set();
-                reservas.forEach(r => {
-                    const clave = `${r.fecha} ${r.hora}`;
-                    reservados.add(clave);
-                });
-                
-                const radios = document.querySelectorAll('input[name="slot"]');
-                radios.forEach(radio => {
-                    if (reservados.has(radio.value)) {
-                        radio.disabled = true;
-                        const cell = radio.closest('td');
-                        if (cell) {
-                            cell.classList.remove('available-cell', 'today-cell');
-                            cell.classList.add('reserved-cell');
-                        }
-                    }
-                });
-            }
-
+            // ===== FUNCIONES DEL FORMULARIO =====
             function saveFormDataToCookies() {
                 const nombre = nombreInput.value.trim();
                 const email = emailInput.value.trim();
@@ -999,49 +1166,6 @@
                 }
             }
 
-            function getToday() {
-                const now = new Date();
-                return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            }
-
-            function getMonday(date) {
-                const d = new Date(date);
-                const day = d.getDay();
-                const diff = (day === 0 ? 6 : day - 1);
-                d.setDate(d.getDate() - diff);
-                d.setHours(0, 0, 0, 0);
-                return d;
-            }
-
-            function formatDate(date) {
-                return String(date.getDate()).padStart(2, '0');
-            }
-
-            function getMonthName(monthIndex) {
-                const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-                return months[monthIndex];
-            }
-
-            function getDateForWeekday(weekStart, weekdayIndex) {
-                const d = new Date(weekStart);
-                d.setDate(d.getDate() + weekdayIndex);
-                return d;
-            }
-
-            function isPastOrCurrentSlot(weekStart, weekdayIndex, hour) {
-                const slotDate = getDateForWeekday(weekStart, weekdayIndex);
-                slotDate.setHours(hour, 0, 0, 0);
-                return slotDate <= new Date();
-            }
-
-            function isToday(date) {
-                const today = getToday();
-                return date.getFullYear() === today.getFullYear() &&
-                    date.getMonth() === today.getMonth() &&
-                    date.getDate() === today.getDate();
-            }
-
             function updateFeedback() {
                 const checked = document.querySelector('input[name="slot"]:checked');
                 if (checked && !checked.disabled) {
@@ -1065,10 +1189,8 @@
                 fields.forEach(field => {
                     const row = document.createElement('div');
                     row.className = 'detail-row';
-                    row.innerHTML = `
-                        <span class="label">${field.label}</span>
-                        <span class="value">${field.value || '—'}</span>
-                    `;
+                    row.innerHTML =
+                        `<span class="label">${field.label}</span><span class="value">${field.value || '—'}</span>`;
                     popupDetails.appendChild(row);
                 });
                 popupOverlay.classList.add('show');
@@ -1091,6 +1213,72 @@
                 window.open(url, '_blank');
             }
 
+            // ===== FUNCIONES DEL CALENDARIO =====
+            function getToday() {
+                const now = new Date();
+                return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            }
+
+            function getMonday(date) {
+                const d = new Date(date);
+                const day = d.getDay();
+                const diff = (day === 0 ? 6 : day - 1);
+                d.setDate(d.getDate() - diff);
+                d.setHours(0, 0, 0, 0);
+                return d;
+            }
+
+            function formatDate(date) {
+                return String(date.getDate()).padStart(2, '0');
+            }
+
+            function getMonthName(monthIndex) {
+                const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                ];
+                return months[monthIndex];
+            }
+
+            function getDateForWeekday(weekStart, weekdayIndex) {
+                const d = new Date(weekStart);
+                d.setDate(d.getDate() + weekdayIndex);
+                return d;
+            }
+
+            function isPastOrCurrentSlot(weekStart, weekdayIndex, hour) {
+                const slotDate = getDateForWeekday(weekStart, weekdayIndex);
+                slotDate.setHours(hour, 0, 0, 0);
+                return slotDate <= new Date();
+            }
+
+            function isToday(date) {
+                const today = getToday();
+                return date.getFullYear() === today.getFullYear() &&
+                    date.getMonth() === today.getMonth() &&
+                    date.getDate() === today.getDate();
+            }
+
+            function updateTableWithReservations(reservas) {
+                const reservados = new Set();
+                reservas.forEach(r => {
+                    const clave = `${r.fecha} ${r.hora}`;
+                    reservados.add(clave);
+                });
+
+                const radios = document.querySelectorAll('input[name="slot"]');
+                radios.forEach(radio => {
+                    if (reservados.has(radio.value)) {
+                        radio.disabled = true;
+                        const cell = radio.closest('td');
+                        if (cell) {
+                            cell.classList.remove('available-cell', 'today-cell');
+                            cell.classList.add('reserved-cell');
+                        }
+                    }
+                });
+            }
+
+            // ===== RENDERIZAR TABLA =====
             async function renderTable() {
                 const today = getToday();
 
@@ -1115,12 +1303,12 @@
                         const value = `${dayLabel} ${dayNumber} ${hour}:00`;
                         const isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, hour);
                         const disabled = isPastOrCurrent ? 'disabled' : '';
-                        
+
                         let cellClass = '';
                         if (isToday(date)) cellClass = 'today-cell';
                         else if (!isPastOrCurrent) cellClass = 'available-cell';
                         else cellClass = 'disabled-cell';
-                        
+
                         bodyHtml +=
                             `<td class="${cellClass}"><div class="slot-cell"><input type="radio" name="slot" value="${value}" ${disabled}></div></td>`;
                     }
@@ -1131,12 +1319,12 @@
                 for (let i = 0; i <= 6; i++) {
                     const date = getDateForWeekday(currentWeekStart, i);
                     const isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, 16);
-                    
+
                     let cellClass = '';
                     if (isToday(date)) cellClass = 'today-cell';
                     else if (!isPastOrCurrent) cellClass = 'available-cell';
                     else cellClass = 'disabled-cell';
-                    
+
                     if (i === 0) {
                         bodyHtml += `<td class="${cellClass}" style="text-align: center; letter-spacing: 2px; font-weight: 600; color: #b0b0b0; font-size: 0.75rem;">
                             <i class="fas fa-sun" style="margin-right: 4px; color: #777777;"></i> TARDE
@@ -1156,12 +1344,12 @@
                         const value = `${dayLabel} ${dayNumber} ${hour}:00`;
                         const isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, i, hour);
                         const disabled = isPastOrCurrent ? 'disabled' : '';
-                        
+
                         let cellClass = '';
                         if (isToday(date)) cellClass = 'today-cell';
                         else if (!isPastOrCurrent) cellClass = 'available-cell';
                         else cellClass = 'disabled-cell';
-                        
+
                         bodyHtml +=
                             `<td class="${cellClass}"><div class="slot-cell"><input type="radio" name="slot" value="${value}" ${disabled}></div></td>`;
                     }
@@ -1200,10 +1388,10 @@
                 updateFeedback();
             }
 
-            // EVENTOS
-            nombreInput.addEventListener('input', saveFormDataToCookies);
-            emailInput.addEventListener('input', saveFormDataToCookies);
-            telefonoInput.addEventListener('input', saveFormDataToCookies);
+            // ===== EVENTOS =====
+            if (nombreInput) nombreInput.addEventListener('input', saveFormDataToCookies);
+            if (emailInput) emailInput.addEventListener('input', saveFormDataToCookies);
+            if (telefonoInput) telefonoInput.addEventListener('input', saveFormDataToCookies);
 
             if (prevWeekBtn) {
                 prevWeekBtn.addEventListener('click', function() {
@@ -1230,11 +1418,13 @@
 
             if (clearCookiesBtn) {
                 clearCookiesBtn.addEventListener('click', function() {
-                    const cookies = ['reserva_nombre', 'reserva_email', 'reserva_telefono', 'reserva_horario', 'cookies_aceptadas'];
+                    const cookies = ['reserva_nombre', 'reserva_email', 'reserva_telefono', 'reserva_horario',
+                        'cookies_aceptadas'
+                    ];
                     cookies.forEach(name => deleteCookie(name));
-                    nombreInput.value = '';
-                    emailInput.value = '';
-                    telefonoInput.value = '';
+                    if (nombreInput) nombreInput.value = '';
+                    if (emailInput) emailInput.value = '';
+                    if (telefonoInput) telefonoInput.value = '';
                     document.querySelectorAll('input[name="slot"]').forEach(radio => radio.checked = false);
                     updateFeedback();
                     alert('🗑️ Cookies eliminadas. Los datos han sido borrados.');
@@ -1257,18 +1447,19 @@
                 }
             });
 
+            // ===== SUBMIT =====
             if (reservationForm) {
                 reservationForm.addEventListener('submit', async function(e) {
                     e.preventDefault();
-                    
-                    const nombre = nombreInput.value.trim();
-                    const email = emailInput.value.trim();
-                    const telefono = telefonoInput.value.trim();
+
+                    const nombre = nombreInput ? nombreInput.value.trim() : '';
+                    const email = emailInput ? emailInput.value.trim() : '';
+                    const telefono = telefonoInput ? telefonoInput.value.trim() : '';
                     const selected = document.querySelector('input[name="slot"]:checked');
 
                     if (!nombre || !email || !telefono) {
                         alert('⚠️ Por favor, completa todos los campos del formulario.');
-                        nombreInput.focus();
+                        if (nombreInput) nombreInput.focus();
                         return;
                     }
 
@@ -1277,17 +1468,19 @@
                         return;
                     }
 
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+                    }
 
                     try {
                         const parts = selected.value.split(' ');
                         const fecha = parts[0] + ' ' + parts[1];
                         const hora = parts[2];
-                        
+
                         const data = { fecha, hora, nombre, email, telefono };
                         const result = await saveToGoogleSheets(data);
-                        
+
                         if (result.success) {
                             saveFormDataToCookies();
                             sendWhatsAppMessage(nombre, email, telefono, selected.value);
@@ -1300,13 +1493,15 @@
                         console.error('Error:', error);
                         alert('❌ Ocurrió un error al procesar la reserva. Por favor, intenta nuevamente.');
                     } finally {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Reservar';
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Reservar';
+                        }
                     }
                 });
             }
 
-            // INICIALIZAR
+            // ===== INICIALIZAR =====
             loadFormDataFromCookies();
             renderTable();
 
