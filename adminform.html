@@ -22,7 +22,7 @@
         .btn:hover { transform: scale(1.02); }
         .btn-secondary { background: #444; color: #e8e8e8; border: 1px solid #555; }
         
-        /* ✅ BOTONES DE ACCIÓN REDISEÑADOS (todos cuadrados con solo íconos) */
+        /* Botones de acción cuadrados con solo íconos */
         .action-buttons { display: flex; gap: 0.4rem; align-items: center; }
         .action-btn {
             width: 32px;
@@ -36,38 +36,43 @@
             font-size: 0.9rem;
             transition: all 0.15s;
             text-decoration: none;
+            position: relative;
         }
         .action-btn:hover { transform: scale(1.1); }
         .action-btn:active { transform: scale(0.95); }
-        
-        .btn-whatsapp {
-            background: #25d366;
-            color: white;
-        }
+        .btn-whatsapp { background: #25d366; color: white; }
         .btn-whatsapp:hover { background: #20ba5a; box-shadow: 0 0 8px rgba(37, 211, 102, 0.5); }
-        
-        .btn-success {
-            background: #2a7;
-            color: white;
-        }
+        .btn-success { background: #2a7; color: white; }
         .btn-success:hover { background: #3b8; }
-        
-        .btn-danger {
-            background: #a33;
-            color: white;
-        }
+        .btn-danger { background: #a33; color: white; }
         .btn-danger:hover { background: #c44; }
-        
-        .btn-neutral {
-            background: #555;
-            color: white;
-        }
+        .btn-neutral { background: #555; color: white; }
         .btn-neutral:hover { background: #666; }
+        .action-btn[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            margin-bottom: 6px;
+            pointer-events: none;
+            z-index: 10;
+        }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
         .stat-card { background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 16px; padding: 1.2rem; text-align: center; }
         .stat-card .number { font-size: 2rem; font-weight: 700; color: #d4af37; display: block; }
+        .stat-card .number.small { font-size: 1.6rem; padding-top: 0.3rem; }
         .stat-card .label { font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.3rem; }
+        /* ✅ Tarjeta destacada de próxima reserva */
+        .stat-card.next-card { border-color: #8b7424; background: linear-gradient(135deg, #2a2a2a 0%, #332b1a 100%); }
+        .stat-card.next-card .number { color: #e5c147; }
         
         .monthly-dashboard { background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; }
         .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
@@ -129,25 +134,6 @@
         .user-info { font-size: 0.85rem; color: #888; }
         .user-info strong { color: #d4af37; }
         
-        /* Tooltip para los botones */
-        .action-btn { position: relative; }
-        .action-btn[title]:hover::after {
-            content: attr(title);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #000;
-            color: white;
-            padding: 0.3rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            white-space: nowrap;
-            margin-bottom: 6px;
-            pointer-events: none;
-            z-index: 10;
-        }
-        
         @media (max-width: 968px) {
             .dashboard-content { grid-template-columns: 1fr; }
         }
@@ -158,6 +144,7 @@
             .donut-chart { width: 160px; height: 160px; }
             .donut-center .percentage { font-size: 2rem; }
             .action-btn { width: 28px; height: 28px; font-size: 0.8rem; }
+            .stat-card .number.small { font-size: 1.3rem; }
         }
     </style>
 </head>
@@ -188,7 +175,9 @@
             </div>
         </div>
 
+        <!-- ✅ ESTADÍSTICAS + NUEVA TARJETA DE CUENTA REGRESIVA -->
         <div class="stats-grid" id="statsGrid">
+            <div class="stat-card next-card"><span class="number small" id="statCountdown">—</span><span class="label" id="statNextInfo">Próxima reserva</span></div>
             <div class="stat-card"><span class="number" id="statTotal">0</span><span class="label">Total</span></div>
             <div class="stat-card"><span class="number" id="statActivas">0</span><span class="label">Activas</span></div>
             <div class="stat-card"><span class="number" id="statFuturas">0</span><span class="label">Futuras</span></div>
@@ -314,11 +303,10 @@
         // ===== CONFIGURACIÓN =====
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwDFvAKsIT2tVmuIWcyJ3duNBNCDEriYuCvDOBATRyTatUJNkSiAmQH3xisg3v74srM1g/exec';
         const HOURS_PER_DAY = 9;
-        const DAYS_OF_WEEK = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
         const MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        const STUDIO_NAME = 'LG Tattoo'; // ⚠️ Cambia por el nombre de tu estudio
-        const STUDIO_WHATSAPP = '5493518692251'; // ⚠️ Tu número (para el formulario público)
-        const DEFAULT_COUNTRY_CODE = '54'; // ⚠️ Código de país por defecto si el cliente no lo puso
+        const DAY_INDEX = { 'Dom': 0, 'Lun': 1, 'Mar': 2, 'Mié': 3, 'Jue': 4, 'Vie': 5, 'Sáb': 6 };
+        const STUDIO_NAME = 'Estudio de Tatuajes'; // ⚠️ Cambia por el nombre de tu estudio
+        const DEFAULT_COUNTRY_CODE = '54';
         
         let adminPassword = '';
         let allReservations = [];
@@ -398,12 +386,91 @@
             
             renderTable();
             updateMonthlyDashboard();
+            updateCountdown();
+        }
+
+        // ✅ NUEVO: Convierte "Lun 06" + "16:00" en un objeto Date real
+        function parseReservaDate(fecha, hora) {
+            try {
+                const partes = fecha.split(' ');
+                if (partes.length < 2) return null;
+                const dayName = partes[0];
+                const dayNum = parseInt(partes[1], 10);
+                const hourParts = (hora || '0:0').split(':');
+                const h = parseInt(hourParts[0], 10) || 0;
+                const m = parseInt(hourParts[1], 10) || 0;
+                const targetDow = DAY_INDEX[dayName];
+                if (targetDow === undefined || isNaN(dayNum)) return null;
+                
+                const now = new Date();
+                // Ventana de búsqueda: 62 días atrás hasta ~408 días adelante
+                const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 62);
+                for (let i = 0; i < 470; i++) {
+                    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+                    if (d.getDate() === dayNum && d.getDay() === targetDow) {
+                        d.setHours(h, m, 0, 0);
+                        return d;
+                    }
+                }
+                return null;
+            } catch (e) { return null; }
+        }
+
+        // ✅ NUEVO: Ordena próximas primero (cronológico) y pasadas al final (más reciente primero)
+        function getSortedReservations() {
+            const now = new Date();
+            const withDates = allReservations.map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }));
+            const upcoming = withDates
+                .filter(x => x.d && x.d >= now)
+                .sort((a, b) => a.d - b.d);
+            const past = withDates
+                .filter(x => !x.d || x.d < now)
+                .sort((a, b) => (b.d ? b.d.getTime() : 0) - (a.d ? a.d.getTime() : 0));
+            return upcoming.concat(past).map(x => x.r);
+        }
+
+        // ✅ NUEVO: Obtiene la próxima reserva activa
+        function getNextUpcoming() {
+            const now = new Date();
+            const candidates = allReservations
+                .filter(r => r.estado === 'ACTIVA')
+                .map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }))
+                .filter(x => x.d && x.d >= now)
+                .sort((a, b) => a.d - b.d);
+            return candidates.length ? candidates[0] : null;
+        }
+
+        // ✅ NUEVO: Formatea la cuenta regresiva
+        function formatCountdown(ms) {
+            if (ms <= 0) return '¡Ahora!';
+            const mins = Math.floor(ms / 60000);
+            const days = Math.floor(mins / 1440);
+            const hours = Math.floor((mins % 1440) / 60);
+            const minutes = mins % 60;
+            if (days > 0) return `${days}d ${hours}h`;
+            if (hours > 0) return `${hours}h ${minutes}m`;
+            return `${minutes}m`;
+        }
+
+        // ✅ NUEVO: Actualiza la tarjeta de cuenta regresiva
+        function updateCountdown() {
+            const numberEl = document.getElementById('statCountdown');
+            const labelEl = document.getElementById('statNextInfo');
+            const next = getNextUpcoming();
+            if (!next) {
+                numberEl.textContent = '—';
+                labelEl.textContent = 'Sin reservas próximas';
+                return;
+            }
+            numberEl.textContent = formatCountdown(next.d - new Date());
+            labelEl.textContent = `Próxima: ${next.r.fecha} · ${next.r.hora}`;
         }
 
         function renderTable() {
             const tbody = document.getElementById('reservasBody');
             
-            let filtered = allReservations.slice().reverse();
+            // ✅ Ahora parte de la lista ordenada (próxima primero)
+            let filtered = getSortedReservations();
             
             if (currentFilter === 'activas') filtered = filtered.filter(r => r.estado === 'ACTIVA');
             else if (currentFilter === 'canceladas') filtered = filtered.filter(r => r.estado === 'CANCELADA');
@@ -460,26 +527,12 @@
         }
 
         function esFutura(fecha, hora) {
-            try {
-                const partesFecha = fecha.split(' ');
-                if (partesFecha.length < 2) return true;
-                const diaNum = parseInt(partesFecha[1], 10);
-                const partesHora = hora.split(':');
-                const h = parseInt(partesHora[0], 10);
-                const ahora = new Date();
-                const año = ahora.getFullYear();
-                
-                for (let offset = 0; offset <= 1; offset++) {
-                    for (let mes = 0; mes < 12; mes++) {
-                        const testDate = new Date(año + offset, mes, diaNum, h, 0, 0);
-                        if (testDate.getDate() === diaNum && testDate >= ahora) return true;
-                    }
-                }
-                return false;
-            } catch (e) { return true; }
+            const d = parseReservaDate(fecha, hora);
+            if (d) return d >= new Date();
+            return true;
         }
 
-        // ✅ FUNCIÓN DE WHATSAPP MEJORADA
+        // ===== WHATSAPP =====
         function sendWhatsApp(id) {
             const reserva = allReservations.find(r => r.id === id);
             if (!reserva) {
@@ -487,7 +540,6 @@
                 return;
             }
             
-            // Limpiar número: quitar todo excepto dígitos y el signo +
             let phone = (reserva.telefono || '').toString().trim();
             
             if (!phone) {
@@ -495,54 +547,34 @@
                 return;
             }
             
-            // Quitar todo excepto dígitos
             phone = phone.replace(/\D/g, '');
             
-            // Si está vacío después de limpiar
             if (phone.length < 8) {
                 alert('⚠️ El número de teléfono es inválido: ' + reserva.telefono);
                 return;
             }
             
-            // Si empieza con 0 (código de área local), quitarlo
-            if (phone.startsWith('0')) {
-                phone = phone.substring(1);
-            }
+            if (phone.startsWith('0')) phone = phone.substring(1);
+            if (phone.startsWith('15') && phone.length >= 10) phone = phone.substring(2);
+            if (phone.length <= 10) phone = DEFAULT_COUNTRY_CODE + phone;
+            else if (phone.length === 11 && phone.startsWith('9')) phone = DEFAULT_COUNTRY_CODE + phone;
             
-            // Si empieza con 15 (celular Argentina sin código país), quitarlo
-            if (phone.startsWith('15') && phone.length >= 10) {
-                phone = phone.substring(2);
-            }
-            
-            // Si no tiene código de país, agregar el predeterminado
-            // Detectar si ya tiene código de país (más de 10 dígitos normalmente)
-            if (phone.length <= 10) {
-                phone = DEFAULT_COUNTRY_CODE + phone;
-            } else if (phone.length === 11 && phone.startsWith('9')) {
-                // Caso Argentina: 9 351 1234567 (sin 54)
-                phone = DEFAULT_COUNTRY_CODE + phone;
-            }
-            
-            // Construir mensaje
             const message = `Hola ${reserva.nombre}! 👋\n\n` +
                 `Te contactamos desde *${STUDIO_NAME}* sobre tu reserva:\n\n` +
                 `📅 *Fecha:* ${reserva.fecha}\n` +
                 `🕐 *Hora:* ${reserva.hora}\n\n` +
-                `Confirmamos tu asistencia!!. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n` +
+                `Por favor confirma tu asistencia. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n` +
                 `¡Te esperamos! 🎨`;
             
-            // Abrir WhatsApp en nueva pestaña
             const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-            
-            // Usar window.open con características para evitar bloqueo
             const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
             
-            // Si el navegador bloqueó el popup, abrir en la misma ventana
             if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
                 window.location.href = url;
             }
         }
 
+        // ===== DASHBOARD MENSUAL =====
         function updateMonthlyDashboard() {
             const year = selectedMonth.getFullYear();
             const month = selectedMonth.getMonth();
@@ -550,19 +582,8 @@
             document.getElementById('currentMonthLabel').textContent = `${MONTH_NAMES[month]} ${year}`;
             
             const monthReservations = allReservations.filter(r => {
-                const partesFecha = r.fecha.split(' ');
-                if (partesFecha.length < 2) return false;
-                const diaNum = parseInt(partesFecha[1], 10);
-                
-                for (let offset = 0; offset <= 1; offset++) {
-                    for (let mes = 0; mes < 12; mes++) {
-                        const testDate = new Date(year + offset, mes, diaNum);
-                        if (testDate.getDate() === diaNum && testDate.getMonth() === month && testDate.getFullYear() === year) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
+                const d = parseReservaDate(r.fecha, r.hora);
+                return d && d.getMonth() === month && d.getFullYear() === year;
             });
             
             const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -598,8 +619,7 @@
             
             const hourCounts = {};
             monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
-                const hour = r.hora;
-                hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+                hourCounts[r.hora] = (hourCounts[r.hora] || 0) + 1;
             });
             
             const peakHour = Object.keys(hourCounts).reduce((a, b) => hourCounts[a] > hourCounts[b] ? a : b, '-');
@@ -643,6 +663,7 @@
             updateMonthlyDashboard();
         });
 
+        // ===== ACCIONES =====
         async function cancelReservation(id) {
             if (!confirm('¿Cancelar esta reserva?')) return;
             await updateEstado(id, 'CANCELADA');
@@ -691,6 +712,9 @@
             a.download = 'reservas_' + new Date().toISOString().split('T')[0] + '.csv';
             a.click();
         }
+
+        // ✅ Actualiza la cuenta regresiva cada 60 segundos automáticamente
+        setInterval(updateCountdown, 60000);
     </script>
 </body>
 </html>
