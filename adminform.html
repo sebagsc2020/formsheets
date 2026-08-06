@@ -28,6 +28,48 @@
         .stat-card { background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 16px; padding: 1.2rem; text-align: center; }
         .stat-card .number { font-size: 2rem; font-weight: 700; color: #d4af37; display: block; }
         .stat-card .label { font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.3rem; }
+        
+        /* Dashboard mensual */
+        .monthly-dashboard { background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .dashboard-header h2 { font-size: 1.3rem; color: #e8e8e8; }
+        .month-selector { display: flex; gap: 0.5rem; align-items: center; }
+        .month-selector button { background: #333; border: 1px solid #444; color: #ccc; padding: 0.4rem 0.8rem; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: 0.15s; }
+        .month-selector button:hover { background: #3d3d3d; }
+        .month-selector button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .month-selector .current-month { background: #d4af37; color: #1a1a1a; font-weight: 600; padding: 0.4rem 1.2rem; }
+        
+        .dashboard-content { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+        
+        /* Gráfico circular */
+        .chart-container { background: #222; border-radius: 16px; padding: 1.5rem; border: 1px solid #353535; }
+        .chart-title { font-size: 0.9rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; text-align: center; }
+        .donut-chart { position: relative; width: 200px; height: 200px; margin: 0 auto 1rem; }
+        .donut-chart svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .donut-center .percentage { font-size: 2.5rem; font-weight: 700; color: #d4af37; line-height: 1; }
+        .donut-center .label { font-size: 0.75rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.3rem; }
+        .chart-legend { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+        .legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; }
+        .legend-color { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+        .legend-label { color: #ccc; flex: 1; }
+        .legend-value { color: #d4af37; font-weight: 600; }
+        
+        /* Métricas adicionales */
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .metric-card { background: #222; border-radius: 12px; padding: 1rem; border: 1px solid #353535; }
+        .metric-card .metric-icon { font-size: 1.5rem; color: #d4af37; margin-bottom: 0.5rem; }
+        .metric-card .metric-value { font-size: 1.5rem; font-weight: 700; color: #e8e8e8; margin-bottom: 0.2rem; }
+        .metric-card .metric-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        /* Distribución por día */
+        .distribution-chart { margin-top: 1rem; }
+        .bar-chart { display: flex; align-items: flex-end; gap: 0.3rem; height: 100px; padding: 0.5rem 0; }
+        .bar { flex: 1; background: linear-gradient(to top, #b8941f, #d4af37); border-radius: 4px 4px 0 0; position: relative; min-height: 4px; transition: all 0.3s; }
+        .bar:hover { opacity: 0.8; }
+        .bar-label { position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 0.65rem; color: #888; }
+        .bar-value { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; color: #d4af37; font-weight: 600; }
+        
         .toolbar { display: flex; gap: 0.8rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; justify-content: space-between; }
         .toolbar-left, .toolbar-right { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
         .filter-btn { background: #333; border: 1px solid #444; color: #ccc; padding: 0.4rem 1rem; border-radius: 30px; cursor: pointer; font-size: 0.85rem; transition: 0.15s; }
@@ -50,9 +92,15 @@
         .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
         .user-info { font-size: 0.85rem; color: #888; }
         .user-info strong { color: #d4af37; }
+        @media (max-width: 968px) {
+            .dashboard-content { grid-template-columns: 1fr; }
+        }
         @media (max-width: 768px) {
             th, td { padding: 0.5rem 0.3rem; font-size: 0.8rem; }
             .hide-mobile { display: none; }
+            .metrics-grid { grid-template-columns: 1fr; }
+            .donut-chart { width: 160px; height: 160px; }
+            .donut-center .percentage { font-size: 2rem; }
         }
     </style>
 </head>
@@ -83,13 +131,93 @@
             </div>
         </div>
 
-        <!-- ESTADÍSTICAS -->
+        <!-- ESTADÍSTICAS GENERALES -->
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card"><span class="number" id="statTotal">0</span><span class="label">Total</span></div>
             <div class="stat-card"><span class="number" id="statActivas">0</span><span class="label">Activas</span></div>
             <div class="stat-card"><span class="number" id="statFuturas">0</span><span class="label">Futuras</span></div>
             <div class="stat-card"><span class="number" id="statPasadas">0</span><span class="label">Pasadas</span></div>
             <div class="stat-card"><span class="number" id="statCanceladas">0</span><span class="label">Canceladas</span></div>
+        </div>
+
+        <!-- DASHBOARD MENSUAL -->
+        <div class="monthly-dashboard">
+            <div class="dashboard-header">
+                <h2><i class="fas fa-chart-pie" style="color: #d4af37; margin-right: 8px;"></i>Estadísticas Mensuales</h2>
+                <div class="month-selector">
+                    <button id="prevMonthBtn"><i class="fas fa-chevron-left"></i></button>
+                    <button class="current-month" id="currentMonthLabel">Agosto 2026</button>
+                    <button id="nextMonthBtn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            
+            <div class="dashboard-content">
+                <!-- Gráfico circular de ocupación -->
+                <div class="chart-container">
+                    <div class="chart-title">Ocupación del Mes</div>
+                    <div class="donut-chart">
+                        <svg viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="#333" stroke-width="12"/>
+                            <circle id="donutFill" cx="50" cy="50" r="40" fill="none" stroke="#d4af37" stroke-width="12" stroke-dasharray="251.2 251.2" stroke-linecap="round"/>
+                        </svg>
+                        <div class="donut-center">
+                            <div class="percentage" id="occupancyPercentage">0%</div>
+                            <div class="label">Ocupación</div>
+                        </div>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #d4af37;"></div>
+                            <span class="legend-label">Reservas activas</span>
+                            <span class="legend-value" id="legendActivas">0</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #ff6b6b;"></div>
+                            <span class="legend-label">Canceladas</span>
+                            <span class="legend-value" id="legendCanceladas">0</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #333;"></div>
+                            <span class="legend-label">Disponibles</span>
+                            <span class="legend-value" id="legendDisponibles">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Métricas adicionales -->
+                <div>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon"><i class="fas fa-calendar-check"></i></div>
+                            <div class="metric-value" id="metricTotalMonth">0</div>
+                            <div class="metric-label">Reservas del mes</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon"><i class="fas fa-calendar-day"></i></div>
+                            <div class="metric-value" id="metricDaysInMonth">0</div>
+                            <div class="metric-label">Días del mes</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon"><i class="fas fa-fire"></i></div>
+                            <div class="metric-value" id="metricPeakDay">-</div>
+                            <div class="metric-label">Día más ocupado</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon"><i class="fas fa-clock"></i></div>
+                            <div class="metric-value" id="metricPeakHour">-</div>
+                            <div class="metric-label">Hora pico</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Distribución por día de la semana -->
+                    <div class="chart-container" style="margin-top: 1rem;">
+                        <div class="chart-title">Distribución por Día</div>
+                        <div class="distribution-chart">
+                            <div class="bar-chart" id="dayDistribution"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- TOOLBAR -->
@@ -135,11 +263,15 @@
     <script>
         // ===== CONFIGURACIÓN =====
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwDFvAKsIT2tVmuIWcyJ3duNBNCDEriYuCvDOBATRyTatUJNkSiAmQH3xisg3v74srM1g/exec';
+        const HOURS_PER_DAY = 9; // 9:00-12:00 (4) + 16:00-20:00 (5) = 9 slots por día
+        const DAYS_OF_WEEK = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        const MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
         
         let adminPassword = '';
         let allReservations = [];
         let currentFilter = 'all';
         let stats = { total: 0, activas: 0, canceladas: 0, futuras: 0, pasadas: 0 };
+        let selectedMonth = new Date(); // Mes seleccionado para el dashboard
 
         // ===== LOGIN =====
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
@@ -214,12 +346,12 @@
             document.getElementById('statCanceladas').textContent = stats.canceladas;
             
             renderTable();
+            updateMonthlyDashboard();
         }
 
         function renderTable() {
             const tbody = document.getElementById('reservasBody');
             
-            // Ordenar por fecha descendente
             let filtered = allReservations.slice().reverse();
             
             if (currentFilter === 'activas') filtered = filtered.filter(r => r.estado === 'ACTIVA');
@@ -276,6 +408,120 @@
                 return false;
             } catch (e) { return true; }
         }
+
+        // ===== DASHBOARD MENSUAL =====
+        function updateMonthlyDashboard() {
+            const year = selectedMonth.getFullYear();
+            const month = selectedMonth.getMonth();
+            
+            // Actualizar label del mes
+            document.getElementById('currentMonthLabel').textContent = `${MONTH_NAMES[month]} ${year}`;
+            
+            // Filtrar reservas del mes seleccionado
+            const monthReservations = allReservations.filter(r => {
+                const partesFecha = r.fecha.split(' ');
+                if (partesFecha.length < 2) return false;
+                const diaNum = parseInt(partesFecha[1], 10);
+                
+                // Buscar en qué mes cae este día
+                for (let offset = 0; offset <= 1; offset++) {
+                    for (let mes = 0; mes < 12; mes++) {
+                        const testDate = new Date(year + offset, mes, diaNum);
+                        if (testDate.getDate() === diaNum && testDate.getMonth() === month && testDate.getFullYear() === year) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            });
+            
+            // Calcular estadísticas del mes
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const totalSlots = daysInMonth * HOURS_PER_DAY;
+            
+            const activas = monthReservations.filter(r => r.estado === 'ACTIVA').length;
+            const canceladas = monthReservations.filter(r => r.estado === 'CANCELADA').length;
+            const disponibles = totalSlots - activas;
+            
+            const occupancyPercentage = totalSlots > 0 ? Math.round((activas / totalSlots) * 100) : 0;
+            
+            // Actualizar gráfico circular
+            updateDonutChart(occupancyPercentage);
+            
+            // Actualizar leyenda
+            document.getElementById('legendActivas').textContent = activas;
+            document.getElementById('legendCanceladas').textContent = canceladas;
+            document.getElementById('legendDisponibles').textContent = disponibles;
+            
+            // Actualizar porcentaje
+            document.getElementById('occupancyPercentage').textContent = occupancyPercentage + '%';
+            
+            // Actualizar métricas
+            document.getElementById('metricTotalMonth').textContent = monthReservations.length;
+            document.getElementById('metricDaysInMonth').textContent = daysInMonth;
+            
+            // Calcular día más ocupado
+            const dayCounts = {};
+            monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
+                const partesFecha = r.fecha.split(' ');
+                if (partesFecha.length >= 2) {
+                    const dayName = partesFecha[0];
+                    dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
+                }
+            });
+            
+            const peakDay = Object.keys(dayCounts).reduce((a, b) => dayCounts[a] > dayCounts[b] ? a : b, '-');
+            document.getElementById('metricPeakDay').textContent = peakDay !== '-' ? `${peakDay} (${dayCounts[peakDay]})` : '-';
+            
+            // Calcular hora pico
+            const hourCounts = {};
+            monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
+                const hour = r.hora;
+                hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+            });
+            
+            const peakHour = Object.keys(hourCounts).reduce((a, b) => hourCounts[a] > hourCounts[b] ? a : b, '-');
+            document.getElementById('metricPeakHour').textContent = peakHour !== '-' ? `${peakHour} (${hourCounts[peakHour]})` : '-';
+            
+            // Actualizar distribución por día
+            updateDayDistribution(dayCounts);
+        }
+
+        function updateDonutChart(percentage) {
+            const circumference = 2 * Math.PI * 40; // 251.2
+            const offset = circumference - (percentage / 100) * circumference;
+            const donutFill = document.getElementById('donutFill');
+            donutFill.style.strokeDasharray = `${circumference} ${circumference}`;
+            donutFill.style.strokeDashoffset = offset;
+        }
+
+        function updateDayDistribution(dayCounts) {
+            const container = document.getElementById('dayDistribution');
+            const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            const maxCount = Math.max(...days.map(d => dayCounts[d] || 0), 1);
+            
+            container.innerHTML = days.map(day => {
+                const count = dayCounts[day] || 0;
+                const height = (count / maxCount) * 100;
+                return `
+                    <div class="bar" style="height: ${height}%;">
+                        ${count > 0 ? `<div class="bar-value">${count}</div>` : ''}
+                        <div class="bar-label">${day}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Navegación de meses
+        document.getElementById('prevMonthBtn').addEventListener('click', function() {
+            selectedMonth.setMonth(selectedMonth.getMonth() - 1);
+            updateMonthlyDashboard();
+        });
+
+        document.getElementById('nextMonthBtn').addEventListener('click', function() {
+            selectedMonth.setMonth(selectedMonth.getMonth() + 1);
+            updateMonthlyDashboard();
+        });
 
         // ===== ACCIONES =====
         async function cancelReservation(id) {
