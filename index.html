@@ -10,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
-        /* Estilos base (iguales que antes, añadimos estilos para select) */
+        /* ===== ESTILOS BASE ===== */
         * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, sans-serif; }
         body { background: #1a1a1a; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:2rem 1rem; }
         .card { max-width:1200px; width:100%; background:#2a2a2a; border-radius:8px; box-shadow:0 20px 40px rgba(0,0,0,0.6); padding:2rem; border:1px solid #3a3a3a; }
@@ -339,9 +339,8 @@
                         nombre: data.nombre,
                         email: data.email,
                         telefono: data.telefono,
-                        servicio: data.servicio, // Nuevo campo
+                        servicio: data.servicio,   // ← AHORA GUARDA EL VALOR SELECCIONADO
                         estado: 'ACTIVA',
-                        servicio: 'Consulta',
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     return { success: true };
@@ -367,7 +366,7 @@
                             nombre: data.nombre,
                             email: data.email,
                             telefono: data.telefono,
-                            servicio: data.servicio || '' // Lo guardamos para referencia
+                            servicio: data.servicio || ''
                         });
                     });
                     return reservas;
