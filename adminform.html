@@ -119,9 +119,37 @@
         .month-selector button:disabled { opacity: 0.4; cursor: not-allowed; }
         .month-selector .current-month { background: #d4af37; color: #1a1a1a; font-weight: 600; padding: 0.3rem 1rem; }
         
-        .dashboard-content { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
+        /* ===== NUEVO: dashboard-content con flex y altura igual ===== */
+        .dashboard-content {
+            display: flex;
+            gap: 1rem;
+            align-items: stretch; /* las columnas tendrán la misma altura */
+        }
+        .dashboard-content > div {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .dashboard-content .chart-container {
+            flex: 1; /* ocupa todo el espacio disponible */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* centra el contenido verticalmente */
+        }
+        .dashboard-content .right-col {
+            gap: 0.8rem; /* espacio entre las dos filas de la derecha */
+        }
+        .dashboard-content .right-col .chart-container {
+            flex: 1; /* el gráfico de barras también ocupa el espacio restante */
+        }
         
-        .chart-container { background: #222; border-radius: 4px; padding: 1rem; border: 1px solid #353535; }
+        /* Ajustes para que los contenedores se vean bien */
+        .chart-container {
+            background: #222;
+            border-radius: 4px;
+            padding: 1rem;
+            border: 1px solid #353535;
+        }
         .chart-title { font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.8rem; text-align: center; }
         .donut-chart { position: relative; width: 180px; height: 180px; margin: 0 auto 0.8rem; }
         .donut-chart svg { width: 100%; height: 100%; transform: rotate(-90deg); }
@@ -140,7 +168,7 @@
         .metric-card .metric-value { font-size: 1.3rem; font-weight: 700; color: #e8e8e8; margin-bottom: 0.1rem; }
         .metric-card .metric-label { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
         
-        .distribution-chart { margin-top: 0.8rem; }
+        .distribution-chart { margin-top: 0.8rem; flex: 1; display: flex; flex-direction: column; justify-content: center; }
         .bar-chart { display: flex; align-items: flex-end; gap: 0.2rem; height: 80px; padding: 0.3rem 0; }
         .bar { flex: 1; background: linear-gradient(to top, #b8941f, #d4af37); border-radius: 2px 2px 0 0; position: relative; min-height: 4px; transition: all 0.3s; }
         .bar:hover { opacity: 0.8; }
@@ -171,7 +199,7 @@
         .user-info strong { color: #d4af37; }
         
         @media (max-width: 968px) {
-            .dashboard-content { grid-template-columns: 1fr; }
+            .dashboard-content { flex-direction: column; }
         }
         @media (max-width: 768px) {
             th, td { padding: 0.4rem 0.2rem; font-size: 0.75rem; }
@@ -286,38 +314,42 @@
             </div>
             
             <div class="dashboard-content">
-                <div class="chart-container">
-                    <div class="chart-title">Ocupación del Mes</div>
-                    <div class="donut-chart">
-                        <svg viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="40" fill="none" stroke="#333" stroke-width="12"/>
-                            <circle id="donutFill" cx="50" cy="50" r="40" fill="none" stroke="#d4af37" stroke-width="12" stroke-dasharray="251.2 251.2" stroke-linecap="round"/>
-                        </svg>
-                        <div class="donut-center">
-                            <div class="percentage" id="occupancyPercentage">0%</div>
-                            <div class="label">Ocupación</div>
+                <!-- Columna izquierda: Donut -->
+                <div>
+                    <div class="chart-container">
+                        <div class="chart-title">Ocupación del Mes</div>
+                        <div class="donut-chart">
+                            <svg viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="40" fill="none" stroke="#333" stroke-width="12"/>
+                                <circle id="donutFill" cx="50" cy="50" r="40" fill="none" stroke="#d4af37" stroke-width="12" stroke-dasharray="251.2 251.2" stroke-linecap="round"/>
+                            </svg>
+                            <div class="donut-center">
+                                <div class="percentage" id="occupancyPercentage">0%</div>
+                                <div class="label">Ocupación</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="chart-legend">
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #d4af37;"></div>
-                            <span class="legend-label">Reservas activas</span>
-                            <span class="legend-value" id="legendActivas">0</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #ff6b6b;"></div>
-                            <span class="legend-label">Canceladas</span>
-                            <span class="legend-value" id="legendCanceladas">0</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #333;"></div>
-                            <span class="legend-label">Disponibles</span>
-                            <span class="legend-value" id="legendDisponibles">0</span>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #d4af37;"></div>
+                                <span class="legend-label">Reservas activas</span>
+                                <span class="legend-value" id="legendActivas">0</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ff6b6b;"></div>
+                                <span class="legend-label">Canceladas</span>
+                                <span class="legend-value" id="legendCanceladas">0</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #333;"></div>
+                                <span class="legend-label">Disponibles</span>
+                                <span class="legend-value" id="legendDisponibles">0</span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <div>
+                <!-- Columna derecha: métricas + gráfico de barras -->
+                <div class="right-col">
                     <div class="metrics-grid">
                         <div class="metric-card">
                             <div class="metric-icon"><i class="fas fa-calendar-check"></i></div>
@@ -341,7 +373,7 @@
                         </div>
                     </div>
                     
-                    <div class="chart-container" style="margin-top: 0.8rem;">
+                    <div class="chart-container">
                         <div class="chart-title">Distribución por Día</div>
                         <div class="distribution-chart">
                             <div class="bar-chart" id="dayDistribution"></div>
