@@ -9,7 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
-        /* (Mismos estilos que antes, no los repito para no alargar) */
+        /* (estilos exactamente iguales a los anteriores, no los repito para no alargar) */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
         body { background: #1a1a1a; min-height: 100vh; padding: 0.8rem 0.5rem; color: #e8e8e8; }
         .container { max-width: 1200px; margin: 0 auto; }
@@ -170,7 +170,7 @@
             </div>
         </div>
 
-        <!-- AGENDA DE HOY (mejorada) -->
+        <!-- AGENDA DE HOY -->
         <div class="today-agenda">
             <div class="today-header">
                 <h2><i class="fas fa-sun"></i>Agenda de Hoy</h2>
@@ -465,7 +465,7 @@
                 } catch (e) { return null; }
             }
 
-            // ===== AGENDA DE HOY (mejorada: muestra todos los estados) =====
+            // ===== AGENDA DE HOY (con los 3 botones siempre visibles) =====
             function renderTodayAgenda() {
                 const now = new Date();
                 const listEl = document.getElementById('todayList');
@@ -474,7 +474,6 @@
                 
                 dateLabel.textContent = `${LONG_DAYS[now.getDay()]} ${String(now.getDate()).padStart(2, '0')} de ${MONTH_NAMES[now.getMonth()]}, ${now.getFullYear()}`;
                 
-                // Filtrar todas las reservas del día (sin importar estado)
                 const todayRes = allReservations
                     .map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }))
                     .filter(x => x.d &&
@@ -486,45 +485,39 @@
                 countEl.textContent = todayRes.length === 1 ? '1 cita' : todayRes.length + ' citas';
                 
                 if (todayRes.length === 0) {
-                    listEl.innerHTML = `
-                        <div class="today-empty">
-                            <i class="fas fa-mug-hot"></i>
-                            No hay reservas para hoy. ¡Día libre! 🎉
-                        </div>
-                    `;
+                    listEl.innerHTML = `<div class="today-empty"><i class="fas fa-mug-hot"></i>No hay reservas para hoy. ¡Día libre! 🎉</div>`;
                     return;
                 }
                 
+                // Buscar próxima activa (para marcar como "Siguiente")
                 const nextIndex = todayRes.findIndex(x => x.d >= now && x.r.estado !== 'CANCELADA');
                 
                 listEl.innerHTML = todayRes.map((item, idx) => {
                     const isPast = item.d < now;
-                    const isNext = (idx === nextIndex && item.r.estado !== 'CANCELADA');
+                    const isNext = (idx === nextIndex);
                     const timeStr = String(item.d.getHours()).padStart(2, '0') + ':' + String(item.d.getMinutes()).padStart(2, '0');
                     
-                    let stateLabel = '';
-                    let stateClass = '';
-                    switch (item.r.estado) {
-                        case 'ACTIVA':
-                            stateLabel = isPast ? 'Pasada' : 'Activa';
-                            stateClass = 'past-tag';
-                            break;
-                        case 'CANCELADA':
-                            stateLabel = 'Cancelada';
-                            stateClass = 'cancel-tag';
-                            break;
-                        case 'COMPLETADA':
-                            stateLabel = 'Completada';
-                            stateClass = 'past-tag';
-                            break;
-                        default: stateLabel = item.r.estado;
-                    }
+                    let estadoLabel = item.r.estado;
+                    if (item.r.estado === 'ACTIVA') estadoLabel = isPast ? 'Pasada' : 'Activa';
+                    else if (item.r.estado === 'CANCELADA') estadoLabel = 'Cancelada';
+                    else if (item.r.estado === 'COMPLETADA') estadoLabel = 'Completada';
                     
                     let tag = '';
-                    if (isNext) tag = '<span class="today-tag next-tag">Siguiente</span>';
-                    if (item.r.estado === 'CANCELADA') tag += `<span class="today-tag ${stateClass}">${stateLabel}</span>`;
-                    else if (isPast) tag += `<span class="today-tag ${stateClass}">${stateLabel}</span>`;
-                    else tag += `<span class="today-tag next-tag">${stateLabel}</span>`;
+                    if (isNext && item.r.estado !== 'CANCELADA') tag = '<span class="today-tag next-tag">Siguiente</span>';
+                    else tag = `<span class="today-tag ${item.r.estado === 'CANCELADA' ? 'cancel-tag' : 'past-tag'}">${estadoLabel}</span>`;
+                    
+                    // Siempre mostrar los 3 botones
+                    const actionsHtml = `
+                        <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${item.r.id}')" title="Enviar WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                        </button>
+                        <button class="action-btn btn-success" onclick="markCompleted('${item.r.id}')" title="Completar">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="action-btn btn-danger" onclick="cancelReservation('${item.r.id}')" title="Cancelar">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
                     
                     return `
                         <div class="today-item ${isNext ? 'next' : ''} ${isPast ? 'past' : ''}">
@@ -533,23 +526,7 @@
                                 <span class="today-name">${item.r.nombre} ${tag}</span>
                                 <span class="today-phone"><i class="fas fa-phone-alt"></i> ${item.r.telefono}</span>
                             </div>
-                            <div class="action-buttons">
-                                ${item.r.estado === 'ACTIVA' ? `
-                                <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${item.r.id}')" title="Enviar WhatsApp">
-                                    <i class="fab fa-whatsapp"></i>
-                                </button>
-                                <button class="action-btn btn-success" onclick="markCompleted('${item.r.id}')" title="Completada">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                <button class="action-btn btn-danger" onclick="cancelReservation('${item.r.id}')" title="Cancelar">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                                ` : `
-                                <button class="action-btn btn-neutral" onclick="reactivate('${item.r.id}')" title="Reactivar">
-                                    <i class="fas fa-undo"></i>
-                                </button>
-                                `}
-                            </div>
+                            <div class="action-buttons">${actionsHtml}</div>
                         </div>
                     `;
                 }).join('');
@@ -590,7 +567,7 @@
                 labelEl.textContent = `Próxima: ${next.r.fecha} · ${next.r.hora}`;
             }
 
-            // ===== TABLA (resto igual) =====
+            // ===== TABLA (con los 3 botones siempre visibles) =====
             function getSortedReservations() {
                 const now = new Date();
                 const withDates = allReservations.map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }));
@@ -636,30 +613,20 @@
                         estadoLabel = 'Pasada';
                     }
                     
-                    let actionsHtml = '';
-                    if (r.estado === 'ACTIVA') {
-                        actionsHtml = `
-                            <div class="action-buttons">
-                                <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${r.id}')" title="Enviar WhatsApp">
-                                    <i class="fab fa-whatsapp"></i>
-                                </button>
-                                <button class="action-btn btn-success" onclick="markCompleted('${r.id}')" title="Completada">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                <button class="action-btn btn-danger" onclick="cancelReservation('${r.id}')" title="Cancelar">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        `;
-                    } else {
-                        actionsHtml = `
-                            <div class="action-buttons">
-                                <button class="action-btn btn-neutral" onclick="reactivate('${r.id}')" title="Reactivar">
-                                    <i class="fas fa-undo"></i>
-                                </button>
-                            </div>
-                        `;
-                    }
+                    // Siempre mostrar los 3 botones
+                    const actionsHtml = `
+                        <div class="action-buttons">
+                            <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${r.id}')" title="Enviar WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                            <button class="action-btn btn-success" onclick="markCompleted('${r.id}')" title="Completar">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="action-btn btn-danger" onclick="cancelReservation('${r.id}')" title="Cancelar">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
                     
                     return `
                         <tr>
@@ -702,10 +669,6 @@
                 if (!confirm('¿Marcar como completada?')) return;
                 await updateEstado(id, 'COMPLETADA');
             };
-            window.reactivate = async function(id) {
-                if (!confirm('¿Reactivar esta reserva?')) return;
-                await updateEstado(id, 'ACTIVA');
-            };
 
             async function updateEstado(id, estado) {
                 try {
@@ -724,7 +687,6 @@
                 
                 document.getElementById('currentMonthLabel').textContent = `${MONTH_NAMES[month]} ${year}`;
                 
-                // Todas las reservas del mes
                 const monthReservations = allReservations.filter(r => {
                     const d = parseReservaDate(r.fecha, r.hora);
                     return d && d.getMonth() === month && d.getFullYear() === year;
@@ -746,11 +708,9 @@
                 document.getElementById('legendDisponibles').textContent = disponibles;
                 document.getElementById('occupancyPercentage').textContent = occupancyPercentage + '%';
                 
-                // Reservas del mes (todas)
                 document.getElementById('metricTotalMonth').textContent = monthReservations.length;
                 document.getElementById('metricDaysInMonth').textContent = daysInMonth;
                 
-                // Día más ocupado (solo activas)
                 const dayCounts = {};
                 monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
                     const partesFecha = r.fecha.split(' ');
@@ -762,7 +722,6 @@
                 const peakDay = Object.keys(dayCounts).reduce((a, b) => dayCounts[a] > dayCounts[b] ? a : b, '-');
                 document.getElementById('metricPeakDay').textContent = peakDay !== '-' ? `${peakDay} (${dayCounts[peakDay]})` : '-';
                 
-                // Hora pico (solo activas)
                 const hourCounts = {};
                 monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
                     hourCounts[r.hora] = (hourCounts[r.hora] || 0) + 1;
@@ -770,7 +729,7 @@
                 const peakHour = Object.keys(hourCounts).reduce((a, b) => hourCounts[a] > hourCounts[b] ? a : b, '-');
                 document.getElementById('metricPeakHour').textContent = peakHour !== '-' ? `${peakHour} (${hourCounts[peakHour]})` : '-';
                 
-                // Distribución por día (todas las reservas, incluyendo canceladas)
+                // Distribución por día (todas)
                 const allDayCounts = {};
                 monthReservations.forEach(r => {
                     const partesFecha = r.fecha.split(' ');
