@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Firebase SDKs (versión compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
     <style>
         /* ===== ESTILOS BASE ===== */
         * {
@@ -762,8 +765,19 @@
 
     <script>
         (function() {
-            // ===== CONFIGURACIÓN =====
-            const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwDFvAKsIT2tVmuIWcyJ3duNBNCDEriYuCvDOBATRyTatUJNkSiAmQH3xisg3v74srM1g/exec';
+            // ===== CONFIGURACIÓN DE FIREBASE =====
+            const firebaseConfig = {
+                apiKey: "AIzaSyBCXprwlz801V0co99vpWwm17WUbWYGkk8",
+                authDomain: "reservascitas1.firebaseapp.com",
+                projectId: "reservascitas1",
+                storageBucket: "reservascitas1.firebasestorage.app",
+                messagingSenderId: "766960713190",
+                appId: "1:766960713190:web:adbaa9a25ae3cf0c896a27"
+            };
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+
+            // ===== CONFIGURACIÓN GENERAL =====
             const TIMEZONE = 'America/Argentina/Buenos_Aires';
 
             const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
@@ -791,6 +805,7 @@
             const popupCloseBtn = document.getElementById('popupCloseBtn');
             const updateIndicator = document.getElementById('updateIndicator');
 
+            // ===== COOKIES =====
             function setCookie(name, value, days) {
                 var date = new Date();
                 date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -814,36 +829,46 @@
                 document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             }
 
-            async function saveToGoogleSheets(data) {
+            // ===== FUNCIONES DE FIREBASE =====
+            async function saveToFirestore(data) {
                 try {
-                    var response = await fetch(GOOGLE_SHEETS_URL, {
-                        method: 'POST',
-                        body: JSON.stringify(data),
-                        redirect: 'follow'
+                    await db.collection('reservas').add({
+                        fecha: data.fecha,
+                        hora: data.hora,
+                        nombre: data.nombre,
+                        email: data.email,
+                        telefono: data.telefono,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    var result = await response.json();
-                    return result;
+                    return { success: true };
                 } catch (error) {
-                    console.error('Error al guardar:', error);
+                    console.error('Error al guardar en Firestore:', error);
                     return { success: false, error: error.message };
                 }
             }
 
-            async function loadReservationsFromSheets() {
+            async function loadReservationsFromFirestore() {
                 try {
-                    var response = await fetch(GOOGLE_SHEETS_URL, {
-                        method: 'GET',
-                        redirect: 'follow'
+                    const snapshot = await db.collection('reservas').get();
+                    const reservas = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        reservas.push({
+                            fecha: data.fecha,
+                            hora: data.hora,
+                            nombre: data.nombre,
+                            email: data.email,
+                            telefono: data.telefono
+                        });
                     });
-                    if (!response.ok) throw new Error('Error al cargar reservas');
-                    var result = await response.json();
-                    return result.success ? result.reservas || [] : [];
+                    return reservas;
                 } catch (error) {
-                    console.error('Error al cargar reservas:', error);
+                    console.error('Error al cargar reservas desde Firestore:', error);
                     return [];
                 }
             }
 
+            // ===== FUNCIONES DE FECHAS (sin cambios) =====
             function saveFormDataToCookies() {
                 var nombre = nombreInput.value.trim();
                 var email = emailInput.value.trim();
@@ -1049,20 +1074,20 @@
             async function autoRefreshReservations() {
                 if (popupOverlay.classList.contains('show')) return;
                 if (isAutoUpdating) return;
-                
+
                 isAutoUpdating = true;
                 updateIndicator.classList.add('show');
                 const startTime = Date.now();
 
                 try {
-                    var reservas = await loadReservationsFromSheets();
+                    var reservas = await loadReservationsFromFirestore();
                     updateTableWithReservations(reservas);
                 } catch (error) {
                     console.error('Error en actualización automática:', error);
                 } finally {
                     const elapsed = Date.now() - startTime;
                     const remaining = Math.max(0, MIN_INDICATOR_DURATION - elapsed);
-                    
+
                     setTimeout(function() {
                         updateIndicator.classList.remove('show');
                         isAutoUpdating = false;
@@ -1073,7 +1098,7 @@
             async function renderTable() {
                 updateIndicator.classList.add('show');
                 const startTime = Date.now();
-                
+
                 var today = getToday();
 
                 var headerHtml = '<th>Hora</th>';
@@ -1163,7 +1188,7 @@
                 weekLabel.textContent = monthName + ' ' + currentWeekStart.getFullYear();
 
                 try {
-                    var reservas = await loadReservationsFromSheets();
+                    var reservas = await loadReservationsFromFirestore();
                     updateTableWithReservations(reservas);
                 } catch (error) {
                     console.error('Error al cargar reservas:', error);
@@ -1187,7 +1212,7 @@
                 }
 
                 updateFeedback();
-                
+
                 const elapsed = Date.now() - startTime;
                 const remaining = Math.max(0, MIN_INDICATOR_DURATION - elapsed);
                 setTimeout(function() {
@@ -1195,6 +1220,7 @@
                 }, remaining);
             }
 
+            // ===== EVENT LISTENERS (sin cambios) =====
             nombreInput.addEventListener('input', saveFormDataToCookies);
             emailInput.addEventListener('input', saveFormDataToCookies);
             telefonoInput.addEventListener('input', saveFormDataToCookies);
@@ -1269,7 +1295,7 @@
                     var hora = parts[2];
 
                     var data = { fecha: fecha, hora: hora, nombre: nombre, email: email, telefono: telefono };
-                    var result = await saveToGoogleSheets(data);
+                    var result = await saveToFirestore(data);
 
                     if (result.success) {
                         saveFormDataToCookies();
@@ -1288,6 +1314,7 @@
                 }
             });
 
+            // ===== INICIALIZACIÓN =====
             loadFormDataFromCookies();
             renderTable();
 
