@@ -260,18 +260,18 @@
                         </svg>
                         <div class="donut-center">
                             <div class="percentage" id="occupancyPercentage">0%</div>
-                            <div class="label">Ocupación</div>
+                            <div class="label" id="capacityLabel">Capacidad: 0 slots</div>
                         </div>
                     </div>
                     <div class="chart-legend">
                         <div class="legend-item">
                             <div class="legend-color" style="background: #d4af37;"></div>
-                            <span class="legend-label">Reservas ocupadas (Activas + Futuras + Pasadas)</span>
+                            <span class="legend-label">Ocupadas (Activas + Futuras + Pasadas)</span>
                             <span class="legend-value" id="legendActivas">0</span>
                         </div>
                         <div class="legend-item">
                             <div class="legend-color" style="background: #333;"></div>
-                            <span class="legend-label">Disponibles (Libres)</span>
+                            <span class="legend-label">Libres</span>
                             <span class="legend-value" id="legendDisponibles">0</span>
                         </div>
                         <div class="legend-item">
@@ -291,7 +291,7 @@
                         <div class="metric-card">
                             <div class="metric-icon"><i class="fas fa-calendar-day"></i></div>
                             <div class="metric-value" id="metricDaysInMonth">0</div>
-                            <div class="metric-label">Días del mes</div>
+                            <div class="metric-label">Días hábiles (Lun-Sáb)</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-icon"><i class="fas fa-fire"></i></div>
@@ -379,7 +379,7 @@
             let stats = { total:0, activas:0, canceladas:0, futuras:0, pasadas:0 };
             let selectedMonth = new Date();
             let currentUser = null;
-            let unsubscribe = null; // Para cancelar el listener en tiempo real
+            let unsubscribe = null;
 
             // ===== LOGIN =====
             document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -402,7 +402,6 @@
                         document.getElementById('loginScreen').style.display = 'none';
                         document.getElementById('adminPanel').style.display = 'block';
                         document.getElementById('userEmailDisplay').innerHTML = `Hola, <strong>${currentUser.email}</strong>`;
-                        // Iniciar listener en tiempo real
                         startRealtimeListener();
                     })
                     .catch((error) => {
@@ -424,7 +423,7 @@
             // ===== LISTENER EN TIEMPO REAL =====
             function startRealtimeListener() {
                 if (unsubscribe) {
-                    unsubscribe(); // Limpiar listener anterior
+                    unsubscribe();
                 }
                 const tbody = document.getElementById('reservasBody');
                 tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Conectando a Firestore...</td></tr>';
@@ -656,7 +655,6 @@
                 if (!confirm('¿Cancelar esta reserva?')) return;
                 try {
                     await db.collection('citas').doc(id).update({ estado: 'CANCELADA' });
-                    // El listener actualiza automáticamente
                 } catch (err) {
                     console.error(err);
                     alert('Error al cancelar. Verifica permisos.');
@@ -772,7 +770,6 @@
                 try {
                     await db.collection('citas').doc(id).update({ fecha: fecha, hora: hora });
                     closeRescheduleModal();
-                    // El listener actualizará automáticamente
                 } catch (err) {
                     console.error(err);
                     alert('Error al reagendar. Verifica permisos.');
@@ -790,42 +787,49 @@
                 if (e.key === 'Escape') closeRescheduleModal();
             });
 
-            // ===== DASHBOARD MENSUAL (con nuevo cálculo de ocupación) =====
+            // ===== DASHBOARD MENSUAL (con nueva lógica de capacidad y gráfico) =====
             function updateMonthlyDashboard() {
                 const year = selectedMonth.getFullYear();
                 const month = selectedMonth.getMonth();
                 document.getElementById('currentMonthLabel').textContent = `${MONTH_NAMES[month]} ${year}`;
                 
-                // Filtrar reservas del mes seleccionado
+                // Calcular días hábiles (Lun-Sáb) del mes seleccionado
+                let diasHabiles = 0;
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
+                    const dow = d.getDay();
+                    if (dow >= 1 && dow <= 6) { // Lunes(1) a Sábado(6)
+                        diasHabiles++;
+                    }
+                }
+                const capacidadTotal = diasHabiles * HOURS_PER_DAY;
+                
+                // Reservas del mes
                 const monthReservations = allReservations.filter(r => {
                     const d = parseReservaDate(r.fecha, r.hora);
                     return d && d.getMonth() === month && d.getFullYear() === year;
                 });
                 
-                const daysInMonth = new Date(year, month+1, 0).getDate();
-                const totalSlots = daysInMonth * HOURS_PER_DAY;
-                
                 const activas = monthReservations.filter(r => r.estado === 'ACTIVA').length;
                 const canceladas = monthReservations.filter(r => r.estado === 'CANCELADA').length;
-                const totalReservas = activas + canceladas; // todas las reservas del mes
+                const libres = capacidadTotal - activas; // las canceladas no ocupan slots
                 
-                // NUEVO CÁLCULO: ocupación = activas / (activas + canceladas) * 100
-                const occupancyPercentage = totalReservas > 0 ? Math.round((activas / totalReservas) * 100) : 0;
-                
-                // Disponibles (slots libres) solo para referencia, no afectan el porcentaje
-                const disponibles = totalSlots - activas;
+                // Porcentaje de ocupación = activas / capacidad * 100
+                const occupancyPercentage = capacidadTotal > 0 ? Math.round((activas / capacidadTotal) * 100) : 0;
                 
                 updateDonutChart(occupancyPercentage);
                 
                 document.getElementById('legendActivas').textContent = activas;
                 document.getElementById('legendCanceladas').textContent = canceladas;
-                document.getElementById('legendDisponibles').textContent = disponibles;
+                document.getElementById('legendDisponibles').textContent = libres;
                 document.getElementById('occupancyPercentage').textContent = occupancyPercentage + '%';
+                document.getElementById('capacityLabel').textContent = `Capacidad: ${capacidadTotal} slots (${diasHabiles} días)`;
                 
                 document.getElementById('metricTotalMonth').textContent = monthReservations.length;
-                document.getElementById('metricDaysInMonth').textContent = daysInMonth;
+                document.getElementById('metricDaysInMonth').textContent = diasHabiles;
                 
-                // Día más ocupado de la semana actual (sin cambios)
+                // Día más ocupado de la semana actual
                 const now = new Date();
                 const dayOfWeek = now.getDay();
                 const diffToMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
@@ -855,7 +859,7 @@
                 }
                 document.getElementById('metricPeakDay').textContent = peakDayText;
                 
-                // Hora pico (sin cambios)
+                // Hora pico
                 const hourCounts = {};
                 monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
                     hourCounts[r.hora] = (hourCounts[r.hora] || 0) + 1;
@@ -863,7 +867,7 @@
                 const peakHour = Object.keys(hourCounts).reduce((a,b) => hourCounts[a] > hourCounts[b] ? a : b, '-');
                 document.getElementById('metricPeakHour').textContent = peakHour !== '-' ? `${peakHour} (${hourCounts[peakHour]})` : '-';
                 
-                // Distribución por día (sin cambios)
+                // Distribución por día
                 const allDayCounts = {};
                 monthReservations.forEach(r => {
                     const partesFecha = r.fecha.split(' ');
