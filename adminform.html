@@ -9,7 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
-        /* ===== ESTILOS COMPLETOS (igual que antes) ===== */
+        /* ===== ESTILOS COMPLETOS (los mismos que antes) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
         body { background: #1a1a1a; min-height: 100vh; padding: 0.8rem 0.5rem; color: #e8e8e8; }
         .container { max-width: 1200px; margin: 0 auto; }
@@ -204,7 +204,7 @@
             <div class="stat-card"><span class="number" id="statCanceladas">0</span><span class="label">Canceladas</span></div>
         </div>
 
-        <!-- Toolbar (sin botón Actualizar) -->
+        <!-- Toolbar -->
         <div class="toolbar">
             <div class="toolbar-left">
                 <button class="filter-btn active" data-filter="all">Todas</button>
@@ -379,7 +379,7 @@
             let stats = { total:0, activas:0, canceladas:0, futuras:0, pasadas:0 };
             let selectedMonth = new Date();
             let currentUser = null;
-            let unsubscribe = null; // Para la escucha en tiempo real
+            let unsubscribe = null; // Para cancelar el listener
 
             // ===== LOGIN =====
             document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -402,7 +402,7 @@
                         document.getElementById('loginScreen').style.display = 'none';
                         document.getElementById('adminPanel').style.display = 'block';
                         document.getElementById('userEmailDisplay').innerHTML = `Hola, <strong>${currentUser.email}</strong>`;
-                        // Iniciar la escucha en tiempo real
+                        // Iniciar listener en tiempo real
                         startRealtimeListener();
                     })
                     .catch((error) => {
@@ -424,38 +424,37 @@
             // ===== LISTENER EN TIEMPO REAL =====
             function startRealtimeListener() {
                 if (unsubscribe) {
-                    unsubscribe(); // Cancelar escucha anterior si existe
+                    unsubscribe(); // Limpiar listener anterior
                 }
-                // Mostrar loading
-                document.getElementById('reservasBody').innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Cargando reservas...</td></tr>';
+                const tbody = document.getElementById('reservasBody');
+                tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Conectando a Firestore...</td></tr>';
 
-                unsubscribe = db.collection('citas')
-                    .onSnapshot((snapshot) => {
-                        const reservas = [];
-                        snapshot.forEach(doc => {
-                            const data = doc.data();
-                            reservas.push({
-                                id: doc.id,
-                                fecha: data.fecha || '',
-                                hora: data.hora || '',
-                                nombre: data.nombre || '',
-                                email: data.email || '',
-                                telefono: data.telefono || '',
-                                estado: data.estado || 'ACTIVA',
-                                servicio: data.servicio || 'Consulta',
-                                fechaReserva: data.createdAt ? data.createdAt.toDate().toISOString() : new Date().toISOString()
-                            });
+                unsubscribe = db.collection('citas').onSnapshot((snapshot) => {
+                    const reservas = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        reservas.push({
+                            id: doc.id,
+                            fecha: data.fecha || '',
+                            hora: data.hora || '',
+                            nombre: data.nombre || '',
+                            email: data.email || '',
+                            telefono: data.telefono || '',
+                            estado: data.estado || 'ACTIVA',
+                            servicio: data.servicio || 'Consulta',
+                            fechaReserva: data.createdAt ? data.createdAt.toDate().toISOString() : new Date().toISOString()
                         });
-                        allReservations = reservas;
-                        calculateStats();
-                        renderData();
-                    }, (error) => {
-                        console.error('Error en tiempo real:', error);
-                        document.getElementById('reservasBody').innerHTML = '<tr><td colspan="7" class="empty-state">Error al cargar datos en tiempo real. Verifica conexión.</td></tr>';
                     });
+                    allReservations = reservas;
+                    calculateStats();
+                    renderData();
+                }, (error) => {
+                    console.error('Error en listener:', error);
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Error al conectar con Firestore. Verifica permisos.</td></tr>';
+                });
             }
 
-            // ===== FUNCIONES DE CÁLCULO Y RENDERIZADO =====
+            // ===== FUNCIONES =====
             function calculateStats() {
                 const now = new Date();
                 stats.total = allReservations.length;
@@ -655,34 +654,34 @@
 
             window.cancelReservation = async function(id) {
                 if (!confirm('¿Cancelar esta reserva?')) return;
-                await updateEstado(id, 'CANCELADA');
+                try {
+                    await db.collection('citas').doc(id).update({ estado: 'CANCELADA' });
+                    // El listener se encargará de actualizar
+                } catch (err) {
+                    console.error(err);
+                    alert('Error al cancelar. Verifica permisos.');
+                }
             };
 
             window.reactivate = async function(id) {
                 if (!confirm('¿Reactivar esta reserva?')) return;
-                await updateEstado(id, 'ACTIVA');
+                try {
+                    await db.collection('citas').doc(id).update({ estado: 'ACTIVA' });
+                } catch (err) {
+                    console.error(err);
+                    alert('Error al reactivar. Verifica permisos.');
+                }
             };
 
             window.deleteReservation = async function(id) {
                 if (!confirm('⚠️ ¿Estás seguro de que quieres ELIMINAR esta reserva permanentemente?\nEsta acción no se puede deshacer.')) return;
                 try {
                     await db.collection('citas').doc(id).delete();
-                    // La escucha en tiempo real se encargará de actualizar la vista
                 } catch (err) {
                     console.error(err);
-                    alert('Error al eliminar la reserva. Verifica permisos.');
+                    alert('Error al eliminar. Verifica permisos.');
                 }
             };
-
-            async function updateEstado(id, estado) {
-                try {
-                    await db.collection('citas').doc(id).update({ estado: estado });
-                    // La escucha en tiempo real se encargará de actualizar la vista
-                } catch (err) {
-                    console.error(err);
-                    alert('Error al actualizar. Verifica permisos.');
-                }
-            }
 
             // ===== REAGENDAR =====
             window.openRescheduleModal = function(id) {
@@ -705,7 +704,6 @@
                 select.innerHTML = '<option value="">Cargando...</option>';
                 try {
                     const now = new Date();
-                    // Usamos una lectura única para obtener los ocupados
                     const snapshot = await db.collection('citas').get();
                     const ocupados = new Set();
                     snapshot.forEach(doc => {
@@ -774,7 +772,7 @@
                 try {
                     await db.collection('citas').doc(id).update({ fecha: fecha, hora: hora });
                     closeRescheduleModal();
-                    // La escucha en tiempo real actualizará la vista
+                    // El listener actualizará automáticamente
                 } catch (err) {
                     console.error(err);
                     alert('Error al reagendar. Verifica permisos.');
@@ -792,29 +790,42 @@
                 if (e.key === 'Escape') closeRescheduleModal();
             });
 
-            // ===== DASHBOARD MENSUAL =====
+            // ===== DASHBOARD MENSUAL (con nuevo cálculo de ocupación) =====
             function updateMonthlyDashboard() {
                 const year = selectedMonth.getFullYear();
                 const month = selectedMonth.getMonth();
                 document.getElementById('currentMonthLabel').textContent = `${MONTH_NAMES[month]} ${year}`;
+                
+                // Filtrar reservas del mes seleccionado
                 const monthReservations = allReservations.filter(r => {
                     const d = parseReservaDate(r.fecha, r.hora);
                     return d && d.getMonth() === month && d.getFullYear() === year;
                 });
+                
                 const daysInMonth = new Date(year, month+1, 0).getDate();
                 const totalSlots = daysInMonth * HOURS_PER_DAY;
+                
                 const activas = monthReservations.filter(r => r.estado === 'ACTIVA').length;
                 const canceladas = monthReservations.filter(r => r.estado === 'CANCELADA').length;
+                const totalReservas = activas + canceladas; // todas las reservas del mes (excluyendo las que no existen)
+                
+                // Nuevo cálculo: porcentaje de ocupación basado en reservas activas vs total de reservas
+                const occupancyPercentage = totalReservas > 0 ? Math.round((activas / totalReservas) * 100) : 0;
+                
+                // Los disponibles (slots libres) se mantienen para referencia, pero no se usan en el porcentaje
                 const disponibles = totalSlots - activas;
-                const occupancyPercentage = totalSlots > 0 ? Math.round((activas / totalSlots) * 100) : 0;
+                
                 updateDonutChart(occupancyPercentage);
+                
                 document.getElementById('legendActivas').textContent = activas;
                 document.getElementById('legendCanceladas').textContent = canceladas;
                 document.getElementById('legendDisponibles').textContent = disponibles;
                 document.getElementById('occupancyPercentage').textContent = occupancyPercentage + '%';
+                
                 document.getElementById('metricTotalMonth').textContent = monthReservations.length;
                 document.getElementById('metricDaysInMonth').textContent = daysInMonth;
-                // Día más ocupado de la semana actual
+                
+                // Día más ocupado de la semana actual (sin cambios)
                 const now = new Date();
                 const dayOfWeek = now.getDay();
                 const diffToMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
@@ -843,14 +854,16 @@
                     peakDayText = `${dayWithMax} (${maxCount})`;
                 }
                 document.getElementById('metricPeakDay').textContent = peakDayText;
-                // Hora pico
+                
+                // Hora pico (sin cambios)
                 const hourCounts = {};
                 monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
                     hourCounts[r.hora] = (hourCounts[r.hora] || 0) + 1;
                 });
                 const peakHour = Object.keys(hourCounts).reduce((a,b) => hourCounts[a] > hourCounts[b] ? a : b, '-');
                 document.getElementById('metricPeakHour').textContent = peakHour !== '-' ? `${peakHour} (${hourCounts[peakHour]})` : '-';
-                // Distribución por día
+                
+                // Distribución por día (sin cambios)
                 const allDayCounts = {};
                 monthReservations.forEach(r => {
                     const partesFecha = r.fecha.split(' ');
@@ -928,6 +941,11 @@
                 }).catch(console.error);
             };
 
+            // Exponer funciones para acciones manuales (opcional)
+            window.loadData = function() {
+                // No es necesario, pero se mantiene por compatibilidad
+                console.log('Los datos se actualizan automáticamente en tiempo real.');
+            };
         })();
     </script>
 </body>
