@@ -156,17 +156,17 @@
                     <div class="form-grid">
                         <div class="field-group">
                             <label for="nombre"><i class="far fa-user"></i> Nombre</label>
-                            <input type="text" id="nombre" placeholder="Ej: Ana Pérez" autocomplete="off" required>
+                            <input type="text" id="nombre" placeholder="Ej: Ana Pérez" autocomplete="name" required>
                             <span class="hint">Nombre completo</span>
                         </div>
                         <div class="field-group">
                             <label for="email"><i class="far fa-envelope"></i> Email</label>
-                            <input type="email" id="email" placeholder="ejemplo@email.com" autocomplete="off" required>
+                            <input type="email" id="email" placeholder="ejemplo@email.com" autocomplete="email" required>
                             <span class="hint">Correo electrónico</span>
                         </div>
                         <div class="field-group">
                             <label for="telefono"><i class="fas fa-phone-alt"></i> Teléfono</label>
-                            <input type="tel" id="telefono" placeholder="+34 600 000 000" autocomplete="off" required>
+                            <input type="tel" id="telefono" placeholder="+34 600 000 000" autocomplete="tel" required>
                             <span class="hint">Incluye código de país</span>
                         </div>
                         <div class="btn-wrapper">
@@ -390,6 +390,27 @@
                 window.open(url, '_blank');
             }
 
+            // === LIMPIAR FORMULARIO Y COOKIES ===
+            function clearFormAndCookies() {
+                // Vaciar campos
+                nombreInput.value = '';
+                emailInput.value = '';
+                telefonoInput.value = '';
+                // Desmarcar radio
+                var checkedRadio = document.querySelector('input[name="slot"]:checked');
+                if (checkedRadio) {
+                    checkedRadio.checked = false;
+                }
+                // Ocultar mensaje de selección
+                selectedDisplay.classList.remove('show');
+                // Eliminar cookies de reserva (excepto cookies_aceptadas)
+                var cookiesToDelete = ['reserva_nombre', 'reserva_email', 'reserva_telefono', 'reserva_horario'];
+                cookiesToDelete.forEach(function(name) {
+                    deleteCookie(name);
+                });
+            }
+
+            // ===== FUNCIONES DE FECHAS Y TABLA =====
             function getDatePartsInTimezone(date) {
                 const formatter = new Intl.DateTimeFormat('en-GB', {
                     timeZone: TIMEZONE,
@@ -679,9 +700,13 @@
                     var result = await saveToFirestore(data);
 
                     if (result.success) {
+                        // Guardar cookies (por si acaso) pero luego limpiar
                         saveFormDataToCookies();
                         sendWhatsAppMessage(nombre, email, telefono, selected.value);
                         showConfirmationPopup(nombre, email, telefono, selected.value);
+                        // Limpiar formulario y cookies DESPUÉS de mostrar el popup
+                        clearFormAndCookies();
+                        // Recargar tabla para reflejar la nueva reserva
                         setTimeout(function() { renderTable(); }, 2000);
                     } else {
                         alert('❌ Error al guardar la reserva: ' + (result.error || 'Intenta nuevamente.'));
