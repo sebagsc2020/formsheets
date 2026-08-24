@@ -10,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
-        /* ===== ESTILOS BASE (iguales a los tuyos) ===== */
+        /* ===== ESTILOS BASE ===== */
         * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, sans-serif; }
         body { background: #1a1a1a; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:2rem 1rem; }
         .card { max-width:1200px; width:100%; background:#2a2a2a; border-radius:8px; box-shadow:0 20px 40px rgba(0,0,0,0.6); padding:2rem; border:1px solid #3a3a3a; }
@@ -224,16 +224,15 @@
                 .then(() => {
                     console.log('✅ Autenticación anónima exitosa');
                     authReady = true;
-                    // Una vez autenticado, cargamos la tabla
                     loadFormDataFromCookies();
                     renderTable();
-                    // Iniciamos los event listeners de navegación (ya están definidos)
                 })
                 .catch((error) => {
                     console.error('❌ Error en auth anónima:', error);
                     authError = error;
-                    alert('No se pudo autenticar con Firebase. Las reservas no funcionarán. Revisa las reglas de Firestore.');
-                    // Intentamos cargar igual (por si las reglas son abiertas)
+                    // Si falla la autenticación, mostramos mensaje pero intentamos cargar igual
+                    // (esto solo funciona si las reglas son abiertas, pero es mejor que nada)
+                    alert('⚠️ No se pudo autenticar con Firebase. Las reservas no se guardarán.');
                     loadFormDataFromCookies();
                     renderTable();
                 });
@@ -293,7 +292,7 @@
                         nombre: data.nombre,
                         email: data.email,
                         telefono: data.telefono,
-                        estado: 'ACTIVA',   // Cambiado de 'pendiente' a 'ACTIVA' para que coincida con el panel admin
+                        estado: 'ACTIVA',   // ← Estado correcto para el panel de admin
                         servicio: 'Consulta',
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
@@ -329,7 +328,7 @@
                 }
             }
 
-            // ===== FUNCIONES DE FECHAS =====
+            // ===== FUNCIONES DE FECHAS Y COOKIES =====
             function saveFormDataToCookies() {
                 var nombre = nombreInput.value.trim();
                 var email = emailInput.value.trim();
@@ -543,7 +542,6 @@
             }
 
             async function renderTable() {
-                // Mostrar mensaje de carga
                 tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Cargando horarios...</td></tr>';
                 
                 var today = getToday();
@@ -625,13 +623,11 @@
                 var monthName = getMonthName(currentWeekStart.getMonth());
                 weekLabel.textContent = monthName + ' ' + currentWeekStart.getFullYear();
 
-                // Cargar reservas desde Firestore
                 try {
                     var reservas = await loadReservationsFromFirestore();
                     updateTableWithReservations(reservas);
                 } catch (error) {
                     console.error('Error al cargar reservas:', error);
-                    // Si falla, mostramos un mensaje en la tabla
                     tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-exclamation-triangle"></i><br>Error al cargar horarios. Verifica tu conexión.</td></tr>';
                 }
 
@@ -746,21 +742,9 @@
             });
 
             // ===== INICIALIZACIÓN =====
-            // La inicialización se hace después de la autenticación (dentro del .then y .catch de auth)
-            // Pero también llamamos a loadFormDataFromCookies() para cargar las cookies aunque la autenticación falle.
-            // Ya se llama desde auth.then y auth.catch.
-
-            // Ocultar el aviso de cookies si ya están aceptadas
             if (getCookie('cookies_aceptadas') === 'true') {
                 document.getElementById('cookieNotice').style.display = 'none';
             }
-
-            // Si después de 3 segundos la autenticación no ha respondido, intentamos cargar de todas formas
-            setTimeout(function() {
-                if (!authReady && !authError) {
-                    // Aún no hay respuesta, pero no hacemos nada, esperamos.
-                }
-            }, 3000);
 
         })();
     </script>
