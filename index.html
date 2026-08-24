@@ -2,213 +2,206 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ===== RESET Y BASE ===== */
+        /* ===== ESTILOS BASE ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
         }
-        html, body {
-            height: 100%;
-            overflow: hidden; /* Sin scroll en ningún lado */
-            background: #1a1a1a;
-        }
         body {
+            background: #1a1a1a;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 0.5rem;
+            padding: 2rem 1rem;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        body::-webkit-scrollbar {
+            display: none;
         }
 
-        /* ===== CARD ===== */
         .card {
-            max-width: 1400px;
+            max-width: 1200px;
             width: 100%;
-            height: 100vh; /* Ocupa toda la altura */
-            max-height: 100vh;
             background: #2a2a2a;
             border-radius: 8px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-            padding: 0.8rem 1.2rem;
+            padding: 2rem;
             border: 1px solid #3a3a3a;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* Evita desbordes */
         }
 
-        /* ===== HEADER ===== */
         h1 {
-            font-size: clamp(1.2rem, 2.5vw, 2rem);
+            font-size: 1.9rem;
             font-weight: 600;
             color: #e8e8e8;
+            margin-bottom: 0.3rem;
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            gap: 8px;
-            flex-shrink: 0;
-            margin-bottom: 0.15rem;
+            gap: 12px;
         }
         h1 i { color: #d4af37; }
         .update-indicator {
             display: none;
             align-items: center;
-            gap: 4px;
-            font-size: 0.6rem;
+            gap: 6px;
+            font-size: 0.75rem;
             color: #999999;
-            padding: 0.1rem 0.5rem;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            padding: 0.2rem 0.8rem;
             background: #262626;
             border-radius: 4px;
             border: 1px solid #3a3a3a;
         }
         .update-indicator.show { display: inline-flex; }
         .update-indicator i {
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             color: #d4af37;
             animation: clockPulse 1.2s ease-in-out infinite;
+        }
+        .update-indicator span {
+            font-size: 0.7rem;
+            color: #aaaaaa;
         }
         @keyframes clockPulse {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.4; transform: scale(0.85); }
         }
 
-        /* ===== COOKIE NOTICE ===== */
         .cookie-notice {
             background: #333333;
             border: 1px solid #444444;
             border-radius: 4px;
-            padding: 0.2rem 0.8rem;
-            margin-bottom: 0.3rem;
+            padding: 0.6rem 1rem;
+            margin-bottom: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 0.4rem;
-            flex-shrink: 0;
+            gap: 0.8rem;
         }
-        .cookie-notice p {
-            color: #c0c0c0;
-            font-size: clamp(0.6rem, 0.9vw, 0.8rem);
-            margin: 0;
-        }
-        .cookie-notice p i { color: #888888; margin-right: 6px; }
+        .cookie-notice p { color: #c0c0c0; font-size: 0.85rem; margin: 0; }
+        .cookie-notice p i { color: #888888; margin-right: 8px; }
         .cookie-notice .cookie-btn {
             background: #444444;
             border: 1px solid #555555;
             color: #e0e0e0;
-            padding: 0.1rem 0.8rem;
+            padding: 0.3rem 1rem;
             border-radius: 4px;
             cursor: pointer;
-            font-size: clamp(0.55rem, 0.8vw, 0.7rem);
+            font-size: 0.8rem;
             transition: 0.15s;
         }
         .cookie-notice .cookie-btn:hover { background: #555555; border-color: #666666; }
 
-        /* ===== NAVEGACIÓN SEMANAL ===== */
         .week-navigation {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.2rem;
+            gap: 0.8rem;
+            margin-bottom: 0.5rem;
             flex-wrap: wrap;
             justify-content: space-between;
-            flex-shrink: 0;
         }
-        .week-nav-buttons { display: flex; gap: 0.3rem; }
+        .week-nav-buttons { display: flex; gap: 0.4rem; }
         .week-nav-buttons button {
             background: #333333;
             border: 1px solid #444444;
             border-radius: 4px;
-            padding: 0.1rem 0.6rem;
+            padding: 0.25rem 0.8rem;
             font-weight: 500;
             color: #d0d0d0;
             cursor: pointer;
             transition: 0.15s;
-            font-size: clamp(0.6rem, 0.9vw, 0.8rem);
+            font-size: 0.8rem;
             display: inline-flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
         }
         .week-nav-buttons button:hover { background: #3d3d3d; border-color: #555555; }
-        .week-nav-buttons button i { font-size: 0.6rem; color: #888888; }
+        .week-nav-buttons button i { font-size: 0.7rem; color: #888888; }
         .week-label {
             font-weight: 600;
             color: #e0e0e0;
             background: #333333;
-            padding: 0.1rem 0.8rem;
+            padding: 0.2rem 0.8rem;
             border-radius: 4px;
-            font-size: clamp(0.7rem, 1vw, 0.9rem);
+            font-size: 0.85rem;
             border: 1px solid #444444;
         }
 
-        /* ===== MENSAJE DE SELECCIÓN ===== */
+        /* ===== MENSAJE DE HORARIO SELECCIONADO ===== */
         .selected-display {
             background: #1f1f1f;
-            padding: 0.15rem 0.8rem;
+            padding: 0.4rem 1rem;
             border-radius: 4px;
-            font-size: clamp(0.7rem, 1vw, 0.9rem);
+            font-size: 0.9rem;
             color: #b0b0b0;
             border: 1px solid #444444;
             display: none;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            margin-bottom: 0.2rem;
+            gap: 8px;
+            margin-bottom: 0.7rem;
             width: 100%;
             text-align: center;
-            min-height: 28px;
-            flex-shrink: 0;
+            min-height: 36px;
         }
-        .selected-display.show { display: flex; }
+        .selected-display.show {
+            display: flex;
+        }
         .selected-display i {
             color: #4caf50;
-            font-size: clamp(0.8rem, 1.1vw, 1rem);
+            font-size: 1rem;
         }
         .selected-display .selected-text {
             color: #e0e0e0;
             font-weight: 500;
             background: #2d2d2d;
-            padding: 0 0.5rem;
+            padding: 0 0.6rem;
             border-radius: 4px;
             border: 1px solid #3d3d3d;
         }
+        .selected-display .label-text {
+            color: #9a9a9a;
+            font-weight: 400;
+        }
 
-        /* ===== LAYOUT DOS COLUMNAS ===== */
+        /* ===== LAYOUT DE DOS COLUMNAS ===== */
         .two-column-layout {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.8rem;
-            flex: 1 1 auto;
-            min-height: 0; /* Evita desborde */
-            margin-top: 0.1rem;
+            gap: 1.2rem;
+            align-items: stretch;
+            margin-top: 0.2rem;
         }
         .left-col {
             flex: 2;
-            min-width: 280px;
-            display: flex;
-            flex-direction: column;
+            min-width: 300px;
         }
         .right-col {
             flex: 1;
-            min-width: 200px;
+            min-width: 240px;
             display: flex;
             flex-direction: column;
         }
 
-        /* ===== TABLA COMPACTA Y CON FUENTE MÁS GRANDE ===== */
+        /* ===== TABLA COMPACTA ===== */
         .table-responsive {
             overflow-x: auto;
             border-radius: 4px;
             border: 1px solid #3a3a3a;
             background: #222222;
-            flex: 1 1 auto;
-            min-height: 0;
             scrollbar-width: none;
             -ms-overflow-style: none;
+            height: 100%; /* para que ocupe todo el alto disponible */
         }
         .table-responsive::-webkit-scrollbar {
             display: none;
@@ -217,20 +210,20 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: clamp(0.75rem, 1.1vw, 1rem); /* Letra más grande */
-            min-width: 400px;
+            font-size: 0.75rem; /* reducido */
+            min-width: 450px;
             background: #222222;
         }
         th {
             background: #2a2a2a;
             color: #d0d0d0;
             font-weight: 600;
-            padding: 0.1rem 0.2rem;
+            padding: 0.25rem 0.3rem;
             text-align: center;
             border-bottom: 2px solid #3a3a3a;
-            font-size: clamp(0.65rem, 1vw, 0.9rem);
+            font-size: 0.7rem;
         }
-        th:first-child { min-width: 45px; padding: 0.1rem 0.1rem; }
+        th:first-child { min-width: 50px; padding: 0.25rem 0.1rem; }
         th.today-header { background: #3d3d3d; position: relative; }
         th.today-header::after {
             content: '●';
@@ -240,7 +233,7 @@
             vertical-align: super;
         }
         td {
-            padding: 0.08rem 0.05rem;
+            padding: 0.12rem 0.08rem;
             text-align: center;
             border-bottom: 1px solid #333333;
             vertical-align: middle;
@@ -260,7 +253,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: #ff4444;
-            font-size: clamp(0.7rem, 1vw, 0.9rem);
+            font-size: 0.8rem;
             font-weight: bold;
             opacity: 0.9;
         }
@@ -278,21 +271,21 @@
             font-weight: 500;
             color: #c0c0c0;
             background: #262626;
-            font-size: clamp(0.6rem, 0.9vw, 0.8rem);
-            padding: 0.05rem 0.02rem;
+            font-size: 0.7rem;
+            padding: 0.1rem 0.02rem;
         }
-        .time-slot i { margin-right: 2px; color: #777777; font-size: 0.6rem; }
+        .time-slot i { margin-right: 2px; color: #777777; font-size: 0.65rem; }
         .slot-cell {
             position: relative;
-            height: clamp(18px, 2.5vh, 26px);
+            height: 22px; /* reducido */
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .slot-cell input[type="radio"] {
             appearance: none;
-            width: clamp(12px, 1.5vw, 16px);
-            height: clamp(12px, 1.5vw, 16px);
+            width: 14px;
+            height: 14px;
             border: 2px solid #555555;
             border-radius: 50%;
             outline: none;
@@ -332,20 +325,20 @@
             font-weight: 500;
             color: #b0b0b0;
             letter-spacing: 0.5px;
-            padding: 0.08rem 0.02rem;
+            padding: 0.15rem 0.02rem;
             border-bottom: 2px solid #3a3a3a;
-            font-size: clamp(0.5rem, 0.7vw, 0.65rem);
+            font-size: 0.6rem;
             text-transform: uppercase;
         }
         .afternoon-row td:first-child { text-align: right; padding-right: 3px; font-weight: 600; }
 
-        /* ===== FORMULARIO ===== */
+        /* ===== FORMULARIO (lado derecho) ===== */
         .right-col .form-grid {
             display: flex;
             flex-direction: column;
-            gap: 0.3rem;
+            gap: 0.6rem;
             background: #262626;
-            padding: 0.5rem 0.7rem;
+            padding: 0.8rem 1rem;
             border-radius: 4px;
             border: 1px solid #353535;
             height: 100%;
@@ -354,78 +347,78 @@
         .field-group {
             display: flex;
             flex-direction: column;
-            gap: 0.05rem;
+            gap: 0.15rem;
             width: 100%;
         }
         .field-group label {
             font-weight: 500;
-            font-size: clamp(0.55rem, 0.8vw, 0.7rem);
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.03em;
             color: #999999;
         }
-        .field-group label i { color: #777777; margin-right: 3px; }
+        .field-group label i { color: #777777; margin-right: 4px; }
         .field-group input {
-            padding: 0.2rem 0.4rem;
+            padding: 0.4rem 0.6rem;
             border: 1px solid #3d3d3d;
             border-radius: 2px;
-            font-size: clamp(0.75rem, 1vw, 0.9rem);
+            font-size: 0.85rem;
             background: #1e1e1e;
             transition: 0.2s;
             outline: none;
             width: 100%;
             color: #e0e0e0;
-            height: clamp(28px, 3.5vh, 36px);
+            height: 34px;
         }
         .field-group input::placeholder { color: #666666; font-weight: 300; }
         .field-group input:focus {
             border-color: #888888;
             box-shadow: 0 0 0 3px rgba(136, 136, 136, 0.12);
         }
-        .field-group .hint { font-size: clamp(0.45rem, 0.6vw, 0.55rem); color: #666666; margin-top: 0px; }
+        .field-group .hint { font-size: 0.6rem; color: #666666; margin-top: 1px; }
 
         .btn-wrapper {
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            gap: 0.1rem;
+            gap: 0.15rem;
             width: 100%;
             margin-top: auto;
         }
         .btn-wrapper .btn-label {
             font-weight: 500;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.03em;
             color: transparent;
             visibility: hidden;
-            line-height: 1;
+            line-height: 1.2;
         }
         .btn-submit {
             background: linear-gradient(135deg, #e5c147 0%, #d4af37 50%, #b8941f 100%);
             border: 1px solid #8b7424;
             color: #1a1a1a;
-            padding: 0.2rem 0.8rem;
+            padding: 0.4rem 1rem;
             border-radius: 4px;
             font-weight: 700;
-            font-size: clamp(0.7rem, 0.9vw, 0.85rem);
+            font-size: 0.85rem;
             cursor: pointer;
             transition: 0.2s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 6px;
             box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3), 0 2px 4px rgba(0, 0, 0, 0.4);
             width: 100%;
-            height: clamp(28px, 3.5vh, 36px);
-            min-height: 28px;
+            height: 34px;
+            min-height: 34px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .btn-submit:hover {
             background: linear-gradient(135deg, #f0d060 0%, #e5c147 50%, #d4af37 100%);
             border-color: #d4af37;
-            transform: scale(1.02);
+            transform: scale(1.03);
             box-shadow: 0 6px 18px rgba(212, 175, 55, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
         }
         .btn-submit:disabled {
@@ -434,9 +427,9 @@
             transform: none;
             box-shadow: none;
         }
-        .btn-submit i { font-size: 0.7rem; color: #1a1a1a; }
+        .btn-submit i { font-size: 0.75rem; color: #1a1a1a; }
 
-        /* ===== POPUP (sin cambios) ===== */
+        /* ===== POPUP ===== */
         .popup-overlay {
             display: none;
             position: fixed;
@@ -456,7 +449,7 @@
             background: #2a2a2a;
             border-radius: 8px;
             border: 1px solid #444444;
-            padding: 2rem 2.5rem;
+            padding: 2.5rem 3rem;
             max-width: 500px;
             width: 100%;
             max-height: 85vh;
@@ -471,41 +464,42 @@
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
         .popup-container .popup-header { flex-shrink: 0; }
-        .popup-container .popup-icon { text-align: center; font-size: 3rem; color: #4caf50; margin-bottom: 0.3rem; }
-        .popup-container h2 { color: #e8e8e8; text-align: center; font-size: 1.3rem; margin-bottom: 0.3rem; }
+        .popup-container .popup-icon { text-align: center; font-size: 3.5rem; color: #4caf50; margin-bottom: 0.5rem; }
+        .popup-container h2 { color: #e8e8e8; text-align: center; font-size: 1.5rem; margin-bottom: 0.5rem; }
         .popup-container .popup-subtitle {
             color: #9a9a9a;
             text-align: center;
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            margin-bottom: 1.2rem;
             border-bottom: 1px solid #3a3a3a;
-            padding-bottom: 0.6rem;
+            padding-bottom: 0.8rem;
         }
         .popup-container .popup-body {
             flex: 1 1 auto;
             overflow-y: auto;
-            padding-right: 0.3rem;
-            margin-right: -0.3rem;
+            padding-right: 0.5rem;
+            margin-right: -0.5rem;
             scrollbar-width: thin;
             scrollbar-color: #555555 #1e1e1e;
         }
-        .popup-container .popup-body::-webkit-scrollbar { width: 4px; border-radius: 2px; }
-        .popup-container .popup-body::-webkit-scrollbar-track { background: #1e1e1e; }
-        .popup-container .popup-body::-webkit-scrollbar-thumb { background: #555555; border-radius: 2px; }
+        .popup-container .popup-body::-webkit-scrollbar { width: 6px; border-radius: 3px; }
+        .popup-container .popup-body::-webkit-scrollbar-track { background: #1e1e1e; border-radius: 3px; }
+        .popup-container .popup-body::-webkit-scrollbar-thumb { background: #555555; border-radius: 3px; }
+        .popup-container .popup-body::-webkit-scrollbar-thumb:hover { background: #777777; }
         .popup-container .popup-details {
             background: #222222;
             border-radius: 4px;
-            padding: 0.8rem 1rem;
-            margin-bottom: 0.8rem;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1rem;
             border: 1px solid #353535;
         }
         .popup-container .popup-details .detail-row {
             display: flex;
             justify-content: space-between;
-            padding: 0.2rem 0;
+            padding: 0.3rem 0;
             border-bottom: 1px solid #333333;
             color: #c0c0c0;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
         }
         .popup-container .popup-details .detail-row:last-child { border-bottom: none; }
         .popup-container .popup-details .detail-row .label { color: #888888; font-weight: 500; }
@@ -519,41 +513,41 @@
         .popup-container .popup-notice {
             background: #2a1a1a;
             border-left: 3px solid #f44336;
-            padding: 0.4rem 0.6rem;
+            padding: 0.6rem 0.8rem;
             border-radius: 2px;
-            margin-bottom: 0.8rem;
-            font-size: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
             color: #d0a0a0;
         }
-        .popup-container .popup-notice i { color: #f44336; margin-right: 4px; }
+        .popup-container .popup-notice i { color: #f44336; margin-right: 6px; }
         .popup-container .popup-notice strong { color: #f0c0c0; }
         .popup-container .popup-whatsapp {
             background: #1a2a1a;
             border: 1px solid #2a4a2a;
             border-radius: 4px;
-            padding: 0.4rem 0.6rem;
-            margin-bottom: 0.8rem;
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             color: #a0c0a0;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
         }
-        .popup-container .popup-whatsapp i { color: #25d366; font-size: 1.1rem; flex-shrink: 0; }
+        .popup-container .popup-whatsapp i { color: #25d366; font-size: 1.2rem; flex-shrink: 0; }
         .popup-container .popup-whatsapp .whatsapp-number { color: #c0e0c0; font-weight: 500; }
         .popup-container .popup-footer {
             flex-shrink: 0;
-            padding-top: 0.3rem;
+            padding-top: 0.5rem;
             border-top: 1px solid #353535;
         }
         .popup-container .popup-close-btn {
             background: #444444;
             border: 1px solid #555555;
             color: #e8e8e8;
-            padding: 0.4rem 1.2rem;
+            padding: 0.5rem 1.5rem;
             border-radius: 4px;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: 0.15s;
             width: 100%;
@@ -561,93 +555,135 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            margin-top: 0.3rem;
+            margin-top: 0.5rem;
         }
         .popup-container .popup-close-btn:hover { background: #555555; border-color: #666666; }
 
-        /* ===== RESPONSIVE (mantiene sin scroll) ===== */
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .card { padding: 1.5rem; }
+            .two-column-layout { gap: 1rem; }
+        }
+
         @media (max-width: 768px) {
-            .card { padding: 0.5rem 0.6rem; }
-            .two-column-layout { flex-direction: column; gap: 0.4rem; }
-            .left-col, .right-col { flex: 1 1 auto; min-width: 0; }
-            .right-col .form-grid { padding: 0.4rem; gap: 0.2rem; }
-            table { font-size: clamp(0.6rem, 1.5vw, 0.8rem); min-width: 320px; }
-            th { font-size: clamp(0.55rem, 1.2vw, 0.7rem); padding: 0.05rem 0.1rem; }
-            td { padding: 0.05rem 0.03rem; }
-            .slot-cell { height: clamp(16px, 2vh, 20px); }
-            .slot-cell input[type="radio"] { width: 10px; height: 10px; }
-            .time-slot { font-size: clamp(0.5rem, 1vw, 0.65rem); }
-            .afternoon-row td { font-size: clamp(0.4rem, 0.8vw, 0.55rem); }
-            .field-group input { height: clamp(24px, 3vh, 30px); font-size: clamp(0.65rem, 1.2vw, 0.8rem); }
-            .btn-submit { height: clamp(24px, 3vh, 30px); font-size: clamp(0.6rem, 1vw, 0.75rem); }
-            h1 { font-size: clamp(1rem, 3vw, 1.4rem); }
-            .week-nav-buttons button { font-size: clamp(0.5rem, 1vw, 0.7rem); padding: 0.05rem 0.4rem; }
-            .week-label { font-size: clamp(0.5rem, 1vw, 0.7rem); padding: 0.05rem 0.5rem; }
-            .selected-display { font-size: clamp(0.6rem, 1vw, 0.75rem); min-height: 22px; padding: 0.05rem 0.5rem; }
-            .cookie-notice p { font-size: clamp(0.5rem, 0.8vw, 0.65rem); }
-            .cookie-notice .cookie-btn { font-size: clamp(0.45rem, 0.7vw, 0.6rem); padding: 0.05rem 0.4rem; }
+            .two-column-layout {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            .left-col, .right-col {
+                flex: 1 1 100%;
+                min-width: 0;
+            }
+            .right-col .form-grid {
+                padding: 0.8rem;
+                gap: 0.5rem;
+                height: auto;
+            }
+            .card { padding: 1rem 0.6rem 1rem; }
+            table { font-size: 0.7rem; min-width: 380px; }
+            th { padding: 0.2rem 0.15rem; font-size: 0.65rem; }
+            th:first-child { min-width: 40px; padding: 0.2rem 0.1rem; }
+            td { padding: 0.08rem 0.05rem; }
+            .slot-cell { height: 20px; }
+            .slot-cell input[type="radio"] { width: 12px; height: 12px; }
+            .time-slot { font-size: 0.65rem; }
+            .afternoon-row td { font-size: 0.55rem; padding: 0.1rem 0.02rem; }
+            h1 { font-size: 1.3rem; }
+            .update-indicator { font-size: 0.6rem; padding: 0.1rem 0.5rem; }
+            .week-navigation { flex-direction: column; align-items: stretch; gap: 0.3rem; }
+            .week-nav-buttons { justify-content: center; }
+            .week-label { font-size: 0.75rem; padding: 0.15rem 0.6rem; }
+            .cookie-notice { flex-direction: column; align-items: stretch; text-align: center; padding: 0.4rem 0.6rem; gap: 0.4rem; }
+            .cookie-notice .cookie-btn { width: 100%; font-size: 0.75rem; padding: 0.25rem 0.6rem; }
+            .selected-display {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.6rem;
+                flex-wrap: wrap;
+                gap: 4px;
+                min-height: 32px;
+            }
+            .popup-container { padding: 1.5rem 1.2rem; max-height: 90vh; }
+            .popup-container .popup-details .detail-row { font-size: 0.75rem; flex-direction: column; align-items: flex-start; gap: 0.1rem; }
+            .popup-container .popup-details .detail-row .value { text-align: left; max-width: 100%; }
         }
 
         @media (max-width: 480px) {
-            .card { padding: 0.3rem 0.3rem; }
-            table { font-size: clamp(0.5rem, 1.2vw, 0.65rem); min-width: 280px; }
-            th { font-size: clamp(0.45rem, 1vw, 0.55rem); padding: 0.03rem 0.05rem; }
-            td { padding: 0.03rem 0.02rem; }
-            .slot-cell { height: clamp(14px, 1.8vh, 18px); }
-            .slot-cell input[type="radio"] { width: 8px; height: 8px; border-width: 1.5px; }
-            .time-slot { font-size: clamp(0.4rem, 0.8vw, 0.5rem); }
-            .afternoon-row td { font-size: clamp(0.35rem, 0.6vw, 0.45rem); }
-            .field-group input { height: clamp(20px, 2.5vh, 26px); font-size: clamp(0.55rem, 1vw, 0.7rem); }
-            .btn-submit { height: clamp(20px, 2.5vh, 26px); font-size: clamp(0.5rem, 0.8vw, 0.65rem); }
-            h1 { font-size: clamp(0.8rem, 2.5vw, 1.1rem); }
-            .week-nav-buttons button { font-size: clamp(0.4rem, 0.8vw, 0.55rem); padding: 0.02rem 0.3rem; }
-            .week-label { font-size: clamp(0.4rem, 0.8vw, 0.55rem); padding: 0.02rem 0.3rem; }
-            .selected-display { font-size: clamp(0.5rem, 0.8vw, 0.6rem); min-height: 18px; padding: 0.02rem 0.3rem; }
-            .cookie-notice p { font-size: clamp(0.4rem, 0.6vw, 0.5rem); }
-            .cookie-notice .cookie-btn { font-size: clamp(0.35rem, 0.5vw, 0.45rem); padding: 0.02rem 0.3rem; }
+            .card { padding: 0.5rem 0.3rem 0.6rem; border-radius: 4px; }
+            table { font-size: 0.6rem; min-width: 320px; }
+            th { padding: 0.15rem 0.1rem; font-size: 0.55rem; }
+            th:first-child { min-width: 30px; padding: 0.15rem 0.05rem; }
+            td { padding: 0.05rem 0.03rem; }
+            .slot-cell { height: 18px; }
+            .slot-cell input[type="radio"] { width: 10px; height: 10px; border-width: 1.5px; }
+            .time-slot { font-size: 0.55rem; padding: 0.05rem 0.02rem; }
+            .afternoon-row td { font-size: 0.5rem; padding: 0.08rem 0.02rem; }
+            .right-col .form-grid { padding: 0.5rem; gap: 0.4rem; border-radius: 4px; }
+            .field-group input { padding: 0.3rem 0.4rem; font-size: 0.75rem; height: 30px; }
+            .field-group label { font-size: 0.65rem; }
+            .field-group .hint { font-size: 0.55rem; }
+            .btn-submit { height: 30px; font-size: 0.75rem; padding: 0.2rem 0.6rem; min-height: 30px; border-radius: 4px; }
+            h1 { font-size: 1rem; }
+            .update-indicator { font-size: 0.5rem; padding: 0.05rem 0.4rem; gap: 3px; }
+            .week-label { font-size: 0.65rem; padding: 0.1rem 0.5rem; }
+            .week-nav-buttons button { font-size: 0.6rem; padding: 0.15rem 0.5rem; gap: 3px; }
+            .cookie-notice p { font-size: 0.7rem; }
+            .cookie-notice .cookie-btn { font-size: 0.65rem; padding: 0.2rem 0.5rem; }
+            .selected-display {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.5rem;
+                min-height: 28px;
+                gap: 3px;
+            }
+            .selected-display .selected-text { padding: 0 0.3rem; font-size: 0.65rem; }
+            .popup-container { padding: 1rem 0.8rem; border-radius: 4px; max-height: 92vh; max-width: 95%; }
+            .popup-container h2 { font-size: 1rem; }
+            .popup-container .popup-icon { font-size: 2.5rem; }
+            .popup-container .popup-subtitle { font-size: 0.7rem; }
+            .popup-container .popup-details { padding: 0.6rem 0.8rem; }
+            .popup-container .popup-details .detail-row { font-size: 0.7rem; padding: 0.2rem 0; }
+            .popup-container .popup-notice { font-size: 0.7rem; padding: 0.4rem 0.6rem; }
+            .popup-container .popup-whatsapp { font-size: 0.7rem; padding: 0.4rem 0.6rem; }
+            .popup-container .popup-close-btn { font-size: 0.75rem; padding: 0.4rem 1rem; }
         }
     </style>
 </head>
 <body>
     <div class="card">
-        <!-- HEADER -->
         <h1>
             <span><i class="fas fa-calendar-check"></i></span>
             <span>Reserva tu Horario</span>
             <span class="update-indicator" id="updateIndicator">
                 <i class="fas fa-clock"></i>
-                <span>Actualizando...</span>
+                <span>Actualizando horarios...</span>
             </span>
         </h1>
 
-        <!-- COOKIE NOTICE -->
         <div class="cookie-notice" id="cookieNotice">
-            <p><i class="fas fa-cookie-bite"></i> Este sitio usa cookies para recordar tus datos.</p>
+            <p><i class="fas fa-cookie-bite"></i> Este sitio utiliza cookies para recordar tus datos y preferencias.</p>
             <div>
-                <button class="cookie-btn" id="acceptCookiesBtn"><i class="fas fa-check"></i> Aceptar</button>
-                <button class="cookie-btn" id="clearCookiesBtn"><i class="fas fa-trash"></i> Borrar</button>
+                <button class="cookie-btn" id="acceptCookiesBtn"><i class="fas fa-check"></i> Aceptar cookies</button>
+                <button class="cookie-btn" id="clearCookiesBtn"><i class="fas fa-trash"></i> Borrar cookies</button>
             </div>
         </div>
 
-        <!-- NAVEGACIÓN SEMANAL -->
         <div class="week-navigation">
             <div class="week-nav-buttons">
-                <button id="prevWeekBtn"><i class="fas fa-chevron-left"></i> Ant.</button>
-                <button id="nextWeekBtn">Sig. <i class="fas fa-chevron-right"></i></button>
+                <button id="prevWeekBtn"><i class="fas fa-chevron-left"></i> Semana anterior</button>
+                <button id="nextWeekBtn">Semana siguiente <i class="fas fa-chevron-right"></i></button>
             </div>
             <div class="week-label" id="weekLabel">Septiembre 2026</div>
         </div>
 
-        <!-- MENSAJE DE SELECCIÓN -->
+        <!-- Mensaje de horario seleccionado -->
         <div class="selected-display" id="selectedDisplay">
             <i class="fas fa-check-circle"></i>
             <span class="label-text">Horario seleccionado:</span>
             <span class="selected-text" id="selectedText">—</span>
         </div>
 
-        <!-- LAYOUT DOS COLUMNAS -->
+        <!-- LAYOUT DE DOS COLUMNAS -->
         <div class="two-column-layout">
-            <!-- IZQUIERDA: TABLA -->
+            <!-- COLUMNA IZQUIERDA: TABLA -->
             <div class="left-col">
                 <div class="table-responsive">
                     <table>
@@ -662,7 +698,7 @@
                 </div>
             </div>
 
-            <!-- DERECHA: FORMULARIO -->
+            <!-- COLUMNA DERECHA: FORMULARIO -->
             <div class="right-col">
                 <form id="reservationForm">
                     <div class="form-grid">
@@ -679,7 +715,7 @@
                         <div class="field-group">
                             <label for="telefono"><i class="fas fa-phone-alt"></i> Teléfono</label>
                             <input type="tel" id="telefono" placeholder="+34 600 000 000" autocomplete="off" required>
-                            <span class="hint">Código de país</span>
+                            <span class="hint">Incluye código de país</span>
                         </div>
                         <div class="btn-wrapper">
                             <label class="btn-label" aria-hidden="true">Reservar</label>
@@ -691,6 +727,7 @@
                 </form>
             </div>
         </div>
+        <!-- FIN LAYOUT DOS COLUMNAS -->
     </div>
 
     <!-- POPUP -->
@@ -705,13 +742,13 @@
                 <div class="popup-details" id="popupDetails"></div>
                 <div class="popup-notice">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <strong>Importante:</strong> Avisa con <strong>24h</strong> de anticipación si no puedes asistir.
+                    <strong>Importante:</strong> En caso de no poder concurrir, por favor avisa con <strong>24 horas de anticipación</strong> para poder reasignar el turno.
                 </div>
                 <div class="popup-whatsapp">
                     <i class="fab fa-whatsapp"></i>
                     <div>
                         <strong>Confirmación enviada por WhatsApp</strong><br>
-                        <span>Mensaje enviado al <span class="whatsapp-number">+5493518692251</span></span>
+                        <span>Se ha enviado un mensaje con los datos al número <span class="whatsapp-number">+5493518692251</span></span>
                     </div>
                 </div>
             </div>
@@ -724,10 +761,11 @@
     </div>
 
     <script>
-        // ===== JAVASCRIPT (sin cambios funcionales, solo estilos) =====
         (function() {
+            // ===== CONFIGURACIÓN =====
             const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwDFvAKsIT2tVmuIWcyJ3duNBNCDEriYuCvDOBATRyTatUJNkSiAmQH3xisg3v74srM1g/exec';
             const TIMEZONE = 'America/Argentina/Buenos_Aires';
+
             const daysOfWeek = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
             const morningHours = [9, 10, 11, 12];
             const afternoonHours = [16, 17, 18, 19, 20];
@@ -758,16 +796,20 @@
                 date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
                 document.cookie = name + "=" + encodeURIComponent(value) + ";expires=" + date.toUTCString() + ";path=/";
             }
+
             function getCookie(name) {
                 var nameEQ = name + "=";
                 var ca = document.cookie.split(';');
                 for (var i = 0; i < ca.length; i++) {
                     var c = ca[i];
                     while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-                    if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+                    if (c.indexOf(nameEQ) === 0) {
+                        return decodeURIComponent(c.substring(nameEQ.length, c.length));
+                    }
                 }
                 return null;
             }
+
             function deleteCookie(name) {
                 document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             }
@@ -779,15 +821,20 @@
                         body: JSON.stringify(data),
                         redirect: 'follow'
                     });
-                    return await response.json();
+                    var result = await response.json();
+                    return result;
                 } catch (error) {
                     console.error('Error al guardar:', error);
                     return { success: false, error: error.message };
                 }
             }
+
             async function loadReservationsFromSheets() {
                 try {
-                    var response = await fetch(GOOGLE_SHEETS_URL, { method: 'GET', redirect: 'follow' });
+                    var response = await fetch(GOOGLE_SHEETS_URL, {
+                        method: 'GET',
+                        redirect: 'follow'
+                    });
                     if (!response.ok) throw new Error('Error al cargar reservas');
                     var result = await response.json();
                     return result.success ? result.reservas || [] : [];
@@ -802,6 +849,7 @@
                 var email = emailInput.value.trim();
                 var telefono = telefonoInput.value.trim();
                 var selected = document.querySelector('input[name="slot"]:checked');
+
                 if (nombre) setCookie('reserva_nombre', nombre, COOKIE_EXPIRY_DAYS);
                 else deleteCookie('reserva_nombre');
                 if (email) setCookie('reserva_email', email, COOKIE_EXPIRY_DAYS);
@@ -817,9 +865,11 @@
                 var email = getCookie('reserva_email');
                 var telefono = getCookie('reserva_telefono');
                 var horario = getCookie('reserva_horario');
+
                 if (nombre) nombreInput.value = nombre;
                 if (email) emailInput.value = email;
                 if (telefono) telefonoInput.value = telefono;
+
                 if (horario) {
                     setTimeout(function() {
                         var radios = document.querySelectorAll('input[name="slot"]');
@@ -854,7 +904,9 @@
                 fields.forEach(function(field) {
                     var row = document.createElement('div');
                     row.className = 'detail-row';
-                    row.innerHTML = '<span class="label">' + field.label + '</span><span class="value">' + (field.value || '—') + '</span>';
+                    row.innerHTML =
+                        '<span class="label">' + field.label + '</span><span class="value">' + (field.value || '—') +
+                        '</span>';
                     popupDetails.appendChild(row);
                 });
                 popupOverlay.classList.add('show');
@@ -899,16 +951,19 @@
                     second: parseInt(get('second'))
                 };
             }
+
             function getToday() {
                 const now = new Date();
                 const parts = getDatePartsInTimezone(now);
                 return new Date(parts.year, parts.month, parts.day, 0, 0, 0, 0);
             }
+
             function getNowInTimezone() {
                 const now = new Date();
                 const parts = getDatePartsInTimezone(now);
                 return new Date(parts.year, parts.month, parts.day, parts.hour, parts.minute, parts.second);
             }
+
             function getMonday(date) {
                 const parts = getDatePartsInTimezone(date);
                 var d = new Date(parts.year, parts.month, parts.day);
@@ -918,26 +973,31 @@
                 d.setHours(0, 0, 0, 0);
                 return d;
             }
+
             function formatDate(date) {
                 return String(date.getDate()).padStart(2, '0');
             }
+
             function getMonthName(monthIndex) {
                 var months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
                     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
                 ];
                 return months[monthIndex];
             }
+
             function getDateForWeekday(weekStart, weekdayIndex) {
                 var d = new Date(weekStart);
                 d.setDate(d.getDate() + weekdayIndex);
                 return d;
             }
+
             function isPastOrCurrentSlot(weekStart, weekdayIndex, hour) {
                 var slotDate = getDateForWeekday(weekStart, weekdayIndex);
                 slotDate.setHours(hour, 0, 0, 0);
                 const nowInTimezone = getNowInTimezone();
                 return slotDate <= nowInTimezone;
             }
+
             function isToday(date) {
                 var today = getToday();
                 return date.getFullYear() === today.getFullYear() &&
@@ -951,11 +1011,13 @@
                     var clave = r.fecha + ' ' + r.hora;
                     reservados.add(clave);
                 });
+
                 var radios = document.querySelectorAll('input[name="slot"]');
                 radios.forEach(function(radio) {
                     var cell = radio.closest('td');
                     var isPast = radio.hasAttribute('data-past');
                     var isTodayCell = cell && cell.getAttribute('data-is-today') === 'true';
+
                     if (reservados.has(radio.value)) {
                         radio.disabled = true;
                         if (cell) {
@@ -974,6 +1036,7 @@
                         }
                     }
                 });
+
                 var selected = document.querySelector('input[name="slot"]:checked');
                 if (selected && selected.disabled) {
                     selected.checked = false;
@@ -986,9 +1049,11 @@
             async function autoRefreshReservations() {
                 if (popupOverlay.classList.contains('show')) return;
                 if (isAutoUpdating) return;
+                
                 isAutoUpdating = true;
                 updateIndicator.classList.add('show');
                 const startTime = Date.now();
+
                 try {
                     var reservas = await loadReservationsFromSheets();
                     updateTableWithReservations(reservas);
@@ -997,6 +1062,7 @@
                 } finally {
                     const elapsed = Date.now() - startTime;
                     const remaining = Math.max(0, MIN_INDICATOR_DURATION - elapsed);
+                    
                     setTimeout(function() {
                         updateIndicator.classList.remove('show');
                         isAutoUpdating = false;
@@ -1007,6 +1073,7 @@
             async function renderTable() {
                 updateIndicator.classList.add('show');
                 const startTime = Date.now();
+                
                 var today = getToday();
 
                 var headerHtml = '<th>Hora</th>';
@@ -1020,6 +1087,7 @@
                 headerRow.innerHTML = headerHtml;
 
                 var bodyHtml = '';
+
                 morningHours.forEach(function(hour) {
                     bodyHtml += '<tr><td class="time-slot"><i class="far fa-clock"></i> ' + hour + ':00</td>';
                     for (var i = 0; i < daysOfWeek.length; i++) {
@@ -1031,11 +1099,15 @@
                         var disabled = isPastOrCurrent ? 'disabled' : '';
                         var dataPast = isPastOrCurrent ? 'data-past="true"' : '';
                         var dataToday = isToday(date) ? 'data-is-today="true"' : '';
+
                         var cellClass = '';
                         if (isToday(date)) cellClass = 'today-cell';
                         else if (!isPastOrCurrent) cellClass = 'available-cell';
                         else cellClass = 'disabled-cell';
-                        bodyHtml += '<td class="' + cellClass + '" ' + dataToday + '><div class="slot-cell"><input type="radio" name="slot" value="' + value + '" ' + disabled + ' ' + dataPast + '></div></td>';
+
+                        bodyHtml +=
+                            '<td class="' + cellClass + '" ' + dataToday + '><div class="slot-cell"><input type="radio" name="slot" value="' + value + '" ' +
+                            disabled + ' ' + dataPast + '></div></td>';
                     }
                     bodyHtml += '</tr>';
                 });
@@ -1045,12 +1117,16 @@
                     var dayIndex = (i === 0) ? 0 : i - 1;
                     var date = getDateForWeekday(currentWeekStart, dayIndex);
                     var isPastOrCurrent = isPastOrCurrentSlot(currentWeekStart, dayIndex, 16);
+
                     var cellClass = '';
                     if (isToday(date)) cellClass = 'today-cell';
                     else if (!isPastOrCurrent) cellClass = 'available-cell';
                     else cellClass = 'disabled-cell';
+
                     if (i === 0) {
-                        bodyHtml += '<td class="' + cellClass + '" style="text-align: center; letter-spacing: 2px; font-weight: 600; color: #b0b0b0; font-size: 0.6rem;"><i class="fas fa-sun" style="margin-right: 3px; color: #777777;"></i> TARDE</td>';
+                        bodyHtml += '<td class="' + cellClass +
+                            '" style="text-align: center; letter-spacing: 2px; font-weight: 600; color: #b0b0b0; font-size: 0.6rem;">' +
+                            '<i class="fas fa-sun" style="margin-right: 3px; color: #777777;"></i> TARDE</td>';
                     } else {
                         bodyHtml += '<td class="' + cellClass + '"></td>';
                     }
@@ -1068,11 +1144,15 @@
                         var disabled = isPastOrCurrent ? 'disabled' : '';
                         var dataPast = isPastOrCurrent ? 'data-past="true"' : '';
                         var dataToday = isToday(date) ? 'data-is-today="true"' : '';
+
                         var cellClass = '';
                         if (isToday(date)) cellClass = 'today-cell';
                         else if (!isPastOrCurrent) cellClass = 'available-cell';
                         else cellClass = 'disabled-cell';
-                        bodyHtml += '<td class="' + cellClass + '" ' + dataToday + '><div class="slot-cell"><input type="radio" name="slot" value="' + value + '" ' + disabled + ' ' + dataPast + '></div></td>';
+
+                        bodyHtml +=
+                            '<td class="' + cellClass + '" ' + dataToday + '><div class="slot-cell"><input type="radio" name="slot" value="' + value + '" ' +
+                            disabled + ' ' + dataPast + '></div></td>';
                     }
                     bodyHtml += '</tr>';
                 });
@@ -1105,8 +1185,9 @@
                         }
                     });
                 }
-                updateFeedback();
 
+                updateFeedback();
+                
                 const elapsed = Date.now() - startTime;
                 const remaining = Math.max(0, MIN_INDICATOR_DURATION - elapsed);
                 setTimeout(function() {
@@ -1122,6 +1203,7 @@
                 currentWeekStart.setDate(currentWeekStart.getDate() - 7);
                 renderTable();
             });
+
             document.getElementById('nextWeekBtn').addEventListener('click', function() {
                 currentWeekStart.setDate(currentWeekStart.getDate() + 7);
                 renderTable();
@@ -1131,23 +1213,28 @@
                 setCookie('cookies_aceptadas', 'true', 365);
                 document.getElementById('cookieNotice').style.display = 'none';
                 saveFormDataToCookies();
-                alert('✅ Cookies aceptadas.');
+                alert('✅ Cookies aceptadas. Tus datos se guardarán automáticamente.');
             });
+
             document.getElementById('clearCookiesBtn').addEventListener('click', function() {
-                var cookies = ['reserva_nombre', 'reserva_email', 'reserva_telefono', 'reserva_horario', 'cookies_aceptadas'];
+                var cookies = ['reserva_nombre', 'reserva_email', 'reserva_telefono', 'reserva_horario',
+                    'cookies_aceptadas'
+                ];
                 cookies.forEach(function(name) { deleteCookie(name); });
                 nombreInput.value = '';
                 emailInput.value = '';
                 telefonoInput.value = '';
                 document.querySelectorAll('input[name="slot"]').forEach(function(radio) { radio.checked = false; });
                 updateFeedback();
-                alert('🗑️ Cookies eliminadas.');
+                alert('🗑️ Cookies eliminadas. Los datos han sido borrados.');
             });
 
             popupCloseBtn.addEventListener('click', closePopup);
+
             popupOverlay.addEventListener('click', function(e) {
                 if (e.target === this) closePopup();
             });
+
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && popupOverlay.classList.contains('show')) {
                     closePopup();
@@ -1156,27 +1243,34 @@
 
             document.getElementById('reservationForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
+
                 var nombre = nombreInput.value.trim();
                 var email = emailInput.value.trim();
                 var telefono = telefonoInput.value.trim();
                 var selected = document.querySelector('input[name="slot"]:checked');
+
                 if (!nombre || !email || !telefono) {
-                    alert('⚠️ Completa todos los campos.');
+                    alert('⚠️ Por favor, completa todos los campos del formulario.');
                     nombreInput.focus();
                     return;
                 }
+
                 if (!selected) {
-                    alert('⚠️ Selecciona un día y hora válido.');
+                    alert('⚠️ Por favor, selecciona un día y hora válido (futuro) en la tabla.');
                     return;
                 }
+
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
                 try {
                     var parts = selected.value.split(' ');
                     var fecha = parts[0] + ' ' + parts[1];
                     var hora = parts[2];
+
                     var data = { fecha: fecha, hora: hora, nombre: nombre, email: email, telefono: telefono };
                     var result = await saveToGoogleSheets(data);
+
                     if (result.success) {
                         saveFormDataToCookies();
                         sendWhatsAppMessage(nombre, email, telefono, selected.value);
@@ -1187,7 +1281,7 @@
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('❌ Error al guardar la reserva. Verifica tu conexión.');
+                    alert('❌ Error al guardar la reserva. Verifica tu conexión e intenta nuevamente.');
                 } finally {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Reservar';
@@ -1196,10 +1290,13 @@
 
             loadFormDataFromCookies();
             renderTable();
+
             if (getCookie('cookies_aceptadas') === 'true') {
                 document.getElementById('cookieNotice').style.display = 'none';
             }
+
             setInterval(autoRefreshReservations, AUTO_REFRESH_INTERVAL);
+
         })();
     </script>
 </body>
