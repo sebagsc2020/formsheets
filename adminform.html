@@ -9,7 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
-        /* (Mismos estilos que antes, añadimos btn-delete) */
+        /* ===== ESTILOS COMPLETOS ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
         body { background: #1a1a1a; min-height: 100vh; padding: 0.8rem 0.5rem; color: #e8e8e8; }
         .container { max-width: 1200px; margin: 0 auto; }
@@ -41,7 +41,6 @@
         .btn-delete { background: #555; color: white; }
         .btn-delete:hover { background: #777; box-shadow: 0 0 8px rgba(255, 0, 0, 0.3); }
         .action-btn[title]:hover::after { content: attr(title); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #000; color: white; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.6rem; white-space: nowrap; margin-bottom: 3px; pointer-events: none; z-index: 10; }
-        /* Modal */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; padding: 1rem; }
         .modal-overlay.show { display: flex; }
         .modal-container { background: #2a2a2a; border-radius: 8px; border: 1px solid #444; padding: 1.5rem; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
@@ -53,7 +52,6 @@
         .modal-container .btn-secondary:hover { background: #555; }
         .modal-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
         .modal-actions .btn { flex: 1; }
-        /* Resto de estilos iguales */
         .today-agenda { background: linear-gradient(135deg, #2a2a2a 0%, #2e2818 100%); border: 1px solid #8b7424; border-radius: 4px; padding: 0.6rem 0.8rem; margin-bottom: 1rem; }
         .today-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.4rem; }
         .today-header h2 { font-size: 1.1rem; color: #e8e8e8; }
@@ -207,7 +205,7 @@
             <div class="stat-card"><span class="number" id="statCanceladas">0</span><span class="label">Canceladas</span></div>
         </div>
 
-        <!-- Toolbar -->
+        <!-- Toolbar (sin botón Actualizar) -->
         <div class="toolbar">
             <div class="toolbar-left">
                 <button class="filter-btn active" data-filter="all">Todas</button>
@@ -217,9 +215,7 @@
                 <button class="filter-btn" data-filter="canceladas">Canceladas</button>
             </div>
             <div class="toolbar-right">
-                <button class="btn btn-secondary" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.7rem; border-radius: 4px;" onclick="loadData()">
-                    <i class="fas fa-sync-alt"></i> Actualizar
-                </button>
+                <!-- Botón Actualizar eliminado -->
                 <button class="btn btn-secondary" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.7rem; border-radius: 4px;" onclick="exportCSV()">
                     <i class="fas fa-file-csv"></i> Exportar CSV
                 </button>
@@ -662,12 +658,11 @@
                 await updateEstado(id, 'ACTIVA');
             };
 
-            // ===== NUEVO: ELIMINAR =====
             window.deleteReservation = async function(id) {
                 if (!confirm('⚠️ ¿Estás seguro de que quieres ELIMINAR esta reserva permanentemente?\nEsta acción no se puede deshacer.')) return;
                 try {
                     await db.collection('citas').doc(id).delete();
-                    loadData(); // Recargar datos
+                    loadData(); // Recarga instantánea
                 } catch (err) {
                     console.error(err);
                     alert('Error al eliminar la reserva. Verifica permisos.');
@@ -677,14 +672,14 @@
             async function updateEstado(id, estado) {
                 try {
                     await db.collection('citas').doc(id).update({ estado: estado });
-                    loadData();
+                    loadData(); // Recarga instantánea
                 } catch (err) {
                     console.error(err);
                     alert('Error al actualizar. Verifica permisos.');
                 }
             }
 
-            // ===== REAGENDAR (sin cambios) =====
+            // ===== REAGENDAR =====
             window.openRescheduleModal = function(id) {
                 const reserva = allReservations.find(r => r.id === id);
                 if (!reserva) return alert('Reserva no encontrada');
@@ -773,7 +768,7 @@
                 try {
                     await db.collection('citas').doc(id).update({ fecha: fecha, hora: hora });
                     closeRescheduleModal();
-                    loadData();
+                    loadData(); // Recarga instantánea
                 } catch (err) {
                     console.error(err);
                     alert('Error al reagendar. Verifica permisos.');
@@ -791,7 +786,7 @@
                 if (e.key === 'Escape') closeRescheduleModal();
             });
 
-            // ===== DASHBOARD MENSUAL (sin cambios) =====
+            // ===== DASHBOARD MENSUAL =====
             function updateMonthlyDashboard() {
                 const year = selectedMonth.getFullYear();
                 const month = selectedMonth.getMonth();
@@ -923,7 +918,7 @@
                 }).catch(console.error);
             };
 
-            // ===== AUTOREFRESH =====
+            // ===== AUTOREFRESH (solo agenda y countdown) =====
             setInterval(function() {
                 if (document.getElementById('adminPanel').style.display !== 'none') {
                     updateCountdown();
