@@ -9,7 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
-        /* ===== ESTILOS COMPLETOS (omitidos por brevedad, pero incluidos en el archivo final) ===== */
+        /* Estilos completos (iguales a los anteriores) */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
         body { background: #1a1a1a; min-height: 100vh; padding: 0.8rem 0.5rem; color: #e8e8e8; }
         .container { max-width: 1200px; margin: 0 auto; }
@@ -285,7 +285,7 @@
                         <div class="metric-card">
                             <div class="metric-icon"><i class="fas fa-fire"></i></div>
                             <div class="metric-value" id="metricPeakDay">-</div>
-                            <div class="metric-label">Día más ocupado</div>
+                            <div class="metric-label">Día más ocupado (esta semana)</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-icon"><i class="fas fa-clock"></i></div>
@@ -463,7 +463,7 @@
                 } catch (e) { return null; }
             }
 
-            // ===== AGENDA DE HOY (con 3 botones siempre visibles) =====
+            // ===== AGENDA DE HOY =====
             function renderTodayAgenda() {
                 const now = new Date();
                 const listEl = document.getElementById('todayList');
@@ -675,14 +675,13 @@
                 }
             }
 
-            // ===== DASHBOARD MENSUAL (con ocupación real) =====
+            // ===== DASHBOARD MENSUAL (con día más ocupado de la semana) =====
             function updateMonthlyDashboard() {
                 const year = selectedMonth.getFullYear();
                 const month = selectedMonth.getMonth();
                 
                 document.getElementById('currentMonthLabel').textContent = `${MONTH_NAMES[month]} ${year}`;
                 
-                // Reservas del mes
                 const monthReservations = allReservations.filter(r => {
                     const d = parseReservaDate(r.fecha, r.hora);
                     return d && d.getMonth() === month && d.getFullYear() === year;
@@ -691,40 +690,56 @@
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
                 const totalSlots = daysInMonth * HOURS_PER_DAY;
                 
-                // Estadísticas para el donut
                 const activas = monthReservations.filter(r => r.estado === 'ACTIVA').length;
                 const canceladas = monthReservations.filter(r => r.estado === 'CANCELADA').length;
-                const disponibles = totalSlots - activas; // slots libres
-                
-                // Porcentaje de ocupación: activas sobre total slots
+                const disponibles = totalSlots - activas;
                 const occupancyPercentage = totalSlots > 0 ? Math.round((activas / totalSlots) * 100) : 0;
                 
-                // Actualizar donut
                 updateDonutChart(occupancyPercentage);
                 
-                // Leyenda
                 document.getElementById('legendActivas').textContent = activas;
                 document.getElementById('legendCanceladas').textContent = canceladas;
                 document.getElementById('legendDisponibles').textContent = disponibles;
                 document.getElementById('occupancyPercentage').textContent = occupancyPercentage + '%';
                 
-                // Métricas
                 document.getElementById('metricTotalMonth').textContent = monthReservations.length;
                 document.getElementById('metricDaysInMonth').textContent = daysInMonth;
                 
-                // Día más ocupado (solo activas)
-                const dayCounts = {};
-                monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
+                // --- Día más ocupado de la SEMANA ACTUAL (lunes a domingo) ---
+                const now = new Date();
+                const dayOfWeek = now.getDay(); // 0=domingo
+                const diffToMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+                const monday = new Date(now);
+                monday.setDate(now.getDate() - diffToMonday);
+                monday.setHours(0, 0, 0, 0);
+                const sunday = new Date(monday);
+                sunday.setDate(monday.getDate() + 6);
+                sunday.setHours(23, 59, 59, 999);
+
+                // Filtrar reservas de esta semana (todas, sin importar estado)
+                const weekReservations = allReservations.filter(r => {
+                    const d = parseReservaDate(r.fecha, r.hora);
+                    return d && d >= monday && d <= sunday;
+                });
+
+                const weekDayCounts = {};
+                weekReservations.forEach(r => {
                     const partesFecha = r.fecha.split(' ');
                     if (partesFecha.length >= 2) {
                         const dayName = partesFecha[0];
-                        dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
+                        weekDayCounts[dayName] = (weekDayCounts[dayName] || 0) + 1;
                     }
                 });
-                const peakDay = Object.keys(dayCounts).reduce((a, b) => dayCounts[a] > dayCounts[b] ? a : b, '-');
-                document.getElementById('metricPeakDay').textContent = peakDay !== '-' ? `${peakDay} (${dayCounts[peakDay]})` : '-';
+
+                let peakDayText = '-';
+                if (Object.keys(weekDayCounts).length > 0) {
+                    const maxCount = Math.max(...Object.values(weekDayCounts));
+                    const dayWithMax = Object.keys(weekDayCounts).find(d => weekDayCounts[d] === maxCount);
+                    peakDayText = `${dayWithMax} (${maxCount})`;
+                }
+                document.getElementById('metricPeakDay').textContent = peakDayText;
                 
-                // Hora pico (solo activas)
+                // --- Hora pico (solo activas, del mes) ---
                 const hourCounts = {};
                 monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
                     hourCounts[r.hora] = (hourCounts[r.hora] || 0) + 1;
@@ -732,7 +747,7 @@
                 const peakHour = Object.keys(hourCounts).reduce((a, b) => hourCounts[a] > hourCounts[b] ? a : b, '-');
                 document.getElementById('metricPeakHour').textContent = peakHour !== '-' ? `${peakHour} (${hourCounts[peakHour]})` : '-';
                 
-                // Distribución por día (todas las reservas)
+                // Distribución por día (todas las reservas del mes)
                 const allDayCounts = {};
                 monthReservations.forEach(r => {
                     const partesFecha = r.fecha.split(' ');
