@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Admin - Reservas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
         body { background: #1a1a1a; min-height: 100vh; padding: 0.8rem 0.5rem; color: #e8e8e8; }
@@ -21,23 +25,8 @@
         .btn { background: linear-gradient(135deg, #e5c147 0%, #d4af37 50%, #b8941f 100%); border: none; color: #1a1a1a; padding: 0.7rem 1.2rem; border-radius: 4px; font-weight: 700; font-size: 0.95rem; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; }
         .btn:hover { transform: scale(1.02); }
         .btn-secondary { background: #444; color: #e8e8e8; border: 1px solid #555; }
-        
-        /* Botones de acción compactos */
         .action-buttons { display: flex; gap: 0.2rem; align-items: center; }
-        .action-btn {
-            width: 26px;
-            height: 26px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            transition: all 0.15s;
-            text-decoration: none;
-            position: relative;
-        }
+        .action-btn { width: 26px; height: 26px; border: none; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; transition: all 0.15s; text-decoration: none; position: relative; }
         .action-btn:hover { transform: scale(1.1); }
         .action-btn:active { transform: scale(0.95); }
         .btn-whatsapp { background: #25d366; color: white; }
@@ -48,47 +37,15 @@
         .btn-danger:hover { background: #c44; }
         .btn-neutral { background: #555; color: white; }
         .btn-neutral:hover { background: #666; }
-        .action-btn[title]:hover::after {
-            content: attr(title);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #000;
-            color: white;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-size: 0.6rem;
-            white-space: nowrap;
-            margin-bottom: 3px;
-            pointer-events: none;
-            z-index: 10;
-        }
-        
-        /* AGENDA DE HOY */
-        .today-agenda {
-            background: linear-gradient(135deg, #2a2a2a 0%, #2e2818 100%);
-            border: 1px solid #8b7424;
-            border-radius: 4px;
-            padding: 0.6rem 0.8rem;
-            margin-bottom: 1rem;
-        }
+        .action-btn[title]:hover::after { content: attr(title); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #000; color: white; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.6rem; white-space: nowrap; margin-bottom: 3px; pointer-events: none; z-index: 10; }
+        .today-agenda { background: linear-gradient(135deg, #2a2a2a 0%, #2e2818 100%); border: 1px solid #8b7424; border-radius: 4px; padding: 0.6rem 0.8rem; margin-bottom: 1rem; }
         .today-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.4rem; }
         .today-header h2 { font-size: 1.1rem; color: #e8e8e8; }
         .today-header h2 i { color: #d4af37; margin-right: 6px; }
         .today-date { color: #b0a070; font-size: 0.75rem; font-weight: 500; }
         .today-count { background: #d4af37; color: #1a1a1a; font-weight: 700; font-size: 0.65rem; padding: 0.1rem 0.5rem; border-radius: 4px; }
         .today-list { display: flex; flex-direction: column; gap: 0.3rem; }
-        .today-item {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            background: #222;
-            border: 1px solid #353535;
-            border-radius: 4px;
-            padding: 0.3rem 0.6rem;
-            transition: 0.15s;
-        }
+        .today-item { display: flex; align-items: center; gap: 0.6rem; background: #222; border: 1px solid #353535; border-radius: 4px; padding: 0.3rem 0.6rem; transition: 0.15s; }
         .today-item:hover { background: #262626; }
         .today-item.next { border-color: #d4af37; box-shadow: 0 0 10px rgba(212, 175, 55, 0.15); }
         .today-item.past { opacity: 0.4; }
@@ -101,7 +58,6 @@
         .today-tag.past-tag { background: #444; color: #aaa; }
         .today-empty { text-align: center; color: #777; padding: 0.6rem 0.3rem; font-size: 0.8rem; }
         .today-empty i { font-size: 1.8rem; color: #55482a; margin-bottom: 0.2rem; display: block; }
-        
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0.8rem; }
         .stat-card { background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 4px; padding: 0.6rem 0.3rem; text-align: center; }
         .stat-card .number { font-size: 1.4rem; font-weight: 700; color: #d4af37; display: block; }
@@ -109,7 +65,6 @@
         .stat-card .label { font-size: 0.6rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.1rem; }
         .stat-card.next-card { border-color: #8b7424; background: linear-gradient(135deg, #2a2a2a 0%, #332b1a 100%); }
         .stat-card.next-card .number { color: #e5c147; }
-        
         .monthly-dashboard { background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 4px; padding: 0.8rem; margin-top: 0.8rem; }
         .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.3rem; }
         .dashboard-header h2 { font-size: 1rem; color: #e8e8e8; }
@@ -118,30 +73,9 @@
         .month-selector button:hover { background: #3d3d3d; }
         .month-selector button:disabled { opacity: 0.4; cursor: not-allowed; }
         .month-selector .current-month { background: #d4af37; color: #1a1a1a; font-weight: 600; padding: 0.2rem 0.8rem; }
-        
-        /* DASHBOARD CONTENT: dos columnas con la misma altura */
-        .dashboard-content {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: stretch;
-        }
-        .dashboard-content > * {
-            flex: 1 1 calc(50% - 0.5rem);
-            min-width: 250px;
-            display: flex;
-            flex-direction: column;
-        }
-        /* El chart-container del donut ocupa toda la altura disponible */
-        .chart-container {
-            background: #222;
-            border-radius: 4px;
-            padding: 0.8rem;
-            border: 1px solid #353535;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
+        .dashboard-content { display: flex; flex-wrap: wrap; gap: 1rem; align-items: stretch; }
+        .dashboard-content > * { flex: 1 1 calc(50% - 0.5rem); min-width: 250px; display: flex; flex-direction: column; }
+        .chart-container { background: #222; border-radius: 4px; padding: 0.8rem; border: 1px solid #353535; flex: 1; display: flex; flex-direction: column; }
         .chart-title { font-size: 0.75rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem; text-align: center; }
         .donut-chart { position: relative; width: 160px; height: 160px; margin: 0 auto 0.6rem; flex-shrink: 0; }
         .donut-chart svg { width: 100%; height: 100%; transform: rotate(-90deg); }
@@ -153,35 +87,23 @@
         .legend-color { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
         .legend-label { color: #ccc; flex: 1; }
         .legend-value { color: #d4af37; font-weight: 600; }
-        
-        /* Columna derecha: métricas + distribución */
-        .right-column {
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-            flex: 1;
-        }
+        .right-column { display: flex; flex-direction: column; gap: 0.6rem; flex: 1; }
         .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; flex: 1; }
         .metric-card { background: #222; border-radius: 4px; padding: 0.5rem; border: 1px solid #353535; display: flex; flex-direction: column; justify-content: center; }
         .metric-card .metric-icon { font-size: 1rem; color: #d4af37; margin-bottom: 0.1rem; }
         .metric-card .metric-value { font-size: 1.1rem; font-weight: 700; color: #e8e8e8; margin-bottom: 0.05rem; }
         .metric-card .metric-label { font-size: 0.55rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
-        
         .distribution-chart { margin-top: 0.2rem; flex: 1; }
         .bar-chart { display: flex; align-items: flex-end; gap: 0.2rem; height: 70px; padding: 0.2rem 0; }
         .bar { flex: 1; background: linear-gradient(to top, #b8941f, #d4af37); border-radius: 2px 2px 0 0; position: relative; min-height: 4px; transition: all 0.3s; }
         .bar:hover { opacity: 0.8; }
         .bar-label { position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); font-size: 0.5rem; color: #888; }
         .bar-value { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 0.55rem; color: #d4af37; font-weight: 600; }
-        
-        /* TOOLBAR */
         .toolbar { display: flex; gap: 0.3rem; margin-bottom: 0.4rem; flex-wrap: wrap; align-items: center; justify-content: space-between; }
         .toolbar-left, .toolbar-right { display: flex; gap: 0.2rem; align-items: center; flex-wrap: wrap; }
         .filter-btn { background: #333; border: 1px solid #444; color: #ccc; padding: 0.2rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; transition: 0.15s; }
         .filter-btn:hover { background: #3d3d3d; }
         .filter-btn.active { background: #d4af37; color: #1a1a1a; border-color: #d4af37; font-weight: 600; }
-        
-        /* TABLA - más compacta */
         .table-wrap { background: #222; border-radius: 4px; border: 1px solid #3a3a3a; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
         th { background: #2a2a2a; color: #d0d0d0; font-weight: 600; padding: 0.3rem 0.3rem; text-align: left; border-bottom: 2px solid #3a3a3a; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -199,7 +121,6 @@
         .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.3rem; }
         .user-info { font-size: 0.75rem; color: #888; }
         .user-info strong { color: #d4af37; }
-        
         @media (max-width: 768px) {
             th, td { padding: 0.2rem 0.2rem; font-size: 0.65rem; }
             .hide-mobile { display: none; }
@@ -315,7 +236,6 @@
             </div>
             
             <div class="dashboard-content">
-                <!-- COLUMNA IZQUIERDA: Ocupación del Mes (donut) -->
                 <div class="chart-container">
                     <div class="chart-title">Ocupación del Mes</div>
                     <div class="donut-chart">
@@ -347,7 +267,6 @@
                     </div>
                 </div>
 
-                <!-- COLUMNA DERECHA: métricas + distribución -->
                 <div class="right-column">
                     <div class="metrics-grid">
                         <div class="metric-card">
@@ -384,476 +303,541 @@
     </div>
 
     <script>
-        // ===== CONFIGURACIÓN =====
-        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwDFvAKsIT2tVmuIWcyJ3duNBNCDEriYuCvDOBATRyTatUJNkSiAmQH3xisg3v74srM1g/exec';
-        const HOURS_PER_DAY = 9;
-        const MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        const LONG_DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-        const DAY_INDEX = { 'Dom': 0, 'Lun': 1, 'Mar': 2, 'Mié': 3, 'Jue': 4, 'Vie': 5, 'Sáb': 6 };
-        const STUDIO_NAME = 'Estudio de Tatuajes';
-        const DEFAULT_COUNTRY_CODE = '54';
-        
-        let adminPassword = '';
-        let allReservations = [];
-        let currentFilter = 'all';
-        let stats = { total: 0, activas: 0, canceladas: 0, futuras: 0, pasadas: 0 };
-        let selectedMonth = new Date();
+        (function() {
+            // ===== CONFIGURACIÓN DE FIREBASE =====
+            const firebaseConfig = {
+                apiKey: "AIzaSyBCXprwlz801V0co99vpWwm17WUbWYGkk8",
+                authDomain: "reservascitas1.firebaseapp.com",
+                projectId: "reservascitas1",
+                storageBucket: "reservascitas1.firebasestorage.app",
+                messagingSenderId: "766960713190",
+                appId: "1:766960713190:web:adbaa9a25ae3cf0c896a27"
+            };
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+            const auth = firebase.auth();
 
-        // ===== LOGIN =====
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const password = document.getElementById('passwordInput').value;
-            const errorEl = document.getElementById('loginError');
-            errorEl.style.display = 'none';
+            // ===== AUTENTICACIÓN ANÓNIMA =====
+            let authReady = false;
+            auth.signInAnonymously()
+                .then(() => {
+                    console.log('✅ Admin autenticado anónimamente');
+                    authReady = true;
+                    // Si ya estamos logueados con contraseña, cargamos datos
+                    if (document.getElementById('adminPanel').style.display !== 'none') {
+                        loadData();
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Error en auth anónima (admin):', error);
+                    alert('No se pudo autenticar con Firebase. El panel no funcionará correctamente.');
+                });
+
+            // ===== CONFIGURACIÓN GENERAL =====
+            const ADMIN_PASSWORD = 'admin123'; // Cambia esta contraseña por la que desees
+            const HOURS_PER_DAY = 9;
+            const MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const LONG_DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const DAY_INDEX = { 'Dom': 0, 'Lun': 1, 'Mar': 2, 'Mié': 3, 'Jue': 4, 'Vie': 5, 'Sáb': 6 };
+            const STUDIO_NAME = 'Estudio de Tatuajes';
+            const DEFAULT_COUNTRY_CODE = '54';
             
-            try {
-                const response = await fetch(GOOGLE_SHEETS_URL + '?action=admin&password=' + encodeURIComponent(password));
-                const result = await response.json();
+            let allReservations = [];
+            let currentFilter = 'all';
+            let stats = { total: 0, activas: 0, canceladas: 0, futuras: 0, pasadas: 0 };
+            let selectedMonth = new Date();
+
+            // ===== LOGIN =====
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const password = document.getElementById('passwordInput').value;
+                const errorEl = document.getElementById('loginError');
+                errorEl.style.display = 'none';
                 
-                if (result.success) {
-                    adminPassword = password;
+                if (password === ADMIN_PASSWORD) {
                     sessionStorage.setItem('admin_password', password);
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('adminPanel').style.display = 'block';
-                    renderData(result);
+                    if (authReady) {
+                        loadData();
+                    } else {
+                        // Esperar a que auth esté listo
+                        const checkAuth = setInterval(() => {
+                            if (authReady) {
+                                clearInterval(checkAuth);
+                                loadData();
+                            }
+                        }, 500);
+                    }
                 } else {
                     errorEl.textContent = '❌ Contraseña incorrecta';
                     errorEl.style.display = 'block';
                 }
-            } catch (err) {
-                errorEl.textContent = '❌ Error de conexión';
-                errorEl.style.display = 'block';
-            }
-        });
+            });
 
-        window.addEventListener('load', async function() {
-            const saved = sessionStorage.getItem('admin_password');
-            if (saved) {
-                document.getElementById('passwordInput').value = saved;
-                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-            }
-        });
-
-        function logout() {
-            sessionStorage.removeItem('admin_password');
-            adminPassword = '';
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'block';
-            document.getElementById('passwordInput').value = '';
-        }
-
-        async function loadData() {
-            const tbody = document.getElementById('reservasBody');
-            tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Actualizando...</td></tr>';
-            
-            try {
-                const response = await fetch(GOOGLE_SHEETS_URL + '?action=admin&password=' + encodeURIComponent(adminPassword));
-                const result = await response.json();
-                if (result.success) {
-                    renderData(result);
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Error al cargar datos</td></tr>';
+            window.addEventListener('load', function() {
+                const saved = sessionStorage.getItem('admin_password');
+                if (saved === ADMIN_PASSWORD) {
+                    document.getElementById('passwordInput').value = saved;
+                    document.getElementById('loginForm').dispatchEvent(new Event('submit'));
                 }
-            } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Error de conexión</td></tr>';
+            });
+
+            function logout() {
+                sessionStorage.removeItem('admin_password');
+                document.getElementById('adminPanel').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'block';
+                document.getElementById('passwordInput').value = '';
             }
-        }
 
-        function renderData(result) {
-            allReservations = result.reservas || [];
-            stats = result.estadisticas || { total: 0, activas: 0, canceladas: 0, futuras: 0, pasadas: 0 };
-            
-            document.getElementById('statTotal').textContent = stats.total;
-            document.getElementById('statActivas').textContent = stats.activas;
-            document.getElementById('statFuturas').textContent = stats.futuras;
-            document.getElementById('statPasadas').textContent = stats.pasadas;
-            document.getElementById('statCanceladas').textContent = stats.canceladas;
-            
-            renderTodayAgenda();
-            renderTable();
-            updateMonthlyDashboard();
-            updateCountdown();
-        }
-
-        function parseReservaDate(fecha, hora) {
-            try {
-                const partes = fecha.split(' ');
-                if (partes.length < 2) return null;
-                const dayName = partes[0];
-                const dayNum = parseInt(partes[1], 10);
-                const hourParts = (hora || '0:0').split(':');
-                const h = parseInt(hourParts[0], 10) || 0;
-                const m = parseInt(hourParts[1], 10) || 0;
-                const targetDow = DAY_INDEX[dayName];
-                if (targetDow === undefined || isNaN(dayNum)) return null;
+            // ===== FUNCIONES DE FIREBASE =====
+            async function loadData() {
+                const tbody = document.getElementById('reservasBody');
+                tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Actualizando...</td></tr>';
                 
+                try {
+                    const snapshot = await db.collection('citas').get();
+                    const reservas = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        reservas.push({
+                            id: doc.id,
+                            fecha: data.fecha || '',
+                            hora: data.hora || '',
+                            nombre: data.nombre || '',
+                            email: data.email || '',
+                            telefono: data.telefono || '',
+                            estado: data.estado || 'ACTIVA',
+                            servicio: data.servicio || 'Consulta',
+                            fechaReserva: data.createdAt ? data.createdAt.toDate().toISOString() : new Date().toISOString()
+                        });
+                    });
+                    allReservations = reservas;
+                    calculateStats();
+                    renderData();
+                } catch (error) {
+                    console.error('Error al cargar datos:', error);
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Error al cargar datos. Verifica tu conexión.</td></tr>';
+                }
+            }
+
+            function calculateStats() {
                 const now = new Date();
-                const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 62);
-                for (let i = 0; i < 470; i++) {
-                    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-                    if (d.getDate() === dayNum && d.getDay() === targetDow) {
-                        d.setHours(h, m, 0, 0);
-                        return d;
-                    }
-                }
-                return null;
-            } catch (e) { return null; }
-        }
-
-        function renderTodayAgenda() {
-            const now = new Date();
-            const listEl = document.getElementById('todayList');
-            const dateLabel = document.getElementById('todayDateLabel');
-            const countEl = document.getElementById('todayCount');
-            
-            dateLabel.textContent = `${LONG_DAYS[now.getDay()]} ${String(now.getDate()).padStart(2, '0')} de ${MONTH_NAMES[now.getMonth()]}, ${now.getFullYear()}`;
-            
-            const todayRes = allReservations
-                .filter(r => r.estado === 'ACTIVA')
-                .map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }))
-                .filter(x => x.d &&
-                    x.d.getDate() === now.getDate() &&
-                    x.d.getMonth() === now.getMonth() &&
-                    x.d.getFullYear() === now.getFullYear())
-                .sort((a, b) => a.d - b.d);
-            
-            countEl.textContent = todayRes.length === 1 ? '1 cita' : todayRes.length + ' citas';
-            
-            if (todayRes.length === 0) {
-                listEl.innerHTML = `
-                    <div class="today-empty">
-                        <i class="fas fa-mug-hot"></i>
-                        No hay reservas para hoy. ¡Día libre! 🎉
-                    </div>
-                `;
-                return;
+                stats.total = allReservations.length;
+                stats.activas = allReservations.filter(r => r.estado === 'ACTIVA').length;
+                stats.canceladas = allReservations.filter(r => r.estado === 'CANCELADA').length;
+                stats.futuras = allReservations.filter(r => {
+                    if (r.estado !== 'ACTIVA') return false;
+                    const d = parseReservaDate(r.fecha, r.hora);
+                    return d && d >= now;
+                }).length;
+                stats.pasadas = allReservations.filter(r => {
+                    if (r.estado !== 'ACTIVA') return false;
+                    const d = parseReservaDate(r.fecha, r.hora);
+                    return !d || d < now;
+                }).length;
             }
-            
-            const nextIndex = todayRes.findIndex(x => x.d >= now);
-            
-            listEl.innerHTML = todayRes.map((item, idx) => {
-                const isPast = item.d < now;
-                const isNext = idx === nextIndex;
-                const timeStr = String(item.d.getHours()).padStart(2, '0') + ':' + String(item.d.getMinutes()).padStart(2, '0');
+
+            function renderData() {
+                document.getElementById('statTotal').textContent = stats.total;
+                document.getElementById('statActivas').textContent = stats.activas;
+                document.getElementById('statFuturas').textContent = stats.futuras;
+                document.getElementById('statPasadas').textContent = stats.pasadas;
+                document.getElementById('statCanceladas').textContent = stats.canceladas;
                 
-                let tag = '';
-                if (isNext) tag = '<span class="today-tag next-tag">Siguiente</span>';
-                else if (isPast) tag = '<span class="today-tag past-tag">Pasada</span>';
-                
-                return `
-                    <div class="today-item ${isNext ? 'next' : ''} ${isPast ? 'past' : ''}">
-                        <div class="today-time">${timeStr}</div>
-                        <div class="today-info">
-                            <span class="today-name">${item.r.nombre} ${tag}</span>
-                            <span class="today-phone"><i class="fas fa-phone-alt"></i> ${item.r.telefono}</span>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${item.r.id}')" title="Enviar WhatsApp">
-                                <i class="fab fa-whatsapp"></i>
-                            </button>
-                            ${!isPast ? `
-                            <button class="action-btn btn-success" onclick="markCompleted('${item.r.id}')" title="Completada">
-                                <i class="fas fa-check"></i>
-                            </button>` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function getSortedReservations() {
-            const now = new Date();
-            const withDates = allReservations.map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }));
-            const upcoming = withDates
-                .filter(x => x.d && x.d >= now)
-                .sort((a, b) => a.d - b.d);
-            const past = withDates
-                .filter(x => !x.d || x.d < now)
-                .sort((a, b) => (b.d ? b.d.getTime() : 0) - (a.d ? a.d.getTime() : 0));
-            return upcoming.concat(past).map(x => x.r);
-        }
-
-        function getNextUpcoming() {
-            const now = new Date();
-            const candidates = allReservations
-                .filter(r => r.estado === 'ACTIVA')
-                .map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }))
-                .filter(x => x.d && x.d >= now)
-                .sort((a, b) => a.d - b.d);
-            return candidates.length ? candidates[0] : null;
-        }
-
-        function formatCountdown(ms) {
-            if (ms <= 0) return '¡Ahora!';
-            const mins = Math.floor(ms / 60000);
-            const days = Math.floor(mins / 1440);
-            const hours = Math.floor((mins % 1440) / 60);
-            const minutes = mins % 60;
-            if (days > 0) return `${days}d ${hours}h`;
-            if (hours > 0) return `${hours}h ${minutes}m`;
-            return `${minutes}m`;
-        }
-
-        function updateCountdown() {
-            const numberEl = document.getElementById('statCountdown');
-            const labelEl = document.getElementById('statNextInfo');
-            const next = getNextUpcoming();
-            if (!next) {
-                numberEl.textContent = '—';
-                labelEl.textContent = 'Sin reservas próximas';
-                return;
-            }
-            numberEl.textContent = formatCountdown(next.d - new Date());
-            labelEl.textContent = `Próxima: ${next.r.fecha} · ${next.r.hora}`;
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('reservasBody');
-            
-            let filtered = getSortedReservations();
-            
-            if (currentFilter === 'activas') filtered = filtered.filter(r => r.estado === 'ACTIVA');
-            else if (currentFilter === 'canceladas') filtered = filtered.filter(r => r.estado === 'CANCELADA');
-            else if (currentFilter === 'futuras') filtered = filtered.filter(r => r.estado === 'ACTIVA' && esFutura(r.fecha, r.hora));
-            else if (currentFilter === 'pasadas') filtered = filtered.filter(r => r.estado === 'ACTIVA' && !esFutura(r.fecha, r.hora));
-            
-            if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-calendar-times"></i><br>No hay reservas en esta categoría</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = filtered.map(r => {
-                const badgeClass = r.estado === 'ACTIVA' ? (esFutura(r.fecha, r.hora) ? 'badge-activa' : 'badge-completada') : 'badge-cancelada';
-                const estadoLabel = r.estado === 'ACTIVA' ? (esFutura(r.fecha, r.hora) ? 'Activa' : 'Pasada') : 'Cancelada';
-                
-                let actionsHtml = '';
-                
-                if (r.estado === 'ACTIVA') {
-                    actionsHtml = `
-                        <div class="action-buttons">
-                            <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${r.id}')" title="Enviar WhatsApp">
-                                <i class="fab fa-whatsapp"></i>
-                            </button>
-                            <button class="action-btn btn-success" onclick="markCompleted('${r.id}')" title="Completada">
-                                <i class="fas fa-check"></i>
-                            </button>
-                            <button class="action-btn btn-danger" onclick="cancelReservation('${r.id}')" title="Cancelar">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    `;
-                } else {
-                    actionsHtml = `
-                        <div class="action-buttons">
-                            <button class="action-btn btn-neutral" onclick="reactivate('${r.id}')" title="Reactivar">
-                                <i class="fas fa-undo"></i>
-                            </button>
-                        </div>
-                    `;
-                }
-                
-                return `
-                    <tr>
-                        <td><strong>${r.fecha}</strong></td>
-                        <td>${r.hora}</td>
-                        <td>${r.nombre}</td>
-                        <td class="hide-mobile">${r.telefono}</td>
-                        <td class="hide-mobile">${r.email}</td>
-                        <td><span class="badge ${badgeClass}">${estadoLabel}</span></td>
-                        <td>${actionsHtml}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function esFutura(fecha, hora) {
-            const d = parseReservaDate(fecha, hora);
-            if (d) return d >= new Date();
-            return true;
-        }
-
-        function sendWhatsApp(id) {
-            const reserva = allReservations.find(r => r.id === id);
-            if (!reserva) {
-                alert('❌ Reserva no encontrada');
-                return;
-            }
-            
-            let phone = (reserva.telefono || '').toString().trim();
-            
-            if (!phone) {
-                alert('⚠️ Este cliente no cargó un número de teléfono');
-                return;
-            }
-            
-            phone = phone.replace(/\D/g, '');
-            
-            if (phone.length < 8) {
-                alert('⚠️ El número de teléfono es inválido: ' + reserva.telefono);
-                return;
-            }
-            
-            if (phone.startsWith('0')) phone = phone.substring(1);
-            if (phone.startsWith('15') && phone.length >= 10) phone = phone.substring(2);
-            if (phone.length <= 10) phone = DEFAULT_COUNTRY_CODE + phone;
-            else if (phone.length === 11 && phone.startsWith('9')) phone = DEFAULT_COUNTRY_CODE + phone;
-            
-            const message = `Hola ${reserva.nombre}! 👋\n\n` +
-                `Te contactamos desde *${STUDIO_NAME}* sobre tu reserva:\n\n` +
-                `📅 *Fecha:* ${reserva.fecha}\n` +
-                `🕐 *Hora:* ${reserva.hora}\n\n` +
-                `Por favor confirma tu asistencia. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n` +
-                `¡Te esperamos! 🎨`;
-            
-            const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-            const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-            
-            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                window.location.href = url;
-            }
-        }
-
-        function updateMonthlyDashboard() {
-            const year = selectedMonth.getFullYear();
-            const month = selectedMonth.getMonth();
-            
-            document.getElementById('currentMonthLabel').textContent = `${MONTH_NAMES[month]} ${year}`;
-            
-            const monthReservations = allReservations.filter(r => {
-                const d = parseReservaDate(r.fecha, r.hora);
-                return d && d.getMonth() === month && d.getFullYear() === year;
-            });
-            
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const totalSlots = daysInMonth * HOURS_PER_DAY;
-            
-            const activas = monthReservations.filter(r => r.estado === 'ACTIVA').length;
-            const canceladas = monthReservations.filter(r => r.estado === 'CANCELADA').length;
-            const disponibles = totalSlots - activas;
-            
-            const occupancyPercentage = totalSlots > 0 ? Math.round((activas / totalSlots) * 100) : 0;
-            
-            updateDonutChart(occupancyPercentage);
-            
-            document.getElementById('legendActivas').textContent = activas;
-            document.getElementById('legendCanceladas').textContent = canceladas;
-            document.getElementById('legendDisponibles').textContent = disponibles;
-            document.getElementById('occupancyPercentage').textContent = occupancyPercentage + '%';
-            
-            document.getElementById('metricTotalMonth').textContent = monthReservations.length;
-            document.getElementById('metricDaysInMonth').textContent = daysInMonth;
-            
-            const dayCounts = {};
-            monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
-                const partesFecha = r.fecha.split(' ');
-                if (partesFecha.length >= 2) {
-                    const dayName = partesFecha[0];
-                    dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
-                }
-            });
-            
-            const peakDay = Object.keys(dayCounts).reduce((a, b) => dayCounts[a] > dayCounts[b] ? a : b, '-');
-            document.getElementById('metricPeakDay').textContent = peakDay !== '-' ? `${peakDay} (${dayCounts[peakDay]})` : '-';
-            
-            const hourCounts = {};
-            monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
-                hourCounts[r.hora] = (hourCounts[r.hora] || 0) + 1;
-            });
-            
-            const peakHour = Object.keys(hourCounts).reduce((a, b) => hourCounts[a] > hourCounts[b] ? a : b, '-');
-            document.getElementById('metricPeakHour').textContent = peakHour !== '-' ? `${peakHour} (${hourCounts[peakHour]})` : '-';
-            
-            updateDayDistribution(dayCounts);
-        }
-
-        function updateDonutChart(percentage) {
-            const circumference = 2 * Math.PI * 40;
-            const offset = circumference - (percentage / 100) * circumference;
-            const donutFill = document.getElementById('donutFill');
-            donutFill.style.strokeDasharray = `${circumference} ${circumference}`;
-            donutFill.style.strokeDashoffset = offset;
-        }
-
-        function updateDayDistribution(dayCounts) {
-            const container = document.getElementById('dayDistribution');
-            const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-            const maxCount = Math.max(...days.map(d => dayCounts[d] || 0), 1);
-            
-            container.innerHTML = days.map(day => {
-                const count = dayCounts[day] || 0;
-                const height = (count / maxCount) * 100;
-                return `
-                    <div class="bar" style="height: ${height}%;">
-                        ${count > 0 ? `<div class="bar-value">${count}</div>` : ''}
-                        <div class="bar-label">${day}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        document.getElementById('prevMonthBtn').addEventListener('click', function() {
-            selectedMonth.setMonth(selectedMonth.getMonth() - 1);
-            updateMonthlyDashboard();
-        });
-
-        document.getElementById('nextMonthBtn').addEventListener('click', function() {
-            selectedMonth.setMonth(selectedMonth.getMonth() + 1);
-            updateMonthlyDashboard();
-        });
-
-        async function cancelReservation(id) {
-            if (!confirm('¿Cancelar esta reserva?')) return;
-            await updateEstado(id, 'CANCELADA');
-        }
-
-        async function markCompleted(id) {
-            if (!confirm('¿Marcar como completada?')) return;
-            await updateEstado(id, 'COMPLETADA');
-        }
-
-        async function reactivate(id) {
-            if (!confirm('¿Reactivar esta reserva?')) return;
-            await updateEstado(id, 'ACTIVA');
-        }
-
-        async function updateEstado(id, estado) {
-            try {
-                await fetch(GOOGLE_SHEETS_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'update', id, estado, password: adminPassword }),
-                    redirect: 'follow'
-                });
-                loadData();
-            } catch (err) {
-                alert('Error al actualizar');
-            }
-        }
-
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentFilter = this.dataset.filter;
+                renderTodayAgenda();
                 renderTable();
+                updateMonthlyDashboard();
+                updateCountdown();
+            }
+
+            // ===== FUNCIONES AUXILIARES (sin cambios) =====
+            function parseReservaDate(fecha, hora) {
+                try {
+                    const partes = fecha.split(' ');
+                    if (partes.length < 2) return null;
+                    const dayName = partes[0];
+                    const dayNum = parseInt(partes[1], 10);
+                    const hourParts = (hora || '0:0').split(':');
+                    const h = parseInt(hourParts[0], 10) || 0;
+                    const m = parseInt(hourParts[1], 10) || 0;
+                    const targetDow = DAY_INDEX[dayName];
+                    if (targetDow === undefined || isNaN(dayNum)) return null;
+                    
+                    const now = new Date();
+                    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 62);
+                    for (let i = 0; i < 470; i++) {
+                        const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+                        if (d.getDate() === dayNum && d.getDay() === targetDow) {
+                            d.setHours(h, m, 0, 0);
+                            return d;
+                        }
+                    }
+                    return null;
+                } catch (e) { return null; }
+            }
+
+            function renderTodayAgenda() {
+                const now = new Date();
+                const listEl = document.getElementById('todayList');
+                const dateLabel = document.getElementById('todayDateLabel');
+                const countEl = document.getElementById('todayCount');
+                
+                dateLabel.textContent = `${LONG_DAYS[now.getDay()]} ${String(now.getDate()).padStart(2, '0')} de ${MONTH_NAMES[now.getMonth()]}, ${now.getFullYear()}`;
+                
+                const todayRes = allReservations
+                    .filter(r => r.estado === 'ACTIVA')
+                    .map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }))
+                    .filter(x => x.d &&
+                        x.d.getDate() === now.getDate() &&
+                        x.d.getMonth() === now.getMonth() &&
+                        x.d.getFullYear() === now.getFullYear())
+                    .sort((a, b) => a.d - b.d);
+                
+                countEl.textContent = todayRes.length === 1 ? '1 cita' : todayRes.length + ' citas';
+                
+                if (todayRes.length === 0) {
+                    listEl.innerHTML = `
+                        <div class="today-empty">
+                            <i class="fas fa-mug-hot"></i>
+                            No hay reservas para hoy. ¡Día libre! 🎉
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const nextIndex = todayRes.findIndex(x => x.d >= now);
+                
+                listEl.innerHTML = todayRes.map((item, idx) => {
+                    const isPast = item.d < now;
+                    const isNext = idx === nextIndex;
+                    const timeStr = String(item.d.getHours()).padStart(2, '0') + ':' + String(item.d.getMinutes()).padStart(2, '0');
+                    
+                    let tag = '';
+                    if (isNext) tag = '<span class="today-tag next-tag">Siguiente</span>';
+                    else if (isPast) tag = '<span class="today-tag past-tag">Pasada</span>';
+                    
+                    return `
+                        <div class="today-item ${isNext ? 'next' : ''} ${isPast ? 'past' : ''}">
+                            <div class="today-time">${timeStr}</div>
+                            <div class="today-info">
+                                <span class="today-name">${item.r.nombre} ${tag}</span>
+                                <span class="today-phone"><i class="fas fa-phone-alt"></i> ${item.r.telefono}</span>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${item.r.id}')" title="Enviar WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </button>
+                                ${!isPast ? `
+                                <button class="action-btn btn-success" onclick="markCompleted('${item.r.id}')" title="Completada">
+                                    <i class="fas fa-check"></i>
+                                </button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            function getSortedReservations() {
+                const now = new Date();
+                const withDates = allReservations.map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }));
+                const upcoming = withDates
+                    .filter(x => x.d && x.d >= now)
+                    .sort((a, b) => a.d - b.d);
+                const past = withDates
+                    .filter(x => !x.d || x.d < now)
+                    .sort((a, b) => (b.d ? b.d.getTime() : 0) - (a.d ? a.d.getTime() : 0));
+                return upcoming.concat(past).map(x => x.r);
+            }
+
+            function getNextUpcoming() {
+                const now = new Date();
+                const candidates = allReservations
+                    .filter(r => r.estado === 'ACTIVA')
+                    .map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }))
+                    .filter(x => x.d && x.d >= now)
+                    .sort((a, b) => a.d - b.d);
+                return candidates.length ? candidates[0] : null;
+            }
+
+            function formatCountdown(ms) {
+                if (ms <= 0) return '¡Ahora!';
+                const mins = Math.floor(ms / 60000);
+                const days = Math.floor(mins / 1440);
+                const hours = Math.floor((mins % 1440) / 60);
+                const minutes = mins % 60;
+                if (days > 0) return `${days}d ${hours}h`;
+                if (hours > 0) return `${hours}h ${minutes}m`;
+                return `${minutes}m`;
+            }
+
+            function updateCountdown() {
+                const numberEl = document.getElementById('statCountdown');
+                const labelEl = document.getElementById('statNextInfo');
+                const next = getNextUpcoming();
+                if (!next) {
+                    numberEl.textContent = '—';
+                    labelEl.textContent = 'Sin reservas próximas';
+                    return;
+                }
+                numberEl.textContent = formatCountdown(next.d - new Date());
+                labelEl.textContent = `Próxima: ${next.r.fecha} · ${next.r.hora}`;
+            }
+
+            function esFutura(fecha, hora) {
+                const d = parseReservaDate(fecha, hora);
+                if (d) return d >= new Date();
+                return true;
+            }
+
+            function renderTable() {
+                const tbody = document.getElementById('reservasBody');
+                
+                let filtered = getSortedReservations();
+                
+                if (currentFilter === 'activas') filtered = filtered.filter(r => r.estado === 'ACTIVA');
+                else if (currentFilter === 'canceladas') filtered = filtered.filter(r => r.estado === 'CANCELADA');
+                else if (currentFilter === 'futuras') filtered = filtered.filter(r => r.estado === 'ACTIVA' && esFutura(r.fecha, r.hora));
+                else if (currentFilter === 'pasadas') filtered = filtered.filter(r => r.estado === 'ACTIVA' && !esFutura(r.fecha, r.hora));
+                
+                if (filtered.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-calendar-times"></i><br>No hay reservas en esta categoría</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = filtered.map(r => {
+                    const badgeClass = r.estado === 'ACTIVA' ? (esFutura(r.fecha, r.hora) ? 'badge-activa' : 'badge-completada') : 'badge-cancelada';
+                    const estadoLabel = r.estado === 'ACTIVA' ? (esFutura(r.fecha, r.hora) ? 'Activa' : 'Pasada') : 'Cancelada';
+                    
+                    let actionsHtml = '';
+                    
+                    if (r.estado === 'ACTIVA') {
+                        actionsHtml = `
+                            <div class="action-buttons">
+                                <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${r.id}')" title="Enviar WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </button>
+                                <button class="action-btn btn-success" onclick="markCompleted('${r.id}')" title="Completada">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="action-btn btn-danger" onclick="cancelReservation('${r.id}')" title="Cancelar">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        actionsHtml = `
+                            <div class="action-buttons">
+                                <button class="action-btn btn-neutral" onclick="reactivate('${r.id}')" title="Reactivar">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                            </div>
+                        `;
+                    }
+                    
+                    return `
+                        <tr>
+                            <td><strong>${r.fecha}</strong></td>
+                            <td>${r.hora}</td>
+                            <td>${r.nombre}</td>
+                            <td class="hide-mobile">${r.telefono}</td>
+                            <td class="hide-mobile">${r.email}</td>
+                            <td><span class="badge ${badgeClass}">${estadoLabel}</span></td>
+                            <td>${actionsHtml}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // ===== ACCIONES =====
+            window.sendWhatsApp = function(id) {
+                const reserva = allReservations.find(r => r.id === id);
+                if (!reserva) {
+                    alert('❌ Reserva no encontrada');
+                    return;
+                }
+                
+                let phone = (reserva.telefono || '').toString().trim();
+                if (!phone) {
+                    alert('⚠️ Este cliente no cargó un número de teléfono');
+                    return;
+                }
+                
+                phone = phone.replace(/\D/g, '');
+                if (phone.length < 8) {
+                    alert('⚠️ El número de teléfono es inválido: ' + reserva.telefono);
+                    return;
+                }
+                
+                if (phone.startsWith('0')) phone = phone.substring(1);
+                if (phone.startsWith('15') && phone.length >= 10) phone = phone.substring(2);
+                if (phone.length <= 10) phone = DEFAULT_COUNTRY_CODE + phone;
+                else if (phone.length === 11 && phone.startsWith('9')) phone = DEFAULT_COUNTRY_CODE + phone;
+                
+                const message = `Hola ${reserva.nombre}! 👋\n\n` +
+                    `Te contactamos desde *${STUDIO_NAME}* sobre tu reserva:\n\n` +
+                    `📅 *Fecha:* ${reserva.fecha}\n` +
+                    `🕐 *Hora:* ${reserva.hora}\n\n` +
+                    `Por favor confirma tu asistencia. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n` +
+                    `¡Te esperamos! 🎨`;
+                
+                const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+                const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                    window.location.href = url;
+                }
+            };
+
+            window.cancelReservation = async function(id) {
+                if (!confirm('¿Cancelar esta reserva?')) return;
+                await updateEstado(id, 'CANCELADA');
+            };
+
+            window.markCompleted = async function(id) {
+                if (!confirm('¿Marcar como completada?')) return;
+                await updateEstado(id, 'COMPLETADA');
+            };
+
+            window.reactivate = async function(id) {
+                if (!confirm('¿Reactivar esta reserva?')) return;
+                await updateEstado(id, 'ACTIVA');
+            };
+
+            async function updateEstado(id, estado) {
+                try {
+                    await db.collection('citas').doc(id).update({ estado: estado });
+                    loadData();
+                } catch (err) {
+                    console.error('Error al actualizar:', err);
+                    alert('Error al actualizar el estado. Verifica tus permisos en Firestore.');
+                }
+            }
+
+            // ===== DASHBOARD MENSUAL =====
+            function updateMonthlyDashboard() {
+                const year = selectedMonth.getFullYear();
+                const month = selectedMonth.getMonth();
+                
+                document.getElementById('currentMonthLabel').textContent = `${MONTH_NAMES[month]} ${year}`;
+                
+                const monthReservations = allReservations.filter(r => {
+                    const d = parseReservaDate(r.fecha, r.hora);
+                    return d && d.getMonth() === month && d.getFullYear() === year;
+                });
+                
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const totalSlots = daysInMonth * HOURS_PER_DAY;
+                
+                const activas = monthReservations.filter(r => r.estado === 'ACTIVA').length;
+                const canceladas = monthReservations.filter(r => r.estado === 'CANCELADA').length;
+                const disponibles = totalSlots - activas;
+                
+                const occupancyPercentage = totalSlots > 0 ? Math.round((activas / totalSlots) * 100) : 0;
+                
+                updateDonutChart(occupancyPercentage);
+                
+                document.getElementById('legendActivas').textContent = activas;
+                document.getElementById('legendCanceladas').textContent = canceladas;
+                document.getElementById('legendDisponibles').textContent = disponibles;
+                document.getElementById('occupancyPercentage').textContent = occupancyPercentage + '%';
+                
+                document.getElementById('metricTotalMonth').textContent = monthReservations.length;
+                document.getElementById('metricDaysInMonth').textContent = daysInMonth;
+                
+                const dayCounts = {};
+                monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
+                    const partesFecha = r.fecha.split(' ');
+                    if (partesFecha.length >= 2) {
+                        const dayName = partesFecha[0];
+                        dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
+                    }
+                });
+                
+                const peakDay = Object.keys(dayCounts).reduce((a, b) => dayCounts[a] > dayCounts[b] ? a : b, '-');
+                document.getElementById('metricPeakDay').textContent = peakDay !== '-' ? `${peakDay} (${dayCounts[peakDay]})` : '-';
+                
+                const hourCounts = {};
+                monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
+                    hourCounts[r.hora] = (hourCounts[r.hora] || 0) + 1;
+                });
+                
+                const peakHour = Object.keys(hourCounts).reduce((a, b) => hourCounts[a] > hourCounts[b] ? a : b, '-');
+                document.getElementById('metricPeakHour').textContent = peakHour !== '-' ? `${peakHour} (${hourCounts[peakHour]})` : '-';
+                
+                updateDayDistribution(dayCounts);
+            }
+
+            function updateDonutChart(percentage) {
+                const circumference = 2 * Math.PI * 40;
+                const offset = circumference - (percentage / 100) * circumference;
+                const donutFill = document.getElementById('donutFill');
+                donutFill.style.strokeDasharray = `${circumference} ${circumference}`;
+                donutFill.style.strokeDashoffset = offset;
+            }
+
+            function updateDayDistribution(dayCounts) {
+                const container = document.getElementById('dayDistribution');
+                const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+                const maxCount = Math.max(...days.map(d => dayCounts[d] || 0), 1);
+                
+                container.innerHTML = days.map(day => {
+                    const count = dayCounts[day] || 0;
+                    const height = (count / maxCount) * 100;
+                    return `
+                        <div class="bar" style="height: ${height}%;">
+                            ${count > 0 ? `<div class="bar-value">${count}</div>` : ''}
+                            <div class="bar-label">${day}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            document.getElementById('prevMonthBtn').addEventListener('click', function() {
+                selectedMonth.setMonth(selectedMonth.getMonth() - 1);
+                updateMonthlyDashboard();
             });
-        });
 
-        function exportCSV() {
-            const headers = ['ID', 'Fecha', 'Hora', 'Nombre', 'Email', 'Teléfono', 'Fecha Reserva', 'Estado'];
-            const rows = allReservations.map(r => [r.id, r.fecha, r.hora, r.nombre, r.email, r.telefono, r.fechaReserva, r.estado]);
-            const csv = [headers, ...rows].map(row => row.map(cell => `"${(cell || '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'reservas_' + new Date().toISOString().split('T')[0] + '.csv';
-            a.click();
-        }
+            document.getElementById('nextMonthBtn').addEventListener('click', function() {
+                selectedMonth.setMonth(selectedMonth.getMonth() + 1);
+                updateMonthlyDashboard();
+            });
 
-        setInterval(function() {
-            updateCountdown();
-            renderTodayAgenda();
-        }, 60000);
+            // ===== FILTROS =====
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    renderTable();
+                });
+            });
+
+            // ===== EXPORTAR CSV =====
+            window.exportCSV = function() {
+                const headers = ['ID', 'Fecha', 'Hora', 'Nombre', 'Email', 'Teléfono', 'Fecha Reserva', 'Estado'];
+                const rows = allReservations.map(r => [r.id, r.fecha, r.hora, r.nombre, r.email, r.telefono, r.fechaReserva, r.estado]);
+                const csv = [headers, ...rows].map(row => row.map(cell => `"${(cell || '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'reservas_' + new Date().toISOString().split('T')[0] + '.csv';
+                a.click();
+            };
+
+            // ===== ACTUALIZACIÓN AUTOMÁTICA =====
+            setInterval(function() {
+                if (document.getElementById('adminPanel').style.display !== 'none') {
+                    updateCountdown();
+                    renderTodayAgenda();
+                }
+            }, 60000);
+
+            // ===== EXPONER FUNCIONES GLOBALES =====
+            window.loadData = loadData;
+            window.logout = logout;
+
+        })();
     </script>
 </body>
 </html>
