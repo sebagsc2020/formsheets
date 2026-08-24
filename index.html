@@ -20,7 +20,6 @@
             justify-content: center;
             align-items: center;
             padding: 2rem 1rem;
-            /* Ocultar scrollbar en body (opcional) */
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
@@ -29,10 +28,10 @@
         }
 
         .card {
-            max-width: 1200px; /* Más ancho para dos columnas */
+            max-width: 1200px;
             width: 100%;
             background: #2a2a2a;
-            border-radius: 32px;
+            border-radius: 8px; /* antes 16px */
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             padding: 2rem;
             border: 1px solid #3a3a3a;
@@ -59,7 +58,7 @@
             letter-spacing: 0.3px;
             padding: 0.2rem 0.8rem;
             background: #262626;
-            border-radius: 40px;
+            border-radius: 4px; /* antes 8px */
             border: 1px solid #3a3a3a;
         }
         .update-indicator.show { display: inline-flex; }
@@ -92,14 +91,14 @@
         .subhead .info-text {
             background: #333333;
             padding: 0.2rem 1rem;
-            border-radius: 40px;
+            border-radius: 4px; /* antes 8px */
             font-size: 0.9rem;
             color: #c0c0c0;
         }
         .subhead .selected-display {
             background: #2a2a2a;
             padding: 0.3rem 1.2rem;
-            border-radius: 40px;
+            border-radius: 4px; /* antes 8px */
             font-size: 0.9rem;
             color: #b0b0b0;
             border: 1px solid #444444;
@@ -113,7 +112,7 @@
         .cookie-notice {
             background: #333333;
             border: 1px solid #444444;
-            border-radius: 12px;
+            border-radius: 4px; /* antes 8px */
             padding: 0.8rem 1.2rem;
             margin-bottom: 1.2rem;
             display: flex;
@@ -129,7 +128,7 @@
             border: 1px solid #555555;
             color: #e0e0e0;
             padding: 0.4rem 1.2rem;
-            border-radius: 40px;
+            border-radius: 4px; /* antes 8px */
             cursor: pointer;
             font-size: 0.85rem;
             transition: 0.15s;
@@ -148,7 +147,7 @@
         .week-nav-buttons button {
             background: #333333;
             border: 1px solid #444444;
-            border-radius: 40px;
+            border-radius: 4px; /* antes 8px */
             padding: 0.4rem 1.2rem;
             font-weight: 500;
             color: #d0d0d0;
@@ -166,7 +165,7 @@
             color: #e0e0e0;
             background: #333333;
             padding: 0.3rem 1.2rem;
-            border-radius: 40px;
+            border-radius: 4px; /* antes 8px */
             font-size: 0.95rem;
             border: 1px solid #444444;
         }
@@ -180,11 +179,11 @@
             margin-top: 0.5rem;
         }
         .left-col {
-            flex: 2; /* ocupa 2/3 del ancho */
+            flex: 2;
             min-width: 300px;
         }
         .right-col {
-            flex: 1; /* ocupa 1/3 */
+            flex: 1;
             min-width: 250px;
             display: flex;
             flex-direction: column;
@@ -193,10 +192,9 @@
         /* ===== TABLA ===== */
         .table-responsive {
             overflow-x: auto;
-            border-radius: 20px;
+            border-radius: 4px; /* antes 10px */
             border: 1px solid #3a3a3a;
             background: #222222;
-            /* Ocultar scrollbar en la tabla */
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
@@ -336,9 +334,9 @@
             gap: 0.8rem;
             background: #262626;
             padding: 1.2rem;
-            border-radius: 28px;
+            border-radius: 4px; /* antes 12px */
             border: 1px solid #353535;
-            height: 100%; /* para que se estire y alinee con la tabla */
+            height: 100%;
         }
         .field-group {
             display: flex;
@@ -357,7 +355,7 @@
         .field-group input {
             padding: 0.6rem 0.8rem;
             border: 1px solid #3d3d3d;
-            border-radius: 12px;
+            border-radius: 2px; /* antes 6px */
             font-size: 0.95rem;
             background: #1e1e1e;
             transition: 0.2s;
@@ -379,7 +377,7 @@
             justify-content: flex-end;
             gap: 0.25rem;
             width: 100%;
-            margin-top: auto; /* empuja el botón hacia abajo */
+            margin-top: auto;
         }
         .btn-wrapper .btn-label {
             font-weight: 500;
@@ -395,7 +393,7 @@
             border: 1px solid #8b7424;
             color: #1a1a1a;
             padding: 0.6rem 1.5rem;
-            border-radius: 40px;
+            border-radius: 4px; /* antes 8px */
             font-weight: 700;
             font-size: 0.95rem;
             cursor: pointer;
@@ -443,7 +441,7 @@
         .popup-overlay.show { display: flex; }
         .popup-container {
             background: #2a2a2a;
-            border-radius: 32px;
+            border-radius: 8px; /* antes 16px */
             border: 1px solid #444444;
             padding: 2.5rem 3rem;
             max-width: 500px;
@@ -484,7 +482,7 @@
         .popup-container .popup-body::-webkit-scrollbar-thumb:hover { background: #777777; }
         .popup-container .popup-details {
             background: #222222;
-            border-radius: 16px;
+            border-radius: 4px; /* antes 10px */
             padding: 1.2rem 1.5rem;
             margin-bottom: 1.2rem;
             border: 1px solid #353535;
@@ -510,7 +508,7 @@
             background: #2a1a1a;
             border-left: 3px solid #f44336;
             padding: 0.8rem 1rem;
-            border-radius: 8px;
+            border-radius: 2px; /* antes 6px */
             margin-bottom: 1.2rem;
             font-size: 0.85rem;
             color: #d0a0a0;
@@ -520,7 +518,7 @@
         .popup-container .popup-whatsapp {
             background: #1a2a1a;
             border: 1px solid #2a4a2a;
-            border-radius: 12px;
+            border-radius: 4px; /* antes 8px */
             padding: 0.8rem 1rem;
             margin-bottom: 1.2rem;
             display: flex;
@@ -541,7 +539,7 @@
             border: 1px solid #555555;
             color: #e8e8e8;
             padding: 0.6rem 2rem;
-            border-radius: 40px;
+            border-radius: 4px; /* antes 8px */
             font-weight: 600;
             font-size: 0.9rem;
             cursor: pointer;
@@ -603,7 +601,7 @@
         }
 
         @media (max-width: 480px) {
-            .card { padding: 0.6rem 0.4rem 0.8rem; border-radius: 16px; }
+            .card { padding: 0.6rem 0.4rem 0.8rem; border-radius: 4px; }
             table { font-size: 0.7rem; min-width: 350px; }
             th { padding: 0.3rem 0.1rem; font-size: 0.65rem; }
             th:first-child { min-width: 35px; padding: 0.3rem 0.1rem; }
@@ -612,28 +610,30 @@
             .slot-cell input[type="radio"] { width: 12px; height: 12px; border-width: 1.5px; }
             .time-slot { font-size: 0.65rem; padding: 0.1rem 0.03rem; }
             .afternoon-row td { font-size: 0.55rem; padding: 0.15rem 0.02rem; }
-            .right-col .form-grid { padding: 0.6rem; gap: 0.4rem; border-radius: 12px; }
-            .field-group input { padding: 0.4rem 0.6rem; font-size: 0.85rem; border-radius: 8px; height: 38px; }
+            .right-col .form-grid { padding: 0.6rem; gap: 0.4rem; border-radius: 4px; }
+            .field-group input { padding: 0.4rem 0.6rem; font-size: 0.85rem; border-radius: 2px; height: 38px; }
             .field-group label { font-size: 0.75rem; }
             .field-group .hint { font-size: 0.65rem; }
-            .btn-submit { height: 38px; font-size: 0.85rem; padding: 0.4rem 0.8rem; min-height: 38px; border-radius: 25px; }
+            .btn-submit { height: 38px; font-size: 0.85rem; padding: 0.4rem 0.8rem; min-height: 38px; border-radius: 4px; }
             h1 { font-size: 1.1rem; }
-            .update-indicator { font-size: 0.6rem; padding: 0.1rem 0.5rem; gap: 4px; }
-            .subhead .info-text { font-size: 0.7rem; padding: 0.1rem 0.4rem; }
-            .subhead .selected-display { font-size: 0.7rem; padding: 0.15rem 0.6rem; }
-            .week-label { font-size: 0.7rem; padding: 0.15rem 0.6rem; }
-            .week-nav-buttons button { font-size: 0.7rem; padding: 0.25rem 0.6rem; gap: 4px; }
+            .update-indicator { font-size: 0.6rem; padding: 0.1rem 0.5rem; gap: 4px; border-radius: 2px; }
+            .subhead .info-text { font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 2px; }
+            .subhead .selected-display { font-size: 0.7rem; padding: 0.15rem 0.6rem; border-radius: 2px; }
+            .week-label { font-size: 0.7rem; padding: 0.15rem 0.6rem; border-radius: 2px; }
+            .week-nav-buttons button { font-size: 0.7rem; padding: 0.25rem 0.6rem; gap: 4px; border-radius: 2px; }
             .cookie-notice p { font-size: 0.75rem; }
-            .cookie-notice .cookie-btn { font-size: 0.7rem; padding: 0.25rem 0.6rem; }
-            .popup-container { padding: 1.2rem 1rem; border-radius: 24px; max-height: 92vh; max-width: 95%; }
+            .cookie-notice .cookie-btn { font-size: 0.7rem; padding: 0.25rem 0.6rem; border-radius: 2px; }
+            .popup-container { padding: 1.2rem 1rem; border-radius: 4px; max-height: 92vh; max-width: 95%; }
             .popup-container h2 { font-size: 1.2rem; }
             .popup-container .popup-icon { font-size: 2.8rem; }
             .popup-container .popup-subtitle { font-size: 0.8rem; }
-            .popup-container .popup-details { padding: 0.8rem 1rem; }
+            .popup-container .popup-details { padding: 0.8rem 1rem; border-radius: 4px; }
             .popup-container .popup-details .detail-row { font-size: 0.75rem; padding: 0.3rem 0; }
-            .popup-container .popup-notice { font-size: 0.75rem; padding: 0.6rem 0.8rem; }
-            .popup-container .popup-whatsapp { font-size: 0.75rem; padding: 0.6rem 0.8rem; }
-            .popup-container .popup-close-btn { font-size: 0.8rem; padding: 0.5rem 1.5rem; }
+            .popup-container .popup-notice { font-size: 0.75rem; padding: 0.6rem 0.8rem; border-radius: 2px; }
+            .popup-container .popup-whatsapp { font-size: 0.75rem; padding: 0.6rem 0.8rem; border-radius: 2px; }
+            .popup-container .popup-close-btn { font-size: 0.8rem; padding: 0.5rem 1.5rem; border-radius: 4px; }
+            .popup-container .popup-body { padding-right: 0.3rem; margin-right: -0.3rem; }
+            .popup-container .popup-body::-webkit-scrollbar { width: 4px; }
         }
     </style>
 </head>
