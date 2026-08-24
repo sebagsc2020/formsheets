@@ -9,7 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
-        /* ===== ESTILOS COMPLETOS ===== */
+        /* Estilos base (iguales que antes, añadimos estilos para el modal de servicios) */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
         body { background: #1a1a1a; min-height: 100vh; padding: 0.8rem 0.5rem; color: #e8e8e8; }
         .container { max-width: 1200px; margin: 0 auto; }
@@ -52,6 +52,15 @@
         .modal-container .btn-secondary:hover { background: #555; }
         .modal-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
         .modal-actions .btn { flex: 1; }
+        .modal-container .servicio-item { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
+        .modal-container .servicio-item input { flex: 1; }
+        .modal-container .servicio-item .btn-remove { background: #a33; color: white; border: none; border-radius: 4px; width: 28px; height: 28px; cursor: pointer; font-size: 0.8rem; }
+        .modal-container .servicio-item .btn-remove:hover { background: #c44; }
+        .modal-container .add-servicio { display: flex; gap: 0.4rem; margin-top: 0.3rem; }
+        .modal-container .add-servicio input { flex: 1; }
+        .modal-container .add-servicio button { background: #4a9eff; color: white; border: none; border-radius: 4px; padding: 0.4rem 0.8rem; cursor: pointer; }
+        .modal-container .add-servicio button:hover { background: #3a8eef; }
+        /* Resto de estilos iguales */
         .today-agenda { background: linear-gradient(135deg, #2a2a2a 0%, #2e2818 100%); border: 1px solid #8b7424; border-radius: 4px; padding: 0.6rem 0.8rem; margin-bottom: 1rem; }
         .today-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.4rem; }
         .today-header h2 { font-size: 1.1rem; color: #e8e8e8; }
@@ -135,6 +144,8 @@
         .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.3rem; }
         .user-info { font-size: 0.75rem; color: #888; }
         .user-info strong { color: #d4af37; }
+        .btn-config { background: #4a9eff; color: white; border: none; border-radius: 4px; padding: 0.25rem 0.8rem; cursor: pointer; font-size: 0.7rem; transition: 0.15s; }
+        .btn-config:hover { background: #3a8eef; box-shadow: 0 0 8px rgba(74, 158, 255, 0.5); }
         @media (max-width: 768px) {
             th, td { padding: 0.2rem 0.2rem; font-size: 0.65rem; }
             .hide-mobile { display: none; }
@@ -178,6 +189,7 @@
             <h1><i class="fas fa-user-shield"></i> Panel de Administración</h1>
             <div style="display: flex; gap: 0.3rem; align-items: center;">
                 <span class="user-info" id="userEmailDisplay">Hola, <strong>Admin</strong></span>
+                <button class="btn-config" onclick="openServiceModal()"><i class="fas fa-cog"></i> Servicios</button>
                 <button class="btn btn-secondary" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.7rem; border-radius: 4px;" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i> Salir
                 </button>
@@ -230,12 +242,13 @@
                         <th>Nombre</th>
                         <th class="hide-mobile">Teléfono</th>
                         <th class="hide-mobile">Email</th>
+                        <th>Servicio</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="reservasBody">
-                    <tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Cargando reservas...</td></tr>
+                    <tr><td colspan="8" class="loading"><i class="fas fa-spinner"></i><br>Cargando reservas...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -266,7 +279,7 @@
                     <div class="chart-legend">
                         <div class="legend-item">
                             <div class="legend-color" style="background: #d4af37;"></div>
-                            <span class="legend-label">Ocupadas (Activas + Futuras + Pasadas)</span>
+                            <span class="legend-label">Ocupadas (Activas)</span>
                             <span class="legend-value" id="legendActivas">0</span>
                         </div>
                         <div class="legend-item">
@@ -343,6 +356,34 @@
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeRescheduleModal()">Cancelar</button>
                     <button type="submit" class="btn" id="rescheduleSubmitBtn">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIGURACIÓN DE SERVICIOS -->
+    <div class="modal-overlay" id="serviceModal">
+        <div class="modal-container">
+            <h2><i class="fas fa-concierge-bell" style="color: #d4af37;"></i> Configurar Servicios</h2>
+            <div class="subtitle">Gestiona la lista de servicios disponibles en el formulario de reservas</div>
+            <form id="serviceForm">
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Nombre del campo</label>
+                    <input type="text" id="serviceFieldName" placeholder="Ej: Servicio, Tipo, etc." required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-list"></i> Lista de servicios</label>
+                    <div id="serviceListContainer">
+                        <!-- Se llena con JavaScript -->
+                    </div>
+                    <div class="add-servicio">
+                        <input type="text" id="newServiceInput" placeholder="Nuevo servicio..." />
+                        <button type="button" onclick="addServiceItem()"><i class="fas fa-plus"></i> Agregar</button>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeServiceModal()">Cancelar</button>
+                    <button type="submit" class="btn" id="serviceSubmitBtn">Guardar Cambios</button>
                 </div>
             </form>
         </div>
@@ -426,7 +467,7 @@
                     unsubscribe();
                 }
                 const tbody = document.getElementById('reservasBody');
-                tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Conectando a Firestore...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="loading"><i class="fas fa-spinner"></i><br>Conectando a Firestore...</td></tr>';
 
                 unsubscribe = db.collection('citas').onSnapshot((snapshot) => {
                     const reservas = [];
@@ -439,6 +480,7 @@
                             nombre: data.nombre || '',
                             email: data.email || '',
                             telefono: data.telefono || '',
+                            servicio: data.servicio || '',
                             estado: data.estado || 'ACTIVA',
                             servicio: data.servicio || 'Consulta',
                             fechaReserva: data.createdAt ? data.createdAt.toDate().toISOString() : new Date().toISOString()
@@ -449,7 +491,7 @@
                     renderData();
                 }, (error) => {
                     console.error('Error en listener:', error);
-                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Error al conectar con Firestore. Verifica permisos.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Error al conectar con Firestore. Verifica permisos.</td></tr>';
                 });
             }
 
@@ -604,7 +646,7 @@
                 else if (currentFilter === 'futuras') filtered = filtered.filter(r => r.estado === 'ACTIVA' && esFutura(r.fecha, r.hora));
                 else if (currentFilter === 'pasadas') filtered = filtered.filter(r => r.estado === 'ACTIVA' && !esFutura(r.fecha, r.hora));
                 if (filtered.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-calendar-times"></i><br>No hay reservas en esta categoría</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><i class="fas fa-calendar-times"></i><br>No hay reservas en esta categoría</td></tr>';
                     return;
                 }
                 tbody.innerHTML = filtered.map(r => {
@@ -627,6 +669,7 @@
                         <td>${r.nombre}</td>
                         <td class="hide-mobile">${r.telefono}</td>
                         <td class="hide-mobile">${r.email}</td>
+                        <td>${r.servicio || '-'}</td>
                         <td><span class="badge ${badgeClass}">${estadoLabel}</span></td>
                         <td>${actionsHtml}</td>
                     </tr>`;
@@ -645,7 +688,7 @@
                 if (phone.startsWith('15') && phone.length >= 10) phone = phone.substring(2);
                 if (phone.length <= 10) phone = DEFAULT_COUNTRY_CODE + phone;
                 else if (phone.length === 11 && phone.startsWith('9')) phone = DEFAULT_COUNTRY_CODE + phone;
-                const message = `Hola ${reserva.nombre}! 👋\n\nTe contactamos desde *${STUDIO_NAME}* sobre tu reserva:\n📅 *Fecha:* ${reserva.fecha}\n🕐 *Hora:* ${reserva.hora}\n\nPor favor confirma tu asistencia. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n¡Te esperamos! 🎨`;
+                const message = `Hola ${reserva.nombre}! 👋\n\nTe contactamos desde *${STUDIO_NAME}* sobre tu reserva:\n📅 *Fecha:* ${reserva.fecha}\n🕐 *Hora:* ${reserva.hora}\n🛠 Servicio: ${reserva.servicio}\n\nPor favor confirma tu asistencia. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n¡Te esperamos! 🎨`;
                 const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
                 const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
                 if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') window.location.href = url;
@@ -787,25 +830,140 @@
                 if (e.key === 'Escape') closeRescheduleModal();
             });
 
-            // ===== DASHBOARD MENSUAL (con nueva lógica de capacidad y gráfico) =====
+            // ===== CONFIGURACIÓN DE SERVICIOS =====
+            let serviciosActuales = [];
+            let nombreCampoActual = 'Servicio';
+
+            async function loadServiceConfig() {
+                try {
+                    const doc = await db.collection('config').doc('servicios').get();
+                    if (doc.exists) {
+                        const data = doc.data();
+                        serviciosActuales = data.lista || ['Consulta', 'Tatuaje', 'Piercing', 'Diseño'];
+                        nombreCampoActual = data.nombreCampo || 'Servicio';
+                    } else {
+                        serviciosActuales = ['Consulta', 'Tatuaje', 'Piercing', 'Diseño'];
+                        nombreCampoActual = 'Servicio';
+                    }
+                } catch (error) {
+                    console.error('Error cargando configuración:', error);
+                    serviciosActuales = ['Consulta', 'Tatuaje', 'Piercing', 'Diseño'];
+                    nombreCampoActual = 'Servicio';
+                }
+            }
+
+            function renderServiceList() {
+                const container = document.getElementById('serviceListContainer');
+                container.innerHTML = '';
+                serviciosActuales.forEach((serv, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'servicio-item';
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = serv;
+                    input.dataset.index = index;
+                    input.addEventListener('change', function() {
+                        serviciosActuales[parseInt(this.dataset.index)] = this.value;
+                    });
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'btn-remove';
+                    removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                    removeBtn.title = 'Eliminar servicio';
+                    removeBtn.addEventListener('click', function() {
+                        serviciosActuales.splice(index, 1);
+                        renderServiceList();
+                    });
+                    div.appendChild(input);
+                    div.appendChild(removeBtn);
+                    container.appendChild(div);
+                });
+                document.getElementById('serviceFieldName').value = nombreCampoActual;
+            }
+
+            window.addServiceItem = function() {
+                const input = document.getElementById('newServiceInput');
+                const value = input.value.trim();
+                if (value) {
+                    serviciosActuales.push(value);
+                    input.value = '';
+                    renderServiceList();
+                } else {
+                    alert('Ingresa un nombre de servicio válido.');
+                }
+            };
+
+            window.openServiceModal = function() {
+                loadServiceConfig().then(() => {
+                    renderServiceList();
+                    document.getElementById('serviceModal').classList.add('show');
+                });
+            };
+
+            window.closeServiceModal = function() {
+                document.getElementById('serviceModal').classList.remove('show');
+            };
+
+            document.getElementById('serviceForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const nombreCampo = document.getElementById('serviceFieldName').value.trim();
+                if (!nombreCampo) {
+                    alert('El nombre del campo es obligatorio.');
+                    return;
+                }
+                // Actualizar lista desde los inputs (ya se actualizan con el evento change)
+                // Pero para asegurar, leemos los valores actuales de los inputs
+                const inputs = document.querySelectorAll('#serviceListContainer input');
+                const lista = [];
+                inputs.forEach(inp => {
+                    const val = inp.value.trim();
+                    if (val) lista.push(val);
+                });
+                if (lista.length === 0) {
+                    alert('Debe haber al menos un servicio en la lista.');
+                    return;
+                }
+                const submitBtn = document.getElementById('serviceSubmitBtn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+                try {
+                    await db.collection('config').doc('servicios').set({
+                        nombreCampo: nombreCampo,
+                        lista: lista
+                    });
+                    alert('✅ Configuración de servicios guardada correctamente.');
+                    closeServiceModal();
+                    // Recargar la configuración en el formulario público no es necesario aquí, pero se actualizará al recargar la página.
+                } catch (err) {
+                    console.error(err);
+                    alert('Error al guardar configuración. Verifica permisos.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Guardar Cambios';
+                }
+            });
+
+            // Cerrar modal de servicios con ESC
+            document.getElementById('serviceModal').addEventListener('click', function(e) {
+                if (e.target === this) closeServiceModal();
+            });
+
+            // ===== DASHBOARD MENSUAL =====
             function updateMonthlyDashboard() {
                 const year = selectedMonth.getFullYear();
                 const month = selectedMonth.getMonth();
                 document.getElementById('currentMonthLabel').textContent = `${MONTH_NAMES[month]} ${year}`;
                 
-                // Calcular días hábiles (Lun-Sáb) del mes seleccionado
                 let diasHabiles = 0;
                 const firstDay = new Date(year, month, 1);
                 const lastDay = new Date(year, month + 1, 0);
                 for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
                     const dow = d.getDay();
-                    if (dow >= 1 && dow <= 6) { // Lunes(1) a Sábado(6)
+                    if (dow >= 1 && dow <= 6) {
                         diasHabiles++;
                     }
                 }
                 const capacidadTotal = diasHabiles * HOURS_PER_DAY;
                 
-                // Reservas del mes
                 const monthReservations = allReservations.filter(r => {
                     const d = parseReservaDate(r.fecha, r.hora);
                     return d && d.getMonth() === month && d.getFullYear() === year;
@@ -813,9 +971,8 @@
                 
                 const activas = monthReservations.filter(r => r.estado === 'ACTIVA').length;
                 const canceladas = monthReservations.filter(r => r.estado === 'CANCELADA').length;
-                const libres = capacidadTotal - activas; // las canceladas no ocupan slots
+                const libres = capacidadTotal - activas;
                 
-                // Porcentaje de ocupación = activas / capacidad * 100
                 const occupancyPercentage = capacidadTotal > 0 ? Math.round((activas / capacidadTotal) * 100) : 0;
                 
                 updateDonutChart(occupancyPercentage);
@@ -829,7 +986,6 @@
                 document.getElementById('metricTotalMonth').textContent = monthReservations.length;
                 document.getElementById('metricDaysInMonth').textContent = diasHabiles;
                 
-                // Día más ocupado de la semana actual
                 const now = new Date();
                 const dayOfWeek = now.getDay();
                 const diffToMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
@@ -859,7 +1015,6 @@
                 }
                 document.getElementById('metricPeakDay').textContent = peakDayText;
                 
-                // Hora pico
                 const hourCounts = {};
                 monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
                     hourCounts[r.hora] = (hourCounts[r.hora] || 0) + 1;
@@ -867,7 +1022,6 @@
                 const peakHour = Object.keys(hourCounts).reduce((a,b) => hourCounts[a] > hourCounts[b] ? a : b, '-');
                 document.getElementById('metricPeakHour').textContent = peakHour !== '-' ? `${peakHour} (${hourCounts[peakHour]})` : '-';
                 
-                // Distribución por día
                 const allDayCounts = {};
                 monthReservations.forEach(r => {
                     const partesFecha = r.fecha.split(' ');
@@ -919,8 +1073,8 @@
 
             // ===== EXPORT =====
             window.exportCSV = function() {
-                const headers = ['ID','Fecha','Hora','Nombre','Email','Teléfono','Fecha Reserva','Estado'];
-                const rows = allReservations.map(r => [r.id, r.fecha, r.hora, r.nombre, r.email, r.telefono, r.fechaReserva, r.estado]);
+                const headers = ['ID','Fecha','Hora','Nombre','Email','Teléfono','Servicio','Fecha Reserva','Estado'];
+                const rows = allReservations.map(r => [r.id, r.fecha, r.hora, r.nombre, r.email, r.telefono, r.servicio, r.fechaReserva, r.estado]);
                 const csv = [headers, ...rows].map(row => row.map(cell => `"${(cell||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
                 const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
@@ -944,6 +1098,9 @@
                     currentUser = null;
                 }).catch(console.error);
             };
+
+            // Cargar configuración de servicios al iniciar
+            loadServiceConfig();
 
         })();
     </script>
