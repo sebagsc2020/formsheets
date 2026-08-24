@@ -9,7 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
-        /* ===== ESTILOS COMPLETOS ===== */
+        /* ===== ESTILOS COMPLETOS (igual que antes) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
         body { background: #1a1a1a; min-height: 100vh; padding: 0.8rem 0.5rem; color: #e8e8e8; }
         .container { max-width: 1200px; margin: 0 auto; }
@@ -174,7 +174,6 @@
 
     <!-- PANEL PRINCIPAL -->
     <div id="adminPanel" class="container" style="display: none;">
-        <!-- Header -->
         <div class="header-actions">
             <h1><i class="fas fa-user-shield"></i> Panel de Administración</h1>
             <div style="display: flex; gap: 0.3rem; align-items: center;">
@@ -215,7 +214,6 @@
                 <button class="filter-btn" data-filter="canceladas">Canceladas</button>
             </div>
             <div class="toolbar-right">
-                <!-- Botón Actualizar eliminado -->
                 <button class="btn btn-secondary" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.7rem; border-radius: 4px;" onclick="exportCSV()">
                     <i class="fas fa-file-csv"></i> Exportar CSV
                 </button>
@@ -381,6 +379,7 @@
             let stats = { total:0, activas:0, canceladas:0, futuras:0, pasadas:0 };
             let selectedMonth = new Date();
             let currentUser = null;
+            let unsubscribe = null; // Para la escucha en tiempo real
 
             // ===== LOGIN =====
             document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -403,7 +402,8 @@
                         document.getElementById('loginScreen').style.display = 'none';
                         document.getElementById('adminPanel').style.display = 'block';
                         document.getElementById('userEmailDisplay').innerHTML = `Hola, <strong>${currentUser.email}</strong>`;
-                        loadData();
+                        // Iniciar la escucha en tiempo real
+                        startRealtimeListener();
                     })
                     .catch((error) => {
                         let msg = '❌ Error de autenticación. ';
@@ -421,36 +421,41 @@
                     });
             });
 
-            // ===== FUNCIONES =====
-            async function loadData() {
-                const tbody = document.getElementById('reservasBody');
-                tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Actualizando...</td></tr>';
-                try {
-                    const snapshot = await db.collection('citas').get();
-                    const reservas = [];
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        reservas.push({
-                            id: doc.id,
-                            fecha: data.fecha || '',
-                            hora: data.hora || '',
-                            nombre: data.nombre || '',
-                            email: data.email || '',
-                            telefono: data.telefono || '',
-                            estado: data.estado || 'ACTIVA',
-                            servicio: data.servicio || 'Consulta',
-                            fechaReserva: data.createdAt ? data.createdAt.toDate().toISOString() : new Date().toISOString()
-                        });
-                    });
-                    allReservations = reservas;
-                    calculateStats();
-                    renderData();
-                } catch (error) {
-                    console.error(error);
-                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Error al cargar datos. Verifica conexión y permisos.</td></tr>';
+            // ===== LISTENER EN TIEMPO REAL =====
+            function startRealtimeListener() {
+                if (unsubscribe) {
+                    unsubscribe(); // Cancelar escucha anterior si existe
                 }
+                // Mostrar loading
+                document.getElementById('reservasBody').innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Cargando reservas...</td></tr>';
+
+                unsubscribe = db.collection('citas')
+                    .onSnapshot((snapshot) => {
+                        const reservas = [];
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            reservas.push({
+                                id: doc.id,
+                                fecha: data.fecha || '',
+                                hora: data.hora || '',
+                                nombre: data.nombre || '',
+                                email: data.email || '',
+                                telefono: data.telefono || '',
+                                estado: data.estado || 'ACTIVA',
+                                servicio: data.servicio || 'Consulta',
+                                fechaReserva: data.createdAt ? data.createdAt.toDate().toISOString() : new Date().toISOString()
+                            });
+                        });
+                        allReservations = reservas;
+                        calculateStats();
+                        renderData();
+                    }, (error) => {
+                        console.error('Error en tiempo real:', error);
+                        document.getElementById('reservasBody').innerHTML = '<tr><td colspan="7" class="empty-state">Error al cargar datos en tiempo real. Verifica conexión.</td></tr>';
+                    });
             }
 
+            // ===== FUNCIONES DE CÁLCULO Y RENDERIZADO =====
             function calculateStats() {
                 const now = new Date();
                 stats.total = allReservations.length;
@@ -662,7 +667,7 @@
                 if (!confirm('⚠️ ¿Estás seguro de que quieres ELIMINAR esta reserva permanentemente?\nEsta acción no se puede deshacer.')) return;
                 try {
                     await db.collection('citas').doc(id).delete();
-                    loadData(); // Recarga instantánea
+                    // La escucha en tiempo real se encargará de actualizar la vista
                 } catch (err) {
                     console.error(err);
                     alert('Error al eliminar la reserva. Verifica permisos.');
@@ -672,7 +677,7 @@
             async function updateEstado(id, estado) {
                 try {
                     await db.collection('citas').doc(id).update({ estado: estado });
-                    loadData(); // Recarga instantánea
+                    // La escucha en tiempo real se encargará de actualizar la vista
                 } catch (err) {
                     console.error(err);
                     alert('Error al actualizar. Verifica permisos.');
@@ -700,6 +705,7 @@
                 select.innerHTML = '<option value="">Cargando...</option>';
                 try {
                     const now = new Date();
+                    // Usamos una lectura única para obtener los ocupados
                     const snapshot = await db.collection('citas').get();
                     const ocupados = new Set();
                     snapshot.forEach(doc => {
@@ -768,7 +774,7 @@
                 try {
                     await db.collection('citas').doc(id).update({ fecha: fecha, hora: hora });
                     closeRescheduleModal();
-                    loadData(); // Recarga instantánea
+                    // La escucha en tiempo real actualizará la vista
                 } catch (err) {
                     console.error(err);
                     alert('Error al reagendar. Verifica permisos.');
@@ -909,6 +915,10 @@
 
             // ===== LOGOUT =====
             window.logout = function() {
+                if (unsubscribe) {
+                    unsubscribe();
+                    unsubscribe = null;
+                }
                 auth.signOut().then(() => {
                     document.getElementById('adminPanel').style.display = 'none';
                     document.getElementById('loginScreen').style.display = 'block';
@@ -918,15 +928,6 @@
                 }).catch(console.error);
             };
 
-            // ===== AUTOREFRESH (solo agenda y countdown) =====
-            setInterval(function() {
-                if (document.getElementById('adminPanel').style.display !== 'none') {
-                    updateCountdown();
-                    renderTodayAgenda();
-                }
-            }, 60000);
-
-            window.loadData = loadData;
         })();
     </script>
 </body>
