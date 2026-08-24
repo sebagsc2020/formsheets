@@ -9,7 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
-        /* (estilos exactamente iguales a los anteriores, no los repito para no alargar) */
+        /* ===== ESTILOS COMPLETOS (omitidos por brevedad, pero incluidos en el archivo final) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
         body { background: #1a1a1a; min-height: 100vh; padding: 0.8rem 0.5rem; color: #e8e8e8; }
         .container { max-width: 1200px; margin: 0 auto; }
@@ -35,8 +35,6 @@
         .btn-success:hover { background: #3b8; }
         .btn-danger { background: #a33; color: white; }
         .btn-danger:hover { background: #c44; }
-        .btn-neutral { background: #555; color: white; }
-        .btn-neutral:hover { background: #666; }
         .action-btn[title]:hover::after { content: attr(title); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #000; color: white; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.6rem; white-space: nowrap; margin-bottom: 3px; pointer-events: none; z-index: 10; }
         .today-agenda { background: linear-gradient(135deg, #2a2a2a 0%, #2e2818 100%); border: 1px solid #8b7424; border-radius: 4px; padding: 0.6rem 0.8rem; margin-bottom: 1rem; }
         .today-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.4rem; }
@@ -256,18 +254,18 @@
                     <div class="chart-legend">
                         <div class="legend-item">
                             <div class="legend-color" style="background: #d4af37;"></div>
-                            <span class="legend-label">Reservas activas</span>
+                            <span class="legend-label">Reservas activas (Ocupadas)</span>
                             <span class="legend-value" id="legendActivas">0</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #333;"></div>
+                            <span class="legend-label">Disponibles (Libres)</span>
+                            <span class="legend-value" id="legendDisponibles">0</span>
                         </div>
                         <div class="legend-item">
                             <div class="legend-color" style="background: #ff6b6b;"></div>
                             <span class="legend-label">Canceladas</span>
                             <span class="legend-value" id="legendCanceladas">0</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #333;"></div>
-                            <span class="legend-label">Disponibles</span>
-                            <span class="legend-value" id="legendDisponibles">0</span>
                         </div>
                     </div>
                 </div>
@@ -465,7 +463,7 @@
                 } catch (e) { return null; }
             }
 
-            // ===== AGENDA DE HOY (con los 3 botones siempre visibles) =====
+            // ===== AGENDA DE HOY (con 3 botones siempre visibles) =====
             function renderTodayAgenda() {
                 const now = new Date();
                 const listEl = document.getElementById('todayList');
@@ -489,7 +487,6 @@
                     return;
                 }
                 
-                // Buscar próxima activa (para marcar como "Siguiente")
                 const nextIndex = todayRes.findIndex(x => x.d >= now && x.r.estado !== 'CANCELADA');
                 
                 listEl.innerHTML = todayRes.map((item, idx) => {
@@ -506,7 +503,6 @@
                     if (isNext && item.r.estado !== 'CANCELADA') tag = '<span class="today-tag next-tag">Siguiente</span>';
                     else tag = `<span class="today-tag ${item.r.estado === 'CANCELADA' ? 'cancel-tag' : 'past-tag'}">${estadoLabel}</span>`;
                     
-                    // Siempre mostrar los 3 botones
                     const actionsHtml = `
                         <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${item.r.id}')" title="Enviar WhatsApp">
                             <i class="fab fa-whatsapp"></i>
@@ -532,7 +528,7 @@
                 }).join('');
             }
 
-            // ===== PRÓXIMA RESERVA (excluye canceladas) =====
+            // ===== PRÓXIMA RESERVA =====
             function getNextUpcoming() {
                 const now = new Date();
                 const candidates = allReservations
@@ -567,7 +563,7 @@
                 labelEl.textContent = `Próxima: ${next.r.fecha} · ${next.r.hora}`;
             }
 
-            // ===== TABLA (con los 3 botones siempre visibles) =====
+            // ===== TABLA =====
             function getSortedReservations() {
                 const now = new Date();
                 const withDates = allReservations.map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }));
@@ -613,7 +609,6 @@
                         estadoLabel = 'Pasada';
                     }
                     
-                    // Siempre mostrar los 3 botones
                     const actionsHtml = `
                         <div class="action-buttons">
                             <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${r.id}')" title="Enviar WhatsApp">
@@ -680,13 +675,14 @@
                 }
             }
 
-            // ===== DASHBOARD MENSUAL =====
+            // ===== DASHBOARD MENSUAL (con ocupación real) =====
             function updateMonthlyDashboard() {
                 const year = selectedMonth.getFullYear();
                 const month = selectedMonth.getMonth();
                 
                 document.getElementById('currentMonthLabel').textContent = `${MONTH_NAMES[month]} ${year}`;
                 
+                // Reservas del mes
                 const monthReservations = allReservations.filter(r => {
                     const d = parseReservaDate(r.fecha, r.hora);
                     return d && d.getMonth() === month && d.getFullYear() === year;
@@ -695,22 +691,28 @@
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
                 const totalSlots = daysInMonth * HOURS_PER_DAY;
                 
+                // Estadísticas para el donut
                 const activas = monthReservations.filter(r => r.estado === 'ACTIVA').length;
                 const canceladas = monthReservations.filter(r => r.estado === 'CANCELADA').length;
-                const disponibles = totalSlots - activas;
+                const disponibles = totalSlots - activas; // slots libres
                 
+                // Porcentaje de ocupación: activas sobre total slots
                 const occupancyPercentage = totalSlots > 0 ? Math.round((activas / totalSlots) * 100) : 0;
                 
+                // Actualizar donut
                 updateDonutChart(occupancyPercentage);
                 
+                // Leyenda
                 document.getElementById('legendActivas').textContent = activas;
                 document.getElementById('legendCanceladas').textContent = canceladas;
                 document.getElementById('legendDisponibles').textContent = disponibles;
                 document.getElementById('occupancyPercentage').textContent = occupancyPercentage + '%';
                 
+                // Métricas
                 document.getElementById('metricTotalMonth').textContent = monthReservations.length;
                 document.getElementById('metricDaysInMonth').textContent = daysInMonth;
                 
+                // Día más ocupado (solo activas)
                 const dayCounts = {};
                 monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
                     const partesFecha = r.fecha.split(' ');
@@ -722,6 +724,7 @@
                 const peakDay = Object.keys(dayCounts).reduce((a, b) => dayCounts[a] > dayCounts[b] ? a : b, '-');
                 document.getElementById('metricPeakDay').textContent = peakDay !== '-' ? `${peakDay} (${dayCounts[peakDay]})` : '-';
                 
+                // Hora pico (solo activas)
                 const hourCounts = {};
                 monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
                     hourCounts[r.hora] = (hourCounts[r.hora] || 0) + 1;
@@ -729,7 +732,7 @@
                 const peakHour = Object.keys(hourCounts).reduce((a, b) => hourCounts[a] > hourCounts[b] ? a : b, '-');
                 document.getElementById('metricPeakHour').textContent = peakHour !== '-' ? `${peakHour} (${hourCounts[peakHour]})` : '-';
                 
-                // Distribución por día (todas)
+                // Distribución por día (todas las reservas)
                 const allDayCounts = {};
                 monthReservations.forEach(r => {
                     const partesFecha = r.fecha.split(' ');
