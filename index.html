@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Firebase SDKs (versión compat) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
         /* ===== ESTILOS BASE ===== */
         * {
@@ -51,33 +52,6 @@
             gap: 12px;
         }
         h1 i { color: #d4af37; }
-        .update-indicator {
-            display: none;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.75rem;
-            color: #999999;
-            font-weight: 400;
-            letter-spacing: 0.3px;
-            padding: 0.2rem 0.8rem;
-            background: #262626;
-            border-radius: 4px;
-            border: 1px solid #3a3a3a;
-        }
-        .update-indicator.show { display: inline-flex; }
-        .update-indicator i {
-            font-size: 0.8rem;
-            color: #d4af37;
-            animation: clockPulse 1.2s ease-in-out infinite;
-        }
-        .update-indicator span {
-            font-size: 0.7rem;
-            color: #aaaaaa;
-        }
-        @keyframes clockPulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.85); }
-        }
 
         .cookie-notice {
             background: #333333;
@@ -204,7 +178,7 @@
             background: #222222;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            height: 100%; /* para que ocupe todo el alto disponible */
+            height: 100%;
         }
         .table-responsive::-webkit-scrollbar {
             display: none;
@@ -213,7 +187,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.75rem; /* reducido */
+            font-size: 0.75rem;
             min-width: 450px;
             background: #222222;
         }
@@ -280,7 +254,7 @@
         .time-slot i { margin-right: 2px; color: #777777; font-size: 0.65rem; }
         .slot-cell {
             position: relative;
-            height: 22px; /* reducido */
+            height: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -592,7 +566,6 @@
             .time-slot { font-size: 0.65rem; }
             .afternoon-row td { font-size: 0.55rem; padding: 0.1rem 0.02rem; }
             h1 { font-size: 1.3rem; }
-            .update-indicator { font-size: 0.6rem; padding: 0.1rem 0.5rem; }
             .week-navigation { flex-direction: column; align-items: stretch; gap: 0.3rem; }
             .week-nav-buttons { justify-content: center; }
             .week-label { font-size: 0.75rem; padding: 0.15rem 0.6rem; }
@@ -626,7 +599,6 @@
             .field-group .hint { font-size: 0.55rem; }
             .btn-submit { height: 30px; font-size: 0.75rem; padding: 0.2rem 0.6rem; min-height: 30px; border-radius: 4px; }
             h1 { font-size: 1rem; }
-            .update-indicator { font-size: 0.5rem; padding: 0.05rem 0.4rem; gap: 3px; }
             .week-label { font-size: 0.65rem; padding: 0.1rem 0.5rem; }
             .week-nav-buttons button { font-size: 0.6rem; padding: 0.15rem 0.5rem; gap: 3px; }
             .cookie-notice p { font-size: 0.7rem; }
@@ -655,10 +627,6 @@
         <h1>
             <span><i class="fas fa-calendar-check"></i></span>
             <span>Reserva tu Horario</span>
-            <span class="update-indicator" id="updateIndicator">
-                <i class="fas fa-clock"></i>
-                <span>Actualizando horarios...</span>
-            </span>
         </h1>
 
         <div class="cookie-notice" id="cookieNotice">
@@ -776,6 +744,23 @@
             };
             firebase.initializeApp(firebaseConfig);
             const db = firebase.firestore();
+            const auth = firebase.auth();
+
+            // ===== AUTENTICACIÓN ANÓNIMA =====
+            let currentUser = null;
+            auth.signInAnonymously()
+                .then((userCredential) => {
+                    currentUser = userCredential.user;
+                    console.log('✅ Autenticación anónima exitosa. UID:', currentUser.uid);
+                    // Una vez autenticado, cargamos la tabla
+                    renderTable();
+                })
+                .catch(error => {
+                    console.error('❌ Error en auth anónima:', error);
+                    alert('No se pudo autenticar. Las reservas no funcionarán.');
+                    // Aun así intentamos cargar la tabla (por si las reglas son abiertas)
+                    renderTable();
+                });
 
             // ===== CONFIGURACIÓN GENERAL =====
             const TIMEZONE = 'America/Argentina/Buenos_Aires';
@@ -785,11 +770,9 @@
             const afternoonHours = [16, 17, 18, 19, 20];
             const COOKIE_EXPIRY_DAYS = 30;
             const WHATSAPP_NUMBER = '5493518692251';
-            const AUTO_REFRESH_INTERVAL = 60000;
-            const MIN_INDICATOR_DURATION = 800;
+            const MIN_INDICATOR_DURATION = 800; // (ya no se usa, pero lo dejo)
 
             let currentWeekStart = getMonday(new Date());
-            let isAutoUpdating = false;
 
             const tbody = document.getElementById('tablaHorarios');
             const headerRow = document.getElementById('headerRow');
@@ -803,7 +786,6 @@
             const popupOverlay = document.getElementById('popupOverlay');
             const popupDetails = document.getElementById('popupDetails');
             const popupCloseBtn = document.getElementById('popupCloseBtn');
-            const updateIndicator = document.getElementById('updateIndicator');
 
             // ===== COOKIES =====
             function setCookie(name, value, days) {
@@ -831,13 +813,19 @@
 
             // ===== FUNCIONES DE FIREBASE =====
             async function saveToFirestore(data) {
+                if (!currentUser) {
+                    return { success: false, error: 'Usuario no autenticado' };
+                }
                 try {
-                    await db.collection('reservas').add({
+                    await db.collection('citas').add({
+                        userId: currentUser.uid,
                         fecha: data.fecha,
                         hora: data.hora,
                         nombre: data.nombre,
                         email: data.email,
                         telefono: data.telefono,
+                        estado: 'pendiente',
+                        servicio: 'Consulta',
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     return { success: true };
@@ -849,7 +837,7 @@
 
             async function loadReservationsFromFirestore() {
                 try {
-                    const snapshot = await db.collection('reservas').get();
+                    const snapshot = await db.collection('citas').get();
                     const reservas = [];
                     snapshot.forEach(doc => {
                         const data = doc.data();
@@ -868,7 +856,7 @@
                 }
             }
 
-            // ===== FUNCIONES DE FECHAS (sin cambios) =====
+            // ===== FUNCIONES DE FECHAS Y TABLA =====
             function saveFormDataToCookies() {
                 var nombre = nombreInput.value.trim();
                 var email = emailInput.value.trim();
@@ -1071,34 +1059,7 @@
                 }
             }
 
-            async function autoRefreshReservations() {
-                if (popupOverlay.classList.contains('show')) return;
-                if (isAutoUpdating) return;
-
-                isAutoUpdating = true;
-                updateIndicator.classList.add('show');
-                const startTime = Date.now();
-
-                try {
-                    var reservas = await loadReservationsFromFirestore();
-                    updateTableWithReservations(reservas);
-                } catch (error) {
-                    console.error('Error en actualización automática:', error);
-                } finally {
-                    const elapsed = Date.now() - startTime;
-                    const remaining = Math.max(0, MIN_INDICATOR_DURATION - elapsed);
-
-                    setTimeout(function() {
-                        updateIndicator.classList.remove('show');
-                        isAutoUpdating = false;
-                    }, remaining);
-                }
-            }
-
             async function renderTable() {
-                updateIndicator.classList.add('show');
-                const startTime = Date.now();
-
                 var today = getToday();
 
                 var headerHtml = '<th>Hora</th>';
@@ -1212,15 +1173,9 @@
                 }
 
                 updateFeedback();
-
-                const elapsed = Date.now() - startTime;
-                const remaining = Math.max(0, MIN_INDICATOR_DURATION - elapsed);
-                setTimeout(function() {
-                    updateIndicator.classList.remove('show');
-                }, remaining);
             }
 
-            // ===== EVENT LISTENERS (sin cambios) =====
+            // ===== EVENT LISTENERS =====
             nombreInput.addEventListener('input', saveFormDataToCookies);
             emailInput.addEventListener('input', saveFormDataToCookies);
             telefonoInput.addEventListener('input', saveFormDataToCookies);
@@ -1316,13 +1271,19 @@
 
             // ===== INICIALIZACIÓN =====
             loadFormDataFromCookies();
-            renderTable();
+            // Si el auth ya está resuelto, renderTable se llamó desde el .then.
+            // Si no, lo llamamos después de un tiempo por si el auth falla.
+            setTimeout(function() {
+                if (!currentUser) {
+                    renderTable();
+                }
+            }, 3000);
 
             if (getCookie('cookies_aceptadas') === 'true') {
                 document.getElementById('cookieNotice').style.display = 'none';
             }
 
-            setInterval(autoRefreshReservations, AUTO_REFRESH_INTERVAL);
+            // NOTA: Se ha eliminado la actualización automática (setInterval)
 
         })();
     </script>
