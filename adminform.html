@@ -145,8 +145,12 @@
         <h2>Panel de Administración</h2>
         <form id="loginForm">
             <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" id="emailInput" placeholder="admin@ejemplo.com" required autofocus>
+            </div>
+            <div class="form-group">
                 <label><i class="fas fa-key"></i> Contraseña</label>
-                <input type="password" id="passwordInput" placeholder="Ingresa la contraseña" required autofocus>
+                <input type="password" id="passwordInput" placeholder="Ingresa tu contraseña" required>
             </div>
             <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> Ingresar</button>
         </form>
@@ -158,7 +162,7 @@
         <div class="header-actions">
             <h1><i class="fas fa-user-shield"></i> Panel de Administración</h1>
             <div style="display: flex; gap: 0.3rem; align-items: center;">
-                <span class="user-info">Hola, <strong>Admin</strong></span>
+                <span class="user-info">Hola, <strong id="adminUserName">Admin</strong></span>
                 <button class="btn btn-secondary" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.7rem; border-radius: 4px;" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i> Salir
                 </button>
@@ -317,24 +321,7 @@
             const db = firebase.firestore();
             const auth = firebase.auth();
 
-            // ===== AUTENTICACIÓN ANÓNIMA =====
-            let authReady = false;
-            auth.signInAnonymously()
-                .then(() => {
-                    console.log('✅ Admin autenticado anónimamente');
-                    authReady = true;
-                    // Si ya estamos logueados con contraseña, cargamos datos
-                    if (document.getElementById('adminPanel').style.display !== 'none') {
-                        loadData();
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Error en auth anónima (admin):', error);
-                    alert('No se pudo autenticar con Firebase. El panel no funcionará correctamente.');
-                });
-
             // ===== CONFIGURACIÓN GENERAL =====
-            const ADMIN_PASSWORD = 'admin123'; // Cambia esta contraseña por la que desees
             const HOURS_PER_DAY = 9;
             const MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
             const LONG_DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -347,50 +334,79 @@
             let stats = { total: 0, activas: 0, canceladas: 0, futuras: 0, pasadas: 0 };
             let selectedMonth = new Date();
 
-            // ===== LOGIN =====
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
+            // ===== ELEMENTOS DOM =====
+            const loginScreen = document.getElementById('loginScreen');
+            const adminPanel = document.getElementById('adminPanel');
+            const loginForm = document.getElementById('loginForm');
+            const emailInput = document.getElementById('emailInput');
+            const passwordInput = document.getElementById('passwordInput');
+            const loginError = document.getElementById('loginError');
+            const adminUserName = document.getElementById('adminUserName');
+
+            // ===== FUNCIONES DE LOGIN =====
+            loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                const password = document.getElementById('passwordInput').value;
-                const errorEl = document.getElementById('loginError');
-                errorEl.style.display = 'none';
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
+                loginError.style.display = 'none';
                 
-                if (password === ADMIN_PASSWORD) {
-                    sessionStorage.setItem('admin_password', password);
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('adminPanel').style.display = 'block';
-                    if (authReady) {
-                        loadData();
-                    } else {
-                        // Esperar a que auth esté listo
-                        const checkAuth = setInterval(() => {
-                            if (authReady) {
-                                clearInterval(checkAuth);
-                                loadData();
-                            }
-                        }, 500);
-                    }
-                } else {
-                    errorEl.textContent = '❌ Contraseña incorrecta';
-                    errorEl.style.display = 'block';
+                if (!email || !password) {
+                    loginError.textContent = '❌ Completa todos los campos';
+                    loginError.style.display = 'block';
+                    return;
+                }
+
+                try {
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                    const user = userCredential.user;
+                    adminUserName.textContent = user.email || 'Admin';
+                    loginScreen.style.display = 'none';
+                    adminPanel.style.display = 'block';
+                    // Cargar datos
+                    loadData();
+                    // Guardar sesión
+                    sessionStorage.setItem('admin_email', email);
+                    sessionStorage.setItem('admin_logged', 'true');
+                } catch (error) {
+                    console.error('Error de login:', error);
+                    let msg = '❌ Error al iniciar sesión. ';
+                    if (error.code === 'auth/user-not-found') msg += 'Usuario no encontrado.';
+                    else if (error.code === 'auth/wrong-password') msg += 'Contraseña incorrecta.';
+                    else if (error.code === 'auth/invalid-email') msg += 'Email inválido.';
+                    else msg += 'Verifica tus credenciales.';
+                    loginError.textContent = msg;
+                    loginError.style.display = 'block';
                 }
             });
 
+            // Verificar sesión al cargar
             window.addEventListener('load', function() {
-                const saved = sessionStorage.getItem('admin_password');
-                if (saved === ADMIN_PASSWORD) {
-                    document.getElementById('passwordInput').value = saved;
-                    document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+                if (sessionStorage.getItem('admin_logged') === 'true') {
+                    const email = sessionStorage.getItem('admin_email');
+                    if (email) {
+                        emailInput.value = email;
+                        // Intentar login automático (pero no podemos reutilizar la contraseña)
+                        // Mejor forzar re-login para seguridad
+                        // Simplemente mostramos el login y el usuario solo debe ingresar la contraseña
+                        // Podríamos mostrar el email ya cargado.
+                    }
                 }
             });
 
             function logout() {
-                sessionStorage.removeItem('admin_password');
-                document.getElementById('adminPanel').style.display = 'none';
-                document.getElementById('loginScreen').style.display = 'block';
-                document.getElementById('passwordInput').value = '';
+                auth.signOut().then(() => {
+                    sessionStorage.removeItem('admin_logged');
+                    sessionStorage.removeItem('admin_email');
+                    adminPanel.style.display = 'none';
+                    loginScreen.style.display = 'block';
+                    passwordInput.value = '';
+                    loginError.style.display = 'none';
+                }).catch(error => {
+                    console.error('Error al cerrar sesión:', error);
+                });
             }
 
-            // ===== FUNCIONES DE FIREBASE =====
+            // ===== FUNCIONES DE FIREBASE (lectura/escritura) =====
             async function loadData() {
                 const tbody = document.getElementById('reservasBody');
                 tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Actualizando...</td></tr>';
@@ -827,7 +843,7 @@
 
             // ===== ACTUALIZACIÓN AUTOMÁTICA =====
             setInterval(function() {
-                if (document.getElementById('adminPanel').style.display !== 'none') {
+                if (adminPanel.style.display !== 'none') {
                     updateCountdown();
                     renderTodayAgenda();
                 }
