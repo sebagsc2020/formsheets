@@ -76,36 +76,32 @@
         .btn-submit:hover { background:linear-gradient(135deg, #f0d060 0%, #e5c147 50%, #d4af37 100%); border-color:#d4af37; transform:scale(1.03); box-shadow:0 6px 18px rgba(212,175,55,0.5), 0 2px 4px rgba(0,0,0,0.4); }
         .btn-submit:disabled { opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none; }
         .btn-submit i { font-size:0.75rem; color:#1a1a1a; }
-        .popup-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; backdrop-filter:blur(8px); padding:2rem; }
+
+        /* ===== POPUP REDISEÑADO (sin scroll) ===== */
+        .popup-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; backdrop-filter:blur(8px); padding:1rem; }
         .popup-overlay.show { display:flex; }
-        .popup-container { background:#2a2a2a; border-radius:8px; border:1px solid #444; padding:2.5rem 3rem; max-width:500px; width:100%; max-height:85vh; box-shadow:0 20px 60px rgba(0,0,0,0.8); animation:popupFadeIn 0.4s ease; display:flex; flex-direction:column; overflow:hidden; }
+        .popup-container { background:#2a2a2a; border-radius:8px; border:1px solid #444; padding:1.5rem 2rem; max-width:480px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.8); animation:popupFadeIn 0.4s ease; display:flex; flex-direction:column; }
         @keyframes popupFadeIn { from { opacity:0; transform:scale(0.9) translateY(20px); } to { opacity:1; transform:scale(1) translateY(0); } }
-        .popup-container .popup-header { flex-shrink:0; }
-        .popup-container .popup-icon { text-align:center; font-size:3.5rem; color:#4caf50; margin-bottom:0.5rem; }
-        .popup-container h2 { color:#e8e8e8; text-align:center; font-size:1.5rem; margin-bottom:0.5rem; }
-        .popup-container .popup-subtitle { color:#9a9a9a; text-align:center; font-size:0.9rem; margin-bottom:1.2rem; border-bottom:1px solid #3a3a3a; padding-bottom:0.8rem; }
-        .popup-container .popup-body { flex:1 1 auto; overflow-y:auto; padding-right:0.5rem; margin-right:-0.5rem; scrollbar-width:thin; scrollbar-color:#555 #1e1e1e; }
-        .popup-container .popup-body::-webkit-scrollbar { width:6px; border-radius:3px; }
-        .popup-container .popup-body::-webkit-scrollbar-track { background:#1e1e1e; border-radius:3px; }
-        .popup-container .popup-body::-webkit-scrollbar-thumb { background:#555; border-radius:3px; }
-        .popup-container .popup-body::-webkit-scrollbar-thumb:hover { background:#777; }
-        .popup-container .popup-details { background:#222; border-radius:4px; padding:1rem 1.2rem; margin-bottom:1rem; border:1px solid #353535; }
-        .popup-container .popup-details .detail-row { display:flex; justify-content:space-between; padding:0.3rem 0; border-bottom:1px solid #333; color:#c0c0c0; font-size:0.85rem; }
-        .popup-container .popup-details .detail-row:last-child { border-bottom:none; }
-        .popup-container .popup-details .detail-row .label { color:#888; font-weight:500; }
-        .popup-container .popup-details .detail-row .value { color:#e0e0e0; font-weight:400; text-align:right; max-width:60%; word-break:break-word; }
-        .popup-container .popup-notice { background:#2a1a1a; border-left:3px solid #f44336; padding:0.6rem 0.8rem; border-radius:2px; margin-bottom:1rem; font-size:0.8rem; color:#d0a0a0; }
-        .popup-container .popup-notice i { color:#f44336; margin-right:6px; }
-        .popup-container .popup-notice strong { color:#f0c0c0; }
-        .popup-container .popup-whatsapp { background:#1a2a1a; border:1px solid #2a4a2a; border-radius:4px; padding:0.6rem 0.8rem; margin-bottom:1rem; display:flex; align-items:center; gap:8px; color:#a0c0a0; font-size:0.8rem; }
-        .popup-container .popup-whatsapp i { color:#25d366; font-size:1.2rem; flex-shrink:0; }
-        .popup-container .popup-whatsapp .whatsapp-number { color:#c0e0c0; font-weight:500; }
-        .popup-container .popup-footer { flex-shrink:0; padding-top:0.5rem; border-top:1px solid #353535; }
-        .popup-container .popup-close-btn { background:#444; border:1px solid #555; color:#e8e8e8; padding:0.5rem 1.5rem; border-radius:4px; font-weight:600; font-size:0.85rem; cursor:pointer; transition:0.15s; width:100%; display:flex; align-items:center; justify-content:center; gap:6px; margin-top:0.5rem; }
-        .popup-container .popup-close-btn:hover { background:#555; border-color:#666; }
+        .popup-container .popup-icon { text-align:center; font-size:2.8rem; color:#4caf50; margin-bottom:0.2rem; }
+        .popup-container h2 { color:#e8e8e8; text-align:center; font-size:1.3rem; margin-bottom:0.2rem; }
+        .popup-container .popup-subtitle { color:#9a9a9a; text-align:center; font-size:0.8rem; margin-bottom:0.8rem; border-bottom:1px solid #3a3a3a; padding-bottom:0.5rem; }
+        .popup-details { background:#222; border-radius:4px; padding:0.6rem 1rem; margin-bottom:0.8rem; border:1px solid #353535; display:grid; grid-template-columns:1fr 1fr; gap:0.2rem 1rem; }
+        .popup-details .detail-row { display:contents; }
+        .popup-details .detail-row .label { color:#888; font-size:0.75rem; font-weight:500; text-align:right; padding:0.1rem 0; }
+        .popup-details .detail-row .value { color:#e0e0e0; font-size:0.8rem; text-align:left; padding:0.1rem 0; word-break:break-word; }
+        .popup-notice { background:#2a1a1a; border-left:3px solid #f44336; padding:0.4rem 0.6rem; border-radius:2px; margin-bottom:0.8rem; font-size:0.7rem; color:#d0a0a0; }
+        .popup-notice i { color:#f44336; margin-right:4px; }
+        .popup-notice strong { color:#f0c0c0; }
+        .popup-whatsapp { background:#1a2a1a; border:1px solid #2a4a2a; border-radius:4px; padding:0.4rem 0.6rem; margin-bottom:0.8rem; display:flex; align-items:center; gap:8px; color:#a0c0a0; font-size:0.7rem; }
+        .popup-whatsapp i { color:#25d366; font-size:1rem; flex-shrink:0; }
+        .popup-whatsapp .whatsapp-number { color:#c0e0c0; font-weight:500; }
+        .popup-close-btn { background:#444; border:1px solid #555; color:#e8e8e8; padding:0.4rem 1rem; border-radius:4px; font-weight:600; font-size:0.8rem; cursor:pointer; transition:0.15s; width:100%; display:flex; align-items:center; justify-content:center; gap:6px; }
+        .popup-close-btn:hover { background:#555; border-color:#666; }
+
+        /* ===== RESPONSIVE (mantener) ===== */
         @media (max-width:1024px) { .card { padding:1.5rem; } .two-column-layout { gap:1rem; } }
-        @media (max-width:768px) { .two-column-layout { flex-direction:column; gap:0.8rem; } .left-col, .right-col { flex:1 1 100%; min-width:0; } .right-col .form-grid { padding:0.8rem; gap:0.5rem; height:auto; } .card { padding:1rem 0.6rem; } table { font-size:0.7rem; min-width:380px; } th { padding:0.2rem 0.15rem; font-size:0.65rem; } th:first-child { min-width:40px; padding:0.2rem 0.1rem; } td { padding:0.08rem 0.05rem; } .slot-cell { height:20px; } .slot-cell input[type="radio"] { width:12px; height:12px; } .time-slot { font-size:0.65rem; } .afternoon-row td { font-size:0.55rem; padding:0.1rem 0.02rem; } h1 { font-size:1.3rem; } .week-navigation { flex-direction:column; align-items:stretch; gap:0.3rem; } .week-nav-buttons { justify-content:center; } .week-label { font-size:0.75rem; padding:0.15rem 0.6rem; } .cookie-notice { flex-direction:column; align-items:stretch; text-align:center; padding:0.4rem 0.6rem; gap:0.4rem; } .cookie-notice .cookie-btn { width:100%; font-size:0.75rem; padding:0.25rem 0.6rem; } .selected-display { font-size:0.8rem; padding:0.3rem 0.6rem; flex-wrap:wrap; gap:4px; min-height:32px; } .popup-container { padding:1.5rem 1.2rem; max-height:90vh; } .popup-container .popup-details .detail-row { font-size:0.75rem; flex-direction:column; align-items:flex-start; gap:0.1rem; } .popup-container .popup-details .detail-row .value { text-align:left; max-width:100%; } }
-        @media (max-width:480px) { .card { padding:0.5rem 0.3rem; border-radius:4px; } table { font-size:0.6rem; min-width:320px; } th { padding:0.15rem 0.1rem; font-size:0.55rem; } th:first-child { min-width:30px; padding:0.15rem 0.05rem; } td { padding:0.05rem 0.03rem; } .slot-cell { height:18px; } .slot-cell input[type="radio"] { width:10px; height:10px; border-width:1.5px; } .time-slot { font-size:0.55rem; padding:0.05rem 0.02rem; } .afternoon-row td { font-size:0.5rem; padding:0.08rem 0.02rem; } .right-col .form-grid { padding:0.5rem; gap:0.4rem; border-radius:4px; } .field-group input { padding:0.3rem 0.4rem; font-size:0.75rem; height:30px; } .field-group label { font-size:0.65rem; } .field-group .hint { font-size:0.55rem; } .btn-submit { height:30px; font-size:0.75rem; padding:0.2rem 0.6rem; min-height:30px; border-radius:4px; } h1 { font-size:1rem; } .week-label { font-size:0.65rem; padding:0.1rem 0.5rem; } .week-nav-buttons button { font-size:0.6rem; padding:0.15rem 0.5rem; gap:3px; } .cookie-notice p { font-size:0.7rem; } .cookie-notice .cookie-btn { font-size:0.65rem; padding:0.2rem 0.5rem; } .selected-display { font-size:0.7rem; padding:0.2rem 0.5rem; min-height:28px; gap:3px; } .selected-display .selected-text { padding:0 0.3rem; font-size:0.65rem; } .popup-container { padding:1rem 0.8rem; border-radius:4px; max-height:92vh; max-width:95%; } .popup-container h2 { font-size:1rem; } .popup-container .popup-icon { font-size:2.5rem; } .popup-container .popup-subtitle { font-size:0.7rem; } .popup-container .popup-details { padding:0.6rem 0.8rem; } .popup-container .popup-details .detail-row { font-size:0.7rem; padding:0.2rem 0; } .popup-container .popup-notice { font-size:0.7rem; padding:0.4rem 0.6rem; } .popup-container .popup-whatsapp { font-size:0.7rem; padding:0.4rem 0.6rem; } .popup-container .popup-close-btn { font-size:0.75rem; padding:0.4rem 1rem; } }
+        @media (max-width:768px) { .two-column-layout { flex-direction:column; gap:0.8rem; } .left-col, .right-col { flex:1 1 100%; min-width:0; } .right-col .form-grid { padding:0.8rem; gap:0.5rem; height:auto; } .card { padding:1rem 0.6rem; } table { font-size:0.7rem; min-width:380px; } th { padding:0.2rem 0.15rem; font-size:0.65rem; } th:first-child { min-width:40px; padding:0.2rem 0.1rem; } td { padding:0.08rem 0.05rem; } .slot-cell { height:20px; } .slot-cell input[type="radio"] { width:12px; height:12px; } .time-slot { font-size:0.65rem; } .afternoon-row td { font-size:0.55rem; padding:0.1rem 0.02rem; } h1 { font-size:1.3rem; } .week-navigation { flex-direction:column; align-items:stretch; gap:0.3rem; } .week-nav-buttons { justify-content:center; } .week-label { font-size:0.75rem; padding:0.15rem 0.6rem; } .cookie-notice { flex-direction:column; align-items:stretch; text-align:center; padding:0.4rem 0.6rem; gap:0.4rem; } .cookie-notice .cookie-btn { width:100%; font-size:0.75rem; padding:0.25rem 0.6rem; } .selected-display { font-size:0.8rem; padding:0.3rem 0.6rem; flex-wrap:wrap; gap:4px; min-height:32px; } .popup-container { padding:1.2rem; max-width:95%; } }
+        @media (max-width:480px) { .card { padding:0.5rem 0.3rem; border-radius:4px; } table { font-size:0.6rem; min-width:320px; } th { padding:0.15rem 0.1rem; font-size:0.55rem; } th:first-child { min-width:30px; padding:0.15rem 0.05rem; } td { padding:0.05rem 0.03rem; } .slot-cell { height:18px; } .slot-cell input[type="radio"] { width:10px; height:10px; border-width:1.5px; } .time-slot { font-size:0.55rem; padding:0.05rem 0.02rem; } .afternoon-row td { font-size:0.5rem; padding:0.08rem 0.02rem; } .right-col .form-grid { padding:0.5rem; gap:0.4rem; border-radius:4px; } .field-group input { padding:0.3rem 0.4rem; font-size:0.75rem; height:30px; } .field-group label { font-size:0.65rem; } .field-group .hint { font-size:0.55rem; } .btn-submit { height:30px; font-size:0.75rem; padding:0.2rem 0.6rem; min-height:30px; border-radius:4px; } h1 { font-size:1rem; } .week-label { font-size:0.65rem; padding:0.1rem 0.5rem; } .week-nav-buttons button { font-size:0.6rem; padding:0.15rem 0.5rem; gap:3px; } .cookie-notice p { font-size:0.7rem; } .cookie-notice .cookie-btn { font-size:0.65rem; padding:0.2rem 0.5rem; } .selected-display { font-size:0.7rem; padding:0.2rem 0.5rem; min-height:28px; gap:3px; } .selected-display .selected-text { padding:0 0.3rem; font-size:0.65rem; } .popup-container { padding:0.8rem; } .popup-container h2 { font-size:1rem; } .popup-container .popup-icon { font-size:2rem; } .popup-container .popup-subtitle { font-size:0.7rem; } .popup-details { grid-template-columns:1fr; gap:0.1rem; } .popup-details .detail-row .label { text-align:left; } .popup-notice { font-size:0.65rem; } .popup-whatsapp { font-size:0.65rem; } .popup-close-btn { font-size:0.7rem; padding:0.3rem 0.6rem; } }
     </style>
 </head>
 <body>
@@ -156,17 +152,17 @@
                     <div class="form-grid">
                         <div class="field-group">
                             <label for="nombre"><i class="far fa-user"></i> Nombre</label>
-                            <input type="text" id="nombre" placeholder="Ej: Ana Pérez" autocomplete="name" required>
+                            <input type="text" id="nombre" placeholder="Ej: Ana Pérez" autocomplete="on" required>
                             <span class="hint">Nombre completo</span>
                         </div>
                         <div class="field-group">
                             <label for="email"><i class="far fa-envelope"></i> Email</label>
-                            <input type="email" id="email" placeholder="ejemplo@email.com" autocomplete="email" required>
+                            <input type="email" id="email" placeholder="ejemplo@email.com" autocomplete="on" required>
                             <span class="hint">Correo electrónico</span>
                         </div>
                         <div class="field-group">
                             <label for="telefono"><i class="fas fa-phone-alt"></i> Teléfono</label>
-                            <input type="tel" id="telefono" placeholder="+34 600 000 000" autocomplete="tel" required>
+                            <input type="tel" id="telefono" placeholder="+34 600 000 000" autocomplete="on" required>
                             <span class="hint">Incluye código de país</span>
                         </div>
                         <div class="btn-wrapper">
@@ -181,33 +177,29 @@
         </div>
     </div>
 
-    <!-- POPUP -->
+    <!-- POPUP (rediseñado) -->
     <div class="popup-overlay" id="popupOverlay">
         <div class="popup-container">
-            <div class="popup-header">
-                <div class="popup-icon"><i class="fas fa-check-circle"></i></div>
-                <h2>¡Reserva Confirmada!</h2>
-                <div class="popup-subtitle">Hemos recibido tu solicitud de reserva</div>
+            <div class="popup-icon"><i class="fas fa-check-circle"></i></div>
+            <h2>¡Reserva Confirmada!</h2>
+            <div class="popup-subtitle">Hemos recibido tu solicitud</div>
+            <div class="popup-details" id="popupDetails">
+                <!-- Los detalles se inyectan con JavaScript en formato grid -->
             </div>
-            <div class="popup-body">
-                <div class="popup-details" id="popupDetails"></div>
-                <div class="popup-notice">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <strong>Importante:</strong> En caso de no poder concurrir, por favor avisa con <strong>24 horas de anticipación</strong> para poder reasignar el turno.
-                </div>
-                <div class="popup-whatsapp">
-                    <i class="fab fa-whatsapp"></i>
-                    <div>
-                        <strong>Confirmación enviada por WhatsApp</strong><br>
-                        <span>Se ha enviado un mensaje con los datos al número <span class="whatsapp-number">+5493518692251</span></span>
-                    </div>
+            <div class="popup-notice">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Importante:</strong> Si no puedes asistir, avisa con <strong>24h</strong> de anticipación.
+            </div>
+            <div class="popup-whatsapp">
+                <i class="fab fa-whatsapp"></i>
+                <div>
+                    <strong>Confirmación por WhatsApp</strong><br>
+                    <span>Mensaje enviado al <span class="whatsapp-number">+5493518692251</span></span>
                 </div>
             </div>
-            <div class="popup-footer">
-                <button class="popup-close-btn" id="popupCloseBtn">
-                    <i class="fas fa-times"></i> Cerrar
-                </button>
-            </div>
+            <button class="popup-close-btn" id="popupCloseBtn">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
         </div>
     </div>
 
@@ -357,7 +349,9 @@
             }
 
             function showConfirmationPopup(nombre, email, telefono, horario) {
+                // Limpiar detalles previos
                 popupDetails.innerHTML = '';
+                // Crear filas en formato grid (dos columnas)
                 var fields = [
                     { label: 'Nombre', value: nombre },
                     { label: 'Email', value: email },
@@ -365,10 +359,15 @@
                     { label: 'Horario', value: horario }
                 ];
                 fields.forEach(function(field) {
-                    var row = document.createElement('div');
-                    row.className = 'detail-row';
-                    row.innerHTML = '<span class="label">' + field.label + '</span><span class="value">' + (field.value || '—') + '</span>';
-                    popupDetails.appendChild(row);
+                    var labelSpan = document.createElement('span');
+                    labelSpan.className = 'label';
+                    labelSpan.textContent = field.label + ':';
+                    var valueSpan = document.createElement('span');
+                    valueSpan.className = 'value';
+                    valueSpan.textContent = field.value || '—';
+                    // Los elementos se insertan como hijos directos de .popup-details (grid)
+                    popupDetails.appendChild(labelSpan);
+                    popupDetails.appendChild(valueSpan);
                 });
                 popupOverlay.classList.add('show');
                 document.body.style.overflow = 'hidden';
@@ -390,27 +389,30 @@
                 window.open(url, '_blank');
             }
 
-            // === LIMPIAR FORMULARIO Y COOKIES ===
-            function clearFormAndCookies() {
-                // Vaciar campos
+            // ===== FUNCIÓN PARA LIMPIAR FORMULARIO Y SELECCIÓN =====
+            function clearFormAndSelection() {
+                // Limpiar campos de texto
                 nombreInput.value = '';
                 emailInput.value = '';
                 telefonoInput.value = '';
-                // Desmarcar radio
+                // Deseleccionar radio
                 var checkedRadio = document.querySelector('input[name="slot"]:checked');
                 if (checkedRadio) {
                     checkedRadio.checked = false;
                 }
                 // Ocultar mensaje de selección
                 selectedDisplay.classList.remove('show');
-                // Eliminar cookies de reserva (excepto cookies_aceptadas)
-                var cookiesToDelete = ['reserva_nombre', 'reserva_email', 'reserva_telefono', 'reserva_horario'];
-                cookiesToDelete.forEach(function(name) {
-                    deleteCookie(name);
-                });
+                selectedText.textContent = '—';
+                // Eliminar cookie del horario (los otros datos se borrarán al guardar vacíos)
+                deleteCookie('reserva_horario');
+                // También podemos eliminar las cookies de nombre, email, teléfono si queremos
+                // pero el usuario puede querer mantenerlos, así que mejor solo borrar horario.
+                // No obstante, si los campos quedan vacíos, al guardar se borrarán sus cookies.
+                // Forzamos guardar cookies vacías para que se limpien.
+                saveFormDataToCookies(); // Esto borrará las cookies si los campos están vacíos
             }
 
-            // ===== FUNCIONES DE FECHAS Y TABLA =====
+            // ===== FUNCIONES DE FECHAS (resto) =====
             function getDatePartsInTimezone(date) {
                 const formatter = new Intl.DateTimeFormat('en-GB', {
                     timeZone: TIMEZONE,
@@ -700,14 +702,16 @@
                     var result = await saveToFirestore(data);
 
                     if (result.success) {
-                        // Guardar cookies (por si acaso) pero luego limpiar
+                        // Guardar en cookies (para mantener los datos si el usuario quiere)
                         saveFormDataToCookies();
+                        // Abrir WhatsApp
                         sendWhatsAppMessage(nombre, email, telefono, selected.value);
+                        // Mostrar popup
                         showConfirmationPopup(nombre, email, telefono, selected.value);
-                        // Limpiar formulario y cookies DESPUÉS de mostrar el popup
-                        clearFormAndCookies();
-                        // Recargar tabla para reflejar la nueva reserva
+                        // Recargar tabla
                         setTimeout(function() { renderTable(); }, 2000);
+                        // Limpiar formulario y selección
+                        clearFormAndSelection();
                     } else {
                         alert('❌ Error al guardar la reserva: ' + (result.error || 'Intenta nuevamente.'));
                     }
