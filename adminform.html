@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
+        /* ===== ESTILOS (igual que antes) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
         body { background: #1a1a1a; min-height: 100vh; padding: 0.8rem 0.5rem; color: #e8e8e8; }
         .container { max-width: 1200px; margin: 0 auto; }
@@ -139,7 +140,7 @@
     </style>
 </head>
 <body>
-    <!-- PANTALLA DE LOGIN -->
+    <!-- PANTALLA DE LOGIN (Firebase Auth) -->
     <div id="loginScreen" class="login-box">
         <i class="fas fa-lock lock"></i>
         <h2>Panel de Administración</h2>
@@ -150,7 +151,7 @@
             </div>
             <div class="form-group">
                 <label><i class="fas fa-key"></i> Contraseña</label>
-                <input type="password" id="passwordInput" placeholder="Ingresa tu contraseña" required>
+                <input type="password" id="passwordInput" placeholder="••••••••" required>
             </div>
             <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> Ingresar</button>
         </form>
@@ -162,7 +163,7 @@
         <div class="header-actions">
             <h1><i class="fas fa-user-shield"></i> Panel de Administración</h1>
             <div style="display: flex; gap: 0.3rem; align-items: center;">
-                <span class="user-info">Hola, <strong id="adminUserName">Admin</strong></span>
+                <span class="user-info" id="userEmailDisplay">Hola, <strong>Admin</strong></span>
                 <button class="btn btn-secondary" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.7rem; border-radius: 4px;" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i> Salir
                 </button>
@@ -333,80 +334,64 @@
             let currentFilter = 'all';
             let stats = { total: 0, activas: 0, canceladas: 0, futuras: 0, pasadas: 0 };
             let selectedMonth = new Date();
+            let currentUser = null;
 
-            // ===== ELEMENTOS DOM =====
-            const loginScreen = document.getElementById('loginScreen');
-            const adminPanel = document.getElementById('adminPanel');
-            const loginForm = document.getElementById('loginForm');
-            const emailInput = document.getElementById('emailInput');
-            const passwordInput = document.getElementById('passwordInput');
-            const loginError = document.getElementById('loginError');
-            const adminUserName = document.getElementById('adminUserName');
-
-            // ===== FUNCIONES DE LOGIN =====
-            loginForm.addEventListener('submit', async function(e) {
+            // ===== LOGIN CON EMAIL/PASSWORD =====
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                const email = emailInput.value.trim();
-                const password = passwordInput.value.trim();
-                loginError.style.display = 'none';
+                const email = document.getElementById('emailInput').value.trim();
+                const password = document.getElementById('passwordInput').value;
+                const errorEl = document.getElementById('loginError');
+                errorEl.style.display = 'none';
                 
                 if (!email || !password) {
-                    loginError.textContent = '❌ Completa todos los campos';
-                    loginError.style.display = 'block';
+                    errorEl.textContent = '❌ Completa ambos campos';
+                    errorEl.style.display = 'block';
                     return;
                 }
 
-                try {
-                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                    const user = userCredential.user;
-                    adminUserName.textContent = user.email || 'Admin';
-                    loginScreen.style.display = 'none';
-                    adminPanel.style.display = 'block';
-                    // Cargar datos
-                    loadData();
-                    // Guardar sesión
-                    sessionStorage.setItem('admin_email', email);
-                    sessionStorage.setItem('admin_logged', 'true');
-                } catch (error) {
-                    console.error('Error de login:', error);
-                    let msg = '❌ Error al iniciar sesión. ';
-                    if (error.code === 'auth/user-not-found') msg += 'Usuario no encontrado.';
-                    else if (error.code === 'auth/wrong-password') msg += 'Contraseña incorrecta.';
-                    else if (error.code === 'auth/invalid-email') msg += 'Email inválido.';
-                    else msg += 'Verifica tus credenciales.';
-                    loginError.textContent = msg;
-                    loginError.style.display = 'block';
-                }
+                // Deshabilitar botón mientras se autentica
+                const submitBtn = this.querySelector('.btn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Autenticando...';
+
+                auth.signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        currentUser = userCredential.user;
+                        console.log('✅ Login exitoso:', currentUser.email);
+                        document.getElementById('loginScreen').style.display = 'none';
+                        document.getElementById('adminPanel').style.display = 'block';
+                        document.getElementById('userEmailDisplay').innerHTML = `Hola, <strong>${currentUser.email}</strong>`;
+                        // Cargar datos
+                        loadData();
+                    })
+                    .catch((error) => {
+                        console.error('❌ Error de login:', error);
+                        let msg = '❌ Error de autenticación. ';
+                        switch (error.code) {
+                            case 'auth/user-not-found':
+                                msg += 'Usuario no encontrado.';
+                                break;
+                            case 'auth/wrong-password':
+                                msg += 'Contraseña incorrecta.';
+                                break;
+                            case 'auth/invalid-email':
+                                msg += 'Email inválido.';
+                                break;
+                            case 'auth/too-many-requests':
+                                msg += 'Demasiados intentos. Espera un momento.';
+                                break;
+                            default:
+                                msg += error.message;
+                        }
+                        errorEl.textContent = msg;
+                        errorEl.style.display = 'block';
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar';
+                    });
             });
 
-            // Verificar sesión al cargar
-            window.addEventListener('load', function() {
-                if (sessionStorage.getItem('admin_logged') === 'true') {
-                    const email = sessionStorage.getItem('admin_email');
-                    if (email) {
-                        emailInput.value = email;
-                        // Intentar login automático (pero no podemos reutilizar la contraseña)
-                        // Mejor forzar re-login para seguridad
-                        // Simplemente mostramos el login y el usuario solo debe ingresar la contraseña
-                        // Podríamos mostrar el email ya cargado.
-                    }
-                }
-            });
-
-            function logout() {
-                auth.signOut().then(() => {
-                    sessionStorage.removeItem('admin_logged');
-                    sessionStorage.removeItem('admin_email');
-                    adminPanel.style.display = 'none';
-                    loginScreen.style.display = 'block';
-                    passwordInput.value = '';
-                    loginError.style.display = 'none';
-                }).catch(error => {
-                    console.error('Error al cerrar sesión:', error);
-                });
-            }
-
-            // ===== FUNCIONES DE FIREBASE (lectura/escritura) =====
+            // ===== FUNCIONES DE CARGA Y ACTUALIZACIÓN =====
             async function loadData() {
                 const tbody = document.getElementById('reservasBody');
                 tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Actualizando...</td></tr>';
@@ -423,7 +408,7 @@
                             nombre: data.nombre || '',
                             email: data.email || '',
                             telefono: data.telefono || '',
-                            estado: data.estado || 'ACTIVA',
+                            estado: data.estado || 'ACTIVA',  // Si no existe, por defecto ACTIVA
                             servicio: data.servicio || 'Consulta',
                             fechaReserva: data.createdAt ? data.createdAt.toDate().toISOString() : new Date().toISOString()
                         });
@@ -433,7 +418,7 @@
                     renderData();
                 } catch (error) {
                     console.error('Error al cargar datos:', error);
-                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Error al cargar datos. Verifica tu conexión.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Error al cargar datos. Verifica tu conexión y permisos.</td></tr>';
                 }
             }
 
@@ -622,8 +607,18 @@
                 }
                 
                 tbody.innerHTML = filtered.map(r => {
-                    const badgeClass = r.estado === 'ACTIVA' ? (esFutura(r.fecha, r.hora) ? 'badge-activa' : 'badge-completada') : 'badge-cancelada';
-                    const estadoLabel = r.estado === 'ACTIVA' ? (esFutura(r.fecha, r.hora) ? 'Activa' : 'Pasada') : 'Cancelada';
+                    let badgeClass = 'badge-activa';
+                    let estadoLabel = 'Activa';
+                    if (r.estado === 'CANCELADA') {
+                        badgeClass = 'badge-cancelada';
+                        estadoLabel = 'Cancelada';
+                    } else if (r.estado === 'COMPLETADA') {
+                        badgeClass = 'badge-completada';
+                        estadoLabel = 'Completada';
+                    } else if (r.estado === 'ACTIVA' && !esFutura(r.fecha, r.hora)) {
+                        badgeClass = 'badge-completada';
+                        estadoLabel = 'Pasada';
+                    }
                     
                     let actionsHtml = '';
                     
@@ -665,7 +660,7 @@
                 }).join('');
             }
 
-            // ===== ACCIONES =====
+            // ===== ACCIONES (WhatsApp, cancelar, completar, reactivar) =====
             window.sendWhatsApp = function(id) {
                 const reserva = allReservations.find(r => r.id === id);
                 if (!reserva) {
@@ -841,17 +836,29 @@
                 a.click();
             };
 
+            // ===== CIERRE DE SESIÓN =====
+            window.logout = function() {
+                auth.signOut().then(() => {
+                    document.getElementById('adminPanel').style.display = 'none';
+                    document.getElementById('loginScreen').style.display = 'block';
+                    document.getElementById('emailInput').value = '';
+                    document.getElementById('passwordInput').value = '';
+                    currentUser = null;
+                }).catch((error) => {
+                    console.error('Error al cerrar sesión:', error);
+                });
+            };
+
             // ===== ACTUALIZACIÓN AUTOMÁTICA =====
             setInterval(function() {
-                if (adminPanel.style.display !== 'none') {
+                if (document.getElementById('adminPanel').style.display !== 'none') {
                     updateCountdown();
                     renderTodayAgenda();
                 }
             }, 60000);
 
-            // ===== EXPONER FUNCIONES GLOBALES =====
+            // ===== EXPONER FUNCIONES =====
             window.loadData = loadData;
-            window.logout = logout;
 
         })();
     </script>
