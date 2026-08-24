@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Admin - Reservas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
-        /* ===== ESTILOS (igual que antes) ===== */
+        /* (Mismos estilos que antes, no los repito para no alargar) */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
         body { background: #1a1a1a; min-height: 100vh; padding: 0.8rem 0.5rem; color: #e8e8e8; }
         .container { max-width: 1200px; margin: 0 auto; }
@@ -57,6 +56,7 @@
         .today-tag { font-size: 0.5rem; font-weight: 700; padding: 0.05rem 0.35rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
         .today-tag.next-tag { background: #d4af37; color: #1a1a1a; }
         .today-tag.past-tag { background: #444; color: #aaa; }
+        .today-tag.cancel-tag { background: #3a1a1a; color: #ff6b6b; }
         .today-empty { text-align: center; color: #777; padding: 0.6rem 0.3rem; font-size: 0.8rem; }
         .today-empty i { font-size: 1.8rem; color: #55482a; margin-bottom: 0.2rem; display: block; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0.8rem; }
@@ -140,7 +140,7 @@
     </style>
 </head>
 <body>
-    <!-- PANTALLA DE LOGIN (Firebase Auth) -->
+    <!-- PANTALLA DE LOGIN -->
     <div id="loginScreen" class="login-box">
         <i class="fas fa-lock lock"></i>
         <h2>Panel de Administración</h2>
@@ -170,7 +170,7 @@
             </div>
         </div>
 
-        <!-- AGENDA DE HOY -->
+        <!-- AGENDA DE HOY (mejorada) -->
         <div class="today-agenda">
             <div class="today-header">
                 <h2><i class="fas fa-sun"></i>Agenda de Hoy</h2>
@@ -336,7 +336,7 @@
             let selectedMonth = new Date();
             let currentUser = null;
 
-            // ===== LOGIN CON EMAIL/PASSWORD =====
+            // ===== LOGIN =====
             document.getElementById('loginForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 const email = document.getElementById('emailInput').value.trim();
@@ -350,7 +350,6 @@
                     return;
                 }
 
-                // Deshabilitar botón mientras se autentica
                 const submitBtn = this.querySelector('.btn');
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Autenticando...';
@@ -358,31 +357,19 @@
                 auth.signInWithEmailAndPassword(email, password)
                     .then((userCredential) => {
                         currentUser = userCredential.user;
-                        console.log('✅ Login exitoso:', currentUser.email);
                         document.getElementById('loginScreen').style.display = 'none';
                         document.getElementById('adminPanel').style.display = 'block';
                         document.getElementById('userEmailDisplay').innerHTML = `Hola, <strong>${currentUser.email}</strong>`;
-                        // Cargar datos
                         loadData();
                     })
                     .catch((error) => {
-                        console.error('❌ Error de login:', error);
                         let msg = '❌ Error de autenticación. ';
                         switch (error.code) {
-                            case 'auth/user-not-found':
-                                msg += 'Usuario no encontrado.';
-                                break;
-                            case 'auth/wrong-password':
-                                msg += 'Contraseña incorrecta.';
-                                break;
-                            case 'auth/invalid-email':
-                                msg += 'Email inválido.';
-                                break;
-                            case 'auth/too-many-requests':
-                                msg += 'Demasiados intentos. Espera un momento.';
-                                break;
-                            default:
-                                msg += error.message;
+                            case 'auth/user-not-found': msg += 'Usuario no encontrado.'; break;
+                            case 'auth/wrong-password': msg += 'Contraseña incorrecta.'; break;
+                            case 'auth/invalid-email': msg += 'Email inválido.'; break;
+                            case 'auth/too-many-requests': msg += 'Demasiados intentos. Espera un momento.'; break;
+                            default: msg += error.message;
                         }
                         errorEl.textContent = msg;
                         errorEl.style.display = 'block';
@@ -391,7 +378,7 @@
                     });
             });
 
-            // ===== FUNCIONES DE CARGA Y ACTUALIZACIÓN =====
+            // ===== CARGA DE DATOS =====
             async function loadData() {
                 const tbody = document.getElementById('reservasBody');
                 tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Actualizando...</td></tr>';
@@ -408,7 +395,7 @@
                             nombre: data.nombre || '',
                             email: data.email || '',
                             telefono: data.telefono || '',
-                            estado: data.estado || 'ACTIVA',  // Si no existe, por defecto ACTIVA
+                            estado: data.estado || 'ACTIVA',
                             servicio: data.servicio || 'Consulta',
                             fechaReserva: data.createdAt ? data.createdAt.toDate().toISOString() : new Date().toISOString()
                         });
@@ -452,7 +439,7 @@
                 updateCountdown();
             }
 
-            // ===== FUNCIONES AUXILIARES (sin cambios) =====
+            // ===== FUNCIÓN PARSE FECHA =====
             function parseReservaDate(fecha, hora) {
                 try {
                     const partes = fecha.split(' ');
@@ -478,6 +465,7 @@
                 } catch (e) { return null; }
             }
 
+            // ===== AGENDA DE HOY (mejorada: muestra todos los estados) =====
             function renderTodayAgenda() {
                 const now = new Date();
                 const listEl = document.getElementById('todayList');
@@ -486,8 +474,8 @@
                 
                 dateLabel.textContent = `${LONG_DAYS[now.getDay()]} ${String(now.getDate()).padStart(2, '0')} de ${MONTH_NAMES[now.getMonth()]}, ${now.getFullYear()}`;
                 
+                // Filtrar todas las reservas del día (sin importar estado)
                 const todayRes = allReservations
-                    .filter(r => r.estado === 'ACTIVA')
                     .map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }))
                     .filter(x => x.d &&
                         x.d.getDate() === now.getDate() &&
@@ -507,16 +495,36 @@
                     return;
                 }
                 
-                const nextIndex = todayRes.findIndex(x => x.d >= now);
+                const nextIndex = todayRes.findIndex(x => x.d >= now && x.r.estado !== 'CANCELADA');
                 
                 listEl.innerHTML = todayRes.map((item, idx) => {
                     const isPast = item.d < now;
-                    const isNext = idx === nextIndex;
+                    const isNext = (idx === nextIndex && item.r.estado !== 'CANCELADA');
                     const timeStr = String(item.d.getHours()).padStart(2, '0') + ':' + String(item.d.getMinutes()).padStart(2, '0');
+                    
+                    let stateLabel = '';
+                    let stateClass = '';
+                    switch (item.r.estado) {
+                        case 'ACTIVA':
+                            stateLabel = isPast ? 'Pasada' : 'Activa';
+                            stateClass = 'past-tag';
+                            break;
+                        case 'CANCELADA':
+                            stateLabel = 'Cancelada';
+                            stateClass = 'cancel-tag';
+                            break;
+                        case 'COMPLETADA':
+                            stateLabel = 'Completada';
+                            stateClass = 'past-tag';
+                            break;
+                        default: stateLabel = item.r.estado;
+                    }
                     
                     let tag = '';
                     if (isNext) tag = '<span class="today-tag next-tag">Siguiente</span>';
-                    else if (isPast) tag = '<span class="today-tag past-tag">Pasada</span>';
+                    if (item.r.estado === 'CANCELADA') tag += `<span class="today-tag ${stateClass}">${stateLabel}</span>`;
+                    else if (isPast) tag += `<span class="today-tag ${stateClass}">${stateLabel}</span>`;
+                    else tag += `<span class="today-tag next-tag">${stateLabel}</span>`;
                     
                     return `
                         <div class="today-item ${isNext ? 'next' : ''} ${isPast ? 'past' : ''}">
@@ -526,35 +534,32 @@
                                 <span class="today-phone"><i class="fas fa-phone-alt"></i> ${item.r.telefono}</span>
                             </div>
                             <div class="action-buttons">
+                                ${item.r.estado === 'ACTIVA' ? `
                                 <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${item.r.id}')" title="Enviar WhatsApp">
                                     <i class="fab fa-whatsapp"></i>
                                 </button>
-                                ${!isPast ? `
                                 <button class="action-btn btn-success" onclick="markCompleted('${item.r.id}')" title="Completada">
                                     <i class="fas fa-check"></i>
-                                </button>` : ''}
+                                </button>
+                                <button class="action-btn btn-danger" onclick="cancelReservation('${item.r.id}')" title="Cancelar">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                ` : `
+                                <button class="action-btn btn-neutral" onclick="reactivate('${item.r.id}')" title="Reactivar">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                                `}
                             </div>
                         </div>
                     `;
                 }).join('');
             }
 
-            function getSortedReservations() {
-                const now = new Date();
-                const withDates = allReservations.map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }));
-                const upcoming = withDates
-                    .filter(x => x.d && x.d >= now)
-                    .sort((a, b) => a.d - b.d);
-                const past = withDates
-                    .filter(x => !x.d || x.d < now)
-                    .sort((a, b) => (b.d ? b.d.getTime() : 0) - (a.d ? a.d.getTime() : 0));
-                return upcoming.concat(past).map(x => x.r);
-            }
-
+            // ===== PRÓXIMA RESERVA (excluye canceladas) =====
             function getNextUpcoming() {
                 const now = new Date();
                 const candidates = allReservations
-                    .filter(r => r.estado === 'ACTIVA')
+                    .filter(r => r.estado !== 'CANCELADA')
                     .map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }))
                     .filter(x => x.d && x.d >= now)
                     .sort((a, b) => a.d - b.d);
@@ -585,6 +590,19 @@
                 labelEl.textContent = `Próxima: ${next.r.fecha} · ${next.r.hora}`;
             }
 
+            // ===== TABLA (resto igual) =====
+            function getSortedReservations() {
+                const now = new Date();
+                const withDates = allReservations.map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }));
+                const upcoming = withDates
+                    .filter(x => x.d && x.d >= now)
+                    .sort((a, b) => a.d - b.d);
+                const past = withDates
+                    .filter(x => !x.d || x.d < now)
+                    .sort((a, b) => (b.d ? b.d.getTime() : 0) - (a.d ? a.d.getTime() : 0));
+                return upcoming.concat(past).map(x => x.r);
+            }
+
             function esFutura(fecha, hora) {
                 const d = parseReservaDate(fecha, hora);
                 if (d) return d >= new Date();
@@ -593,9 +611,7 @@
 
             function renderTable() {
                 const tbody = document.getElementById('reservasBody');
-                
                 let filtered = getSortedReservations();
-                
                 if (currentFilter === 'activas') filtered = filtered.filter(r => r.estado === 'ACTIVA');
                 else if (currentFilter === 'canceladas') filtered = filtered.filter(r => r.estado === 'CANCELADA');
                 else if (currentFilter === 'futuras') filtered = filtered.filter(r => r.estado === 'ACTIVA' && esFutura(r.fecha, r.hora));
@@ -621,7 +637,6 @@
                     }
                     
                     let actionsHtml = '';
-                    
                     if (r.estado === 'ACTIVA') {
                         actionsHtml = `
                             <div class="action-buttons">
@@ -660,55 +675,33 @@
                 }).join('');
             }
 
-            // ===== ACCIONES (WhatsApp, cancelar, completar, reactivar) =====
+            // ===== ACCIONES =====
             window.sendWhatsApp = function(id) {
                 const reserva = allReservations.find(r => r.id === id);
-                if (!reserva) {
-                    alert('❌ Reserva no encontrada');
-                    return;
-                }
-                
+                if (!reserva) return alert('Reserva no encontrada');
                 let phone = (reserva.telefono || '').toString().trim();
-                if (!phone) {
-                    alert('⚠️ Este cliente no cargó un número de teléfono');
-                    return;
-                }
-                
+                if (!phone) return alert('Este cliente no cargó teléfono');
                 phone = phone.replace(/\D/g, '');
-                if (phone.length < 8) {
-                    alert('⚠️ El número de teléfono es inválido: ' + reserva.telefono);
-                    return;
-                }
-                
+                if (phone.length < 8) return alert('Teléfono inválido');
                 if (phone.startsWith('0')) phone = phone.substring(1);
                 if (phone.startsWith('15') && phone.length >= 10) phone = phone.substring(2);
                 if (phone.length <= 10) phone = DEFAULT_COUNTRY_CODE + phone;
                 else if (phone.length === 11 && phone.startsWith('9')) phone = DEFAULT_COUNTRY_CODE + phone;
                 
-                const message = `Hola ${reserva.nombre}! 👋\n\n` +
-                    `Te contactamos desde *${STUDIO_NAME}* sobre tu reserva:\n\n` +
-                    `📅 *Fecha:* ${reserva.fecha}\n` +
-                    `🕐 *Hora:* ${reserva.hora}\n\n` +
-                    `Por favor confirma tu asistencia. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n` +
-                    `¡Te esperamos! 🎨`;
-                
+                const message = `Hola ${reserva.nombre}! 👋\n\nTe contactamos desde *${STUDIO_NAME}* sobre tu reserva:\n📅 *Fecha:* ${reserva.fecha}\n🕐 *Hora:* ${reserva.hora}\n\nPor favor confirma tu asistencia. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n¡Te esperamos! 🎨`;
                 const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
                 const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                    window.location.href = url;
-                }
+                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') window.location.href = url;
             };
 
             window.cancelReservation = async function(id) {
                 if (!confirm('¿Cancelar esta reserva?')) return;
                 await updateEstado(id, 'CANCELADA');
             };
-
             window.markCompleted = async function(id) {
                 if (!confirm('¿Marcar como completada?')) return;
                 await updateEstado(id, 'COMPLETADA');
             };
-
             window.reactivate = async function(id) {
                 if (!confirm('¿Reactivar esta reserva?')) return;
                 await updateEstado(id, 'ACTIVA');
@@ -719,8 +712,8 @@
                     await db.collection('citas').doc(id).update({ estado: estado });
                     loadData();
                 } catch (err) {
-                    console.error('Error al actualizar:', err);
-                    alert('Error al actualizar el estado. Verifica tus permisos en Firestore.');
+                    console.error(err);
+                    alert('Error al actualizar. Verifica permisos.');
                 }
             }
 
@@ -731,6 +724,7 @@
                 
                 document.getElementById('currentMonthLabel').textContent = `${MONTH_NAMES[month]} ${year}`;
                 
+                // Todas las reservas del mes
                 const monthReservations = allReservations.filter(r => {
                     const d = parseReservaDate(r.fecha, r.hora);
                     return d && d.getMonth() === month && d.getFullYear() === year;
@@ -752,9 +746,11 @@
                 document.getElementById('legendDisponibles').textContent = disponibles;
                 document.getElementById('occupancyPercentage').textContent = occupancyPercentage + '%';
                 
+                // Reservas del mes (todas)
                 document.getElementById('metricTotalMonth').textContent = monthReservations.length;
                 document.getElementById('metricDaysInMonth').textContent = daysInMonth;
                 
+                // Día más ocupado (solo activas)
                 const dayCounts = {};
                 monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
                     const partesFecha = r.fecha.split(' ');
@@ -763,19 +759,27 @@
                         dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
                     }
                 });
-                
                 const peakDay = Object.keys(dayCounts).reduce((a, b) => dayCounts[a] > dayCounts[b] ? a : b, '-');
                 document.getElementById('metricPeakDay').textContent = peakDay !== '-' ? `${peakDay} (${dayCounts[peakDay]})` : '-';
                 
+                // Hora pico (solo activas)
                 const hourCounts = {};
                 monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
                     hourCounts[r.hora] = (hourCounts[r.hora] || 0) + 1;
                 });
-                
                 const peakHour = Object.keys(hourCounts).reduce((a, b) => hourCounts[a] > hourCounts[b] ? a : b, '-');
                 document.getElementById('metricPeakHour').textContent = peakHour !== '-' ? `${peakHour} (${hourCounts[peakHour]})` : '-';
                 
-                updateDayDistribution(dayCounts);
+                // Distribución por día (todas las reservas, incluyendo canceladas)
+                const allDayCounts = {};
+                monthReservations.forEach(r => {
+                    const partesFecha = r.fecha.split(' ');
+                    if (partesFecha.length >= 2) {
+                        const dayName = partesFecha[0];
+                        allDayCounts[dayName] = (allDayCounts[dayName] || 0) + 1;
+                    }
+                });
+                updateDayDistribution(allDayCounts);
             }
 
             function updateDonutChart(percentage) {
@@ -803,17 +807,17 @@
                 }).join('');
             }
 
+            // Navegación de meses
             document.getElementById('prevMonthBtn').addEventListener('click', function() {
                 selectedMonth.setMonth(selectedMonth.getMonth() - 1);
                 updateMonthlyDashboard();
             });
-
             document.getElementById('nextMonthBtn').addEventListener('click', function() {
                 selectedMonth.setMonth(selectedMonth.getMonth() + 1);
                 updateMonthlyDashboard();
             });
 
-            // ===== FILTROS =====
+            // Filtros
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -823,7 +827,7 @@
                 });
             });
 
-            // ===== EXPORTAR CSV =====
+            // Exportar CSV
             window.exportCSV = function() {
                 const headers = ['ID', 'Fecha', 'Hora', 'Nombre', 'Email', 'Teléfono', 'Fecha Reserva', 'Estado'];
                 const rows = allReservations.map(r => [r.id, r.fecha, r.hora, r.nombre, r.email, r.telefono, r.fechaReserva, r.estado]);
@@ -836,7 +840,7 @@
                 a.click();
             };
 
-            // ===== CIERRE DE SESIÓN =====
+            // Logout
             window.logout = function() {
                 auth.signOut().then(() => {
                     document.getElementById('adminPanel').style.display = 'none';
@@ -844,12 +848,10 @@
                     document.getElementById('emailInput').value = '';
                     document.getElementById('passwordInput').value = '';
                     currentUser = null;
-                }).catch((error) => {
-                    console.error('Error al cerrar sesión:', error);
-                });
+                }).catch(console.error);
             };
 
-            // ===== ACTUALIZACIÓN AUTOMÁTICA =====
+            // Actualización automática (countdown y agenda)
             setInterval(function() {
                 if (document.getElementById('adminPanel').style.display !== 'none') {
                     updateCountdown();
@@ -857,7 +859,7 @@
                 }
             }, 60000);
 
-            // ===== EXPONER FUNCIONES =====
+            // Exponer loadData globalmente
             window.loadData = loadData;
 
         })();
