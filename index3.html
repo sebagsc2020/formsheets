@@ -10,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
         /* ============================================================
-           ESTILOS BASE (sin cambios)
+           ESTILOS BASE
            ============================================================ */
         * {
             margin: 0;
@@ -123,7 +123,7 @@
         }
 
         /* ============================================================
-           ESTILOS DEL PANEL ADMIN (con letra más grande)
+           ESTILOS DEL PANEL ADMIN
            ============================================================ */
         .drawer-content .container {
             max-width: 100%;
@@ -350,6 +350,11 @@
             background: #3a1a1a;
             color: #ff6b6b;
         }
+        /* Badge para Reagendada */
+        .drawer-content .today-tag.reschedule-tag {
+            background: #b8860b;
+            color: #fff;
+        }
         .drawer-content .today-empty {
             text-align: center;
             color: #777;
@@ -364,29 +369,29 @@
         }
         .drawer-content .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 0.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 0.4rem;
             margin-bottom: 0.8rem;
         }
         .drawer-content .stat-card {
             background: #2a2a2a;
             border: 1px solid #3a3a3a;
             border-radius: 4px;
-            padding: 0.5rem 0.2rem;
+            padding: 0.4rem 0.2rem;
             text-align: center;
         }
         .drawer-content .stat-card .number {
-            font-size: 1.32rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #d4af37;
             display: block;
         }
         .drawer-content .stat-card .number.small {
-            font-size: 1.1rem;
+            font-size: 1rem;
             padding-top: 0.1rem;
         }
         .drawer-content .stat-card .label {
-            font-size: 0.66rem;
+            font-size: 0.55rem;
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -468,7 +473,7 @@
             flex-direction: column;
         }
         .drawer-content .chart-title {
-            font-size: 0.72rem;
+            font-size: 0.65rem;
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -495,13 +500,13 @@
             text-align: center;
         }
         .drawer-content .donut-center .percentage {
-            font-size: 1.54rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: #d4af37;
             line-height: 1;
         }
         .drawer-content .donut-center .label {
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -517,7 +522,7 @@
             display: flex;
             align-items: center;
             gap: 0.3rem;
-            font-size: 0.77rem;
+            font-size: 0.7rem;
         }
         .drawer-content .legend-color {
             width: 10px;
@@ -560,13 +565,13 @@
             margin-bottom: 0.05rem;
         }
         .drawer-content .metric-card .metric-value {
-            font-size: 0.99rem;
+            font-size: 0.9rem;
             font-weight: 700;
             color: #e8e8e8;
             margin-bottom: 0.05rem;
         }
         .drawer-content .metric-card .metric-label {
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             color: #888;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -598,7 +603,7 @@
             bottom: -14px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.55rem;
+            font-size: 0.45rem;
             color: #888;
         }
         .drawer-content .bar-value {
@@ -606,14 +611,14 @@
             top: -12px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             color: #d4af37;
             font-weight: 600;
         }
         .drawer-content .toolbar {
             display: flex;
-            gap: 0.3rem;
-            margin-bottom: 0.4rem;
+            gap: 0.2rem;
+            margin-bottom: 0.3rem;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
@@ -651,10 +656,10 @@
             background: #333;
             border: 1px solid #444;
             color: #ccc;
-            padding: 0.2rem 0.6rem;
+            padding: 0.15rem 0.5rem;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.72rem;
+            font-size: 0.65rem;
             transition: 0.15s;
         }
         .drawer-content .filter-btn:hover {
@@ -675,33 +680,32 @@
         .drawer-content table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.77rem;
         }
         .drawer-content th {
             background: #2a2a2a;
             color: #d0d0d0;
             font-weight: 600;
-            padding: 0.3rem 0.3rem;
+            padding: 0.2rem 0.2rem;
             text-align: left;
             border-bottom: 2px solid #3a3a3a;
-            font-size: 0.75rem;
+            font-size: 0.66rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
         .drawer-content td {
-            padding: 0.3rem 0.3rem;
+            padding: 0.2rem 0.2rem;
             border-bottom: 1px solid #333;
             vertical-align: middle;
-            font-size: 0.85rem;
         }
         .drawer-content tr:hover {
             background: #2a2a2a;
         }
         .drawer-content .badge {
             display: inline-block;
-            padding: 0.1rem 0.4rem;
+            padding: 0.1rem 0.3rem;
             border-radius: 4px;
-            font-size: 0.6rem;
+            font-size: 0.5rem;
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -713,11 +717,15 @@
             background: #3a1a1a;
             color: #ff6b6b;
         }
+        .drawer-content .badge-reagendada {
+            background: #b8860b;
+            color: #fff;
+        }
         .drawer-content .empty-state {
             text-align: center;
             padding: 1rem 0.3rem;
             color: #666;
-            font-size: 0.88rem;
+            font-size: 0.75rem;
         }
         .drawer-content .empty-state i {
             font-size: 1.5rem;
@@ -729,7 +737,7 @@
             text-align: center;
             padding: 1rem;
             color: #888;
-            font-size: 0.88rem;
+            font-size: 0.75rem;
         }
         .drawer-content .loading i {
             font-size: 1.2rem;
@@ -743,12 +751,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.6rem;
+            margin-bottom: 0.5rem;
             flex-wrap: wrap;
             gap: 0.3rem;
         }
         .drawer-content .user-info {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #888;
         }
         .drawer-content .user-info strong {
@@ -759,9 +767,9 @@
             color: white;
             border: none;
             border-radius: 4px;
-            padding: 0.25rem 0.8rem;
+            padding: 0.2rem 0.6rem;
             cursor: pointer;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             transition: 0.15s;
         }
         .drawer-content .btn-config:hover {
@@ -812,7 +820,7 @@
                 height: 100px;
             }
             .drawer-content .donut-center .percentage {
-                font-size: 1.32rem;
+                font-size: 1.2rem;
             }
             .drawer-content .action-btn {
                 width: 22px;
@@ -820,8 +828,8 @@
                 font-size: 0.65rem;
             }
             .drawer-content th, .drawer-content td {
-                font-size: 0.75rem;
-                padding: 0.2rem 0.15rem;
+                font-size: 0.55rem;
+                padding: 0.15rem 0.1rem;
             }
             .drawer-content .hide-mobile {
                 display: none;
@@ -1646,7 +1654,7 @@
                     <div class="today-list" id="todayList"></div>
                 </div>
 
-                <!-- Estadísticas -->
+                <!-- Estadísticas (añadida Reagendadas) -->
                 <div class="stats-grid" id="statsGrid">
                     <div class="stat-card next-card"><span class="number small" id="statCountdown">—</span><span class="label" id="statNextInfo">Próxima reserva</span></div>
                     <div class="stat-card"><span class="number" id="statTotal">0</span><span class="label">Total</span></div>
@@ -1654,6 +1662,7 @@
                     <div class="stat-card"><span class="number" id="statFuturas">0</span><span class="label">Futuras</span></div>
                     <div class="stat-card"><span class="number" id="statPasadas">0</span><span class="label">Pasadas</span></div>
                     <div class="stat-card"><span class="number" id="statCanceladas">0</span><span class="label">Canceladas</span></div>
+                    <div class="stat-card"><span class="number" id="statReagendadas">0</span><span class="label">Reagendadas</span></div>
                 </div>
 
                 <!-- Toolbar con búsqueda y filtros -->
@@ -1665,6 +1674,7 @@
                         <button class="filter-btn" data-filter="futuras">Futuras</button>
                         <button class="filter-btn" data-filter="pasadas">Pasadas</button>
                         <button class="filter-btn" data-filter="canceladas">Canceladas</button>
+                        <button class="filter-btn" data-filter="reagendadas">Reagendadas</button>
                     </div>
                     <div class="toolbar-right">
                         <button class="btn btn-secondary" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.7rem; border-radius: 4px;" onclick="exportCSV()">
@@ -2073,32 +2083,32 @@
             let authReady = false;
             let unsubscribeReservas = null;
 
-            // Listener en tiempo real de Firestore
             function startReservationsListener() {
                 if (unsubscribeReservas) {
                     unsubscribeReservas();
                 }
-                unsubscribeReservas = db.collection('citas').onSnapshot((snapshot) => {
-                    const reservas = [];
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        reservas.push({
-                            fecha: data.fecha || '',
-                            hora: data.hora || '',
-                            nombre: data.nombre || '',
-                            email: data.email || '',
-                            telefono: data.telefono || '',
-                            servicio: data.servicio || ''
+                // Incluir documentos con estado ACTIVA o REAGENDADA
+                unsubscribeReservas = db.collection('citas')
+                    .where('estado', 'in', ['ACTIVA', 'REAGENDADA'])
+                    .onSnapshot((snapshot) => {
+                        const reservas = [];
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            reservas.push({
+                                fecha: data.fecha || '',
+                                hora: data.hora || '',
+                                nombre: data.nombre || '',
+                                email: data.email || '',
+                                telefono: data.telefono || '',
+                                servicio: data.servicio || ''
+                            });
                         });
+                        cachedReservations = reservas;
+                        console.log('📦 App reservas: datos actualizados en tiempo real:', reservas.length);
+                        updateTableWithReservations(reservas);
+                    }, (error) => {
+                        console.error('Error en listener de app reservas:', error);
                     });
-                    cachedReservations = reservas;
-                    console.log('📦 App reservas: datos actualizados en tiempo real:', reservas.length);
-                    // Actualizar la tabla con los nuevos datos
-                    updateTableWithReservations(reservas);
-                    // También actualizamos los radios (ya está dentro de updateTableWithReservations)
-                }, (error) => {
-                    console.error('Error en listener de app reservas:', error);
-                });
             }
 
             auth.signInAnonymously()
@@ -2106,9 +2116,7 @@
                     console.log('✅ Autenticación anónima exitosa (app reservas)');
                     authReady = true;
                     loadFormDataFromCookies();
-                    // Iniciar el listener en tiempo real
                     startReservationsListener();
-                    // Llamar a renderTable para construir la tabla inicial
                     renderTable();
                 })
                 .catch(function(error) {
@@ -2409,7 +2417,6 @@
             }
 
             function renderTable() {
-                // Construir la tabla HTML (se mantiene igual, pero ahora usamos cachedReservations)
                 var today = getToday();
                 var headerHtml = '<th>Hora</th>';
                 for (var i = 0; i < daysOfWeek.length; i++) {
@@ -2491,10 +2498,8 @@
                 var monthName = getMonthName(currentWeekStart.getMonth());
                 weekLabel.textContent = monthName + ' ' + currentWeekStart.getFullYear();
 
-                // Aplicar reservas desde caché
                 updateTableWithReservations(cachedReservations);
 
-                // Añadir listeners a los nuevos radios
                 var radios = document.querySelectorAll('input[name="slot"]');
                 radios.forEach(function(radio) {
                     radio.addEventListener('change', function() {
@@ -2514,7 +2519,6 @@
                 updateFeedback();
             }
 
-            // Event listeners de la app de reservas
             nombreInput.addEventListener('input', saveFormDataToCookies);
             emailInput.addEventListener('input', saveFormDataToCookies);
             telefonoInput.addEventListener('input', saveFormDataToCookies);
@@ -2599,7 +2603,6 @@
                         saveFormDataToCookies();
                         sendWhatsAppMessage(nombre, email, telefono, servicio, selected.value);
                         showConfirmationPopup(nombre, email, telefono, servicio, selected.value);
-                        // No llamamos a renderTable() aquí porque el listener actualizará automáticamente
                         clearFormAndSelection();
                     } else {
                         alert('❌ Error al guardar la reserva: ' + (result.error || 'Intenta nuevamente.'));
@@ -2615,7 +2618,6 @@
 
             loadServiceConfig().then(function() {
                 loadFormDataFromCookies();
-                // El render inicial se hace después de autenticarse
             });
 
             if (getCookie('cookies_aceptadas') === 'true') {
@@ -2624,13 +2626,12 @@
         })();
 
         // ===================================================================
-        // 3. PANEL ADMIN (con búsqueda y filtro "Activas" mejorado)
+        // 3. PANEL ADMIN (con lógica de REAGENDADA)
         // ===================================================================
         (function() {
             const db = firebase.firestore();
             const auth = firebase.auth();
 
-            // Configuración
             const HOURS_PER_DAY = 9;
             const MONTH_NAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
             const LONG_DAYS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -2644,7 +2645,7 @@
             let allReservations = [];
             let currentFilter = 'activas';
             let searchTerm = '';
-            let stats = { total:0, activas:0, canceladas:0, futuras:0, pasadas:0 };
+            let stats = { total:0, activas:0, canceladas:0, futuras:0, pasadas:0, reagendadas:0 };
             let selectedMonth = new Date();
             let unsubscribe = null;
 
@@ -2686,6 +2687,7 @@
                 stats.total = allReservations.length;
                 stats.activas = allReservations.filter(r => r.estado === 'ACTIVA').length;
                 stats.canceladas = allReservations.filter(r => r.estado === 'CANCELADA').length;
+                stats.reagendadas = allReservations.filter(r => r.estado === 'REAGENDADA').length;
                 stats.futuras = allReservations.filter(r => {
                     if (r.estado !== 'ACTIVA') return false;
                     const d = parseReservaDate(r.fecha, r.hora);
@@ -2704,6 +2706,7 @@
                 document.getElementById('statFuturas').textContent = stats.futuras;
                 document.getElementById('statPasadas').textContent = stats.pasadas;
                 document.getElementById('statCanceladas').textContent = stats.canceladas;
+                document.getElementById('statReagendadas').textContent = stats.reagendadas;
                 renderTodayAgenda();
                 renderTable();
                 updateMonthlyDashboard();
@@ -2749,22 +2752,30 @@
                     listEl.innerHTML = `<div class="today-empty"><i class="fas fa-mug-hot"></i>No hay reservas para hoy. ¡Día libre! 🎉</div>`;
                     return;
                 }
-                const nextIndex = todayRes.findIndex(x => x.d >= now && x.r.estado !== 'CANCELADA');
+                const nextIndex = todayRes.findIndex(x => x.d >= now && x.r.estado !== 'CANCELADA' && x.r.estado !== 'REAGENDADA');
                 listEl.innerHTML = todayRes.map((item, idx) => {
                     const isPast = item.d < now;
                     const isNext = (idx === nextIndex);
                     const timeStr = String(item.d.getHours()).padStart(2, '0') + ':' + String(item.d.getMinutes()).padStart(2, '0');
                     let estadoLabel = item.r.estado;
-                    if (item.r.estado === 'ACTIVA') estadoLabel = isPast ? 'Pasada' : 'Activa';
-                    else if (item.r.estado === 'CANCELADA') estadoLabel = 'Cancelada';
-                    let tag = '';
+                    let tagClass = '';
+                    if (item.r.estado === 'ACTIVA') {
+                        estadoLabel = isPast ? 'Pasada' : 'Activa';
+                        tagClass = isPast ? 'past-tag' : 'next-tag';
+                    } else if (item.r.estado === 'CANCELADA') {
+                        estadoLabel = 'Cancelada';
+                        tagClass = 'cancel-tag';
+                    } else if (item.r.estado === 'REAGENDADA') {
+                        estadoLabel = 'Reagendada';
+                        tagClass = 'reschedule-tag';
+                    }
+                    let tag = `<span class="today-tag ${tagClass}">${estadoLabel}</span>`;
                     if (isNext && item.r.estado !== 'CANCELADA') tag = '<span class="today-tag next-tag">Siguiente</span>';
-                    else tag = `<span class="today-tag ${item.r.estado==='CANCELADA'?'cancel-tag':'past-tag'}">${estadoLabel}</span>`;
                     const actionsHtml = `
                         <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${item.r.id}')" title="Enviar WhatsApp"><i class="fab fa-whatsapp"></i></button>
                         ${item.r.estado==='CANCELADA' ? `<button class="action-btn btn-reactivate" onclick="reactivate('${item.r.id}')" title="Reactivar"><i class="fas fa-undo"></i></button>` : ''}
-                        <button class="action-btn btn-reschedule" onclick="openRescheduleModal('${item.r.id}')" title="Reagendar"><i class="fas fa-calendar-alt"></i></button>
-                        <button class="action-btn btn-danger" onclick="cancelReservation('${item.r.id}')" title="Cancelar"><i class="fas fa-times"></i></button>
+                        ${item.r.estado==='ACTIVA' ? `<button class="action-btn btn-reschedule" onclick="openRescheduleModal('${item.r.id}')" title="Reagendar"><i class="fas fa-calendar-alt"></i></button>` : ''}
+                        ${item.r.estado==='ACTIVA' ? `<button class="action-btn btn-danger" onclick="cancelReservation('${item.r.id}')" title="Cancelar"><i class="fas fa-times"></i></button>` : ''}
                         <button class="action-btn btn-delete" onclick="deleteReservation('${item.r.id}')" title="Eliminar"><i class="fas fa-trash"></i></button>
                     `;
                     return `<div class="today-item ${isNext?'next':''} ${isPast?'past':''}">
@@ -2778,7 +2789,7 @@
             function getNextUpcoming() {
                 const now = new Date();
                 const candidates = allReservations
-                    .filter(r => r.estado !== 'CANCELADA')
+                    .filter(r => r.estado === 'ACTIVA')
                     .map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }))
                     .filter(x => x.d && x.d >= now)
                     .sort((a, b) => a.d - b.d);
@@ -2831,7 +2842,9 @@
                     filtered = filtered.filter(r => r.estado === 'ACTIVA' && esFutura(r.fecha, r.hora));
                 } else if (currentFilter === 'pasadas') {
                     filtered = filtered.filter(r => r.estado === 'ACTIVA' && !esFutura(r.fecha, r.hora));
-                }
+                } else if (currentFilter === 'reagendadas') {
+                    filtered = filtered.filter(r => r.estado === 'REAGENDADA');
+                } // 'all' no filtra por estado
 
                 if (searchTerm.trim() !== '') {
                     const term = searchTerm.trim().toLowerCase();
@@ -2851,13 +2864,14 @@
                     let badgeClass = 'badge-activa';
                     let estadoLabel = 'Activa';
                     if (r.estado === 'CANCELADA') { badgeClass = 'badge-cancelada'; estadoLabel = 'Cancelada'; }
+                    else if (r.estado === 'REAGENDADA') { badgeClass = 'badge-reagendada'; estadoLabel = 'Reagendada'; }
                     else if (r.estado === 'ACTIVA' && !esFutura(r.fecha, r.hora)) { badgeClass = 'badge-activa'; estadoLabel = 'Pasada'; }
                     const actionsHtml = `
                         <div class="action-buttons">
                             <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${r.id}')" title="Enviar WhatsApp"><i class="fab fa-whatsapp"></i></button>
                             ${r.estado === 'CANCELADA' ? `<button class="action-btn btn-reactivate" onclick="reactivate('${r.id}')" title="Reactivar"><i class="fas fa-undo"></i></button>` : ''}
-                            <button class="action-btn btn-reschedule" onclick="openRescheduleModal('${r.id}')" title="Reagendar"><i class="fas fa-calendar-alt"></i></button>
-                            <button class="action-btn btn-danger" onclick="cancelReservation('${r.id}')" title="Cancelar"><i class="fas fa-times"></i></button>
+                            ${r.estado === 'ACTIVA' ? `<button class="action-btn btn-reschedule" onclick="openRescheduleModal('${r.id}')" title="Reagendar"><i class="fas fa-calendar-alt"></i></button>` : ''}
+                            ${r.estado === 'ACTIVA' ? `<button class="action-btn btn-danger" onclick="cancelReservation('${r.id}')" title="Cancelar"><i class="fas fa-times"></i></button>` : ''}
                             <button class="action-btn btn-delete" onclick="deleteReservation('${r.id}')" title="Eliminar"><i class="fas fa-trash"></i></button>
                         </div>
                     `;
@@ -2874,6 +2888,7 @@
                 }).join('');
             }
 
+            // Acciones
             window.sendWhatsApp = function(id) {
                 const reserva = allReservations.find(r => r.id === id);
                 if (!reserva) return alert('Reserva no encontrada');
@@ -2922,6 +2937,7 @@
                 }
             };
 
+            // Reagendar (modificado)
             window.openRescheduleModal = function(id) {
                 const reserva = allReservations.find(r => r.id === id);
                 if (!reserva) return alert('Reserva no encontrada');
@@ -2947,7 +2963,7 @@
                     snapshot.forEach(doc => {
                         if (doc.id === excludeId) return;
                         const data = doc.data();
-                        if (data.estado === 'ACTIVA') {
+                        if (data.estado === 'ACTIVA' || data.estado === 'REAGENDADA') {
                             ocupados.add(data.fecha + ' ' + data.hora);
                         }
                     });
@@ -3002,14 +3018,36 @@
                 }
                 const partes = newSlot.split(' ');
                 if (partes.length < 3) return alert('Horario inválido');
-                const fecha = partes[0] + ' ' + partes[1];
-                const hora = partes[2];
+                const nuevaFecha = partes[0] + ' ' + partes[1];
+                const nuevaHora = partes[2];
                 const submitBtn = document.getElementById('rescheduleSubmitBtn');
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
                 try {
-                    await db.collection('citas').doc(id).update({ fecha: fecha, hora: hora });
+                    // Obtener la reserva original
+                    const reservaOriginal = allReservations.find(r => r.id === id);
+                    if (!reservaOriginal) throw new Error('Reserva no encontrada');
+
+                    // 1. Marcar la original como REAGENDADA
+                    await db.collection('citas').doc(id).update({
+                        estado: 'REAGENDADA'
+                    });
+
+                    // 2. Crear una nueva reserva con el nuevo horario y los mismos datos
+                    await db.collection('citas').add({
+                        fecha: nuevaFecha,
+                        hora: nuevaHora,
+                        nombre: reservaOriginal.nombre,
+                        email: reservaOriginal.email,
+                        telefono: reservaOriginal.telefono,
+                        servicio: reservaOriginal.servicio,
+                        estado: 'ACTIVA',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
                     closeRescheduleModal();
+                    alert('✅ Reserva reagendada correctamente. El horario original queda bloqueado.');
                 } catch (err) {
                     console.error(err);
                     alert('Error al reagendar. Verifica permisos.');
@@ -3026,6 +3064,7 @@
                 if (e.key === 'Escape') closeRescheduleModal();
             });
 
+            // Configuración de servicios
             let serviciosActuales = [];
             let nombreCampoActual = 'Servicio';
 
@@ -3282,6 +3321,7 @@
 
             loadServiceConfig();
             startRealtimeListener();
+            // Activar filtro "Activas" por defecto
             document.querySelector('.filter-btn[data-filter="activas"]').classList.add('active');
         })();
     </script>
