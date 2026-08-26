@@ -10,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
         /* ============================================================
-           ESTILOS BASE
+           ESTILOS BASE (sin cambios)
            ============================================================ */
         * {
             margin: 0;
@@ -28,7 +28,6 @@
             font-family: system-ui, -apple-system, sans-serif;
         }
 
-        /* ---------- CONTENEDOR PRINCIPAL ---------- */
         .main-container {
             position: absolute;
             top: 15px;
@@ -42,7 +41,6 @@
             overflow: hidden;
         }
 
-        /* ---------- DRAWER (segundo contenedor) ---------- */
         .drawer {
             position: fixed;
             top: 15px;
@@ -50,7 +48,7 @@
             bottom: 15px;
             width: 360px;
             background: #1a1a1a;
-            border-radius: 12px; /* Ahora igual que el principal */
+            border-radius: 12px;
             box-shadow: -4px 0 24px rgba(0, 0, 0, 0.30);
             transform: translateX(calc(100% - 40px));
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -64,10 +62,9 @@
         .drawer.open {
             width: calc(100vw - 15px);
             transform: translateX(15px);
-            border-radius: 12px; /* Mantiene bordes redondeados al abrir */
+            border-radius: 12px;
         }
 
-        /* ---------- PESTAÑA (altura total, pegada a la derecha) ---------- */
         .drawer-handle {
             position: absolute;
             left: 0;
@@ -105,7 +102,6 @@
             margin: 3px 0;
         }
 
-        /* ---------- CONTENIDO DEL DRAWER ---------- */
         .drawer-content {
             flex: 1;
             overflow-y: auto;
@@ -634,7 +630,6 @@
             align-items: center;
             flex-wrap: wrap;
         }
-        /* Campo de búsqueda */
         .drawer-content .search-input {
             background: #1e1e1e;
             border: 1px solid #3d3d3d;
@@ -652,7 +647,6 @@
         .drawer-content .search-input::placeholder {
             color: #666;
         }
-
         .drawer-content .filter-btn {
             background: #333;
             border: 1px solid #444;
@@ -681,7 +675,7 @@
         .drawer-content table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem; /* Aumentado un 15% adicional */
+            font-size: 0.85rem;
         }
         .drawer-content th {
             background: #2a2a2a;
@@ -775,7 +769,6 @@
             box-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
         }
 
-        /* ---------- RESPONSIVE DRAWER ---------- */
         @media (max-width: 600px) {
             .drawer {
                 width: 280px;
@@ -1295,7 +1288,6 @@
             color: #1a1a1a;
         }
 
-        /* POPUP de la app de reservas */
         .popup-overlay {
             display: none;
             position: fixed;
@@ -1345,7 +1337,6 @@
         .popup-close-btn { background: #444; border: 1px solid #555; color: #e8e8e8; padding: 0.4rem 1rem; border-radius: 4px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.15s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .popup-close-btn:hover { background: #555; border-color: #666; }
 
-        /* MODALES DEL ADMIN (fuera del drawer) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -1485,7 +1476,6 @@
             background: #3a8eef;
         }
 
-        /* Responsive de la app de reservas */
         @media (max-width: 768px) {
             .two-column-layout { flex-direction: column; gap: 0.4rem; }
             .left-col, .right-col { flex: 1 1 100%; min-width: 0; }
@@ -1669,9 +1659,7 @@
                 <!-- Toolbar con búsqueda y filtros -->
                 <div class="toolbar">
                     <div class="toolbar-left">
-                        <!-- Campo de búsqueda -->
                         <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar cliente..." />
-                        <!-- Filtros -->
                         <button class="filter-btn" data-filter="all">Todas</button>
                         <button class="filter-btn active" data-filter="activas">Activas</button>
                         <button class="filter-btn" data-filter="futuras">Futuras</button>
@@ -2039,7 +2027,7 @@
         })();
 
         // ===================================================================
-        // 2. APLICACIÓN DE RESERVAS (contenedor principal)
+        // 2. APLICACIÓN DE RESERVAS (con listener en tiempo real)
         // ===================================================================
         (function() {
             const db = firebase.firestore();
@@ -2047,6 +2035,7 @@
 
             let serviciosLista = [];
             let nombreCampoServicio = 'Servicio';
+            let cachedReservations = [];
 
             async function loadServiceConfig() {
                 try {
@@ -2082,12 +2071,44 @@
             }
 
             let authReady = false;
+            let unsubscribeReservas = null;
+
+            // Listener en tiempo real de Firestore
+            function startReservationsListener() {
+                if (unsubscribeReservas) {
+                    unsubscribeReservas();
+                }
+                unsubscribeReservas = db.collection('citas').onSnapshot((snapshot) => {
+                    const reservas = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        reservas.push({
+                            fecha: data.fecha || '',
+                            hora: data.hora || '',
+                            nombre: data.nombre || '',
+                            email: data.email || '',
+                            telefono: data.telefono || '',
+                            servicio: data.servicio || ''
+                        });
+                    });
+                    cachedReservations = reservas;
+                    console.log('📦 App reservas: datos actualizados en tiempo real:', reservas.length);
+                    // Actualizar la tabla con los nuevos datos
+                    updateTableWithReservations(reservas);
+                    // También actualizamos los radios (ya está dentro de updateTableWithReservations)
+                }, (error) => {
+                    console.error('Error en listener de app reservas:', error);
+                });
+            }
 
             auth.signInAnonymously()
                 .then(function() {
                     console.log('✅ Autenticación anónima exitosa (app reservas)');
                     authReady = true;
                     loadFormDataFromCookies();
+                    // Iniciar el listener en tiempo real
+                    startReservationsListener();
+                    // Llamar a renderTable para construir la tabla inicial
                     renderTable();
                 })
                 .catch(function(error) {
@@ -2160,33 +2181,6 @@
                 } catch (error) {
                     console.error('Error al guardar en Firestore:', error);
                     return { success: false, error: error.message };
-                }
-            }
-
-            async function loadReservationsFromFirestore() {
-                if (!authReady) {
-                    console.warn('No autenticado, no se pueden leer reservas');
-                    return [];
-                }
-                try {
-                    const snapshot = await db.collection('citas').get();
-                    const reservas = [];
-                    snapshot.forEach(function(doc) {
-                        const data = doc.data();
-                        reservas.push({
-                            fecha: data.fecha,
-                            hora: data.hora,
-                            nombre: data.nombre,
-                            email: data.email,
-                            telefono: data.telefono,
-                            servicio: data.servicio || ''
-                        });
-                    });
-                    console.log('📦 Reservas cargadas desde Firestore (app):', reservas.length);
-                    return reservas;
-                } catch (error) {
-                    console.error('Error al cargar reservas desde Firestore:', error);
-                    return [];
                 }
             }
 
@@ -2414,9 +2408,8 @@
                 }
             }
 
-            async function renderTable() {
-                tbody.innerHTML = '<tr><td colspan="7" class="loading"><i class="fas fa-spinner"></i><br>Cargando horarios...</td></tr>';
-
+            function renderTable() {
+                // Construir la tabla HTML (se mantiene igual, pero ahora usamos cachedReservations)
                 var today = getToday();
                 var headerHtml = '<th>Hora</th>';
                 for (var i = 0; i < daysOfWeek.length; i++) {
@@ -2498,14 +2491,10 @@
                 var monthName = getMonthName(currentWeekStart.getMonth());
                 weekLabel.textContent = monthName + ' ' + currentWeekStart.getFullYear();
 
-                try {
-                    var reservas = await loadReservationsFromFirestore();
-                    updateTableWithReservations(reservas);
-                } catch (error) {
-                    console.error('Error al cargar reservas:', error);
-                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-exclamation-triangle"></i><br>Error al cargar horarios. Verifica tu conexión.</td></tr>';
-                }
+                // Aplicar reservas desde caché
+                updateTableWithReservations(cachedReservations);
 
+                // Añadir listeners a los nuevos radios
                 var radios = document.querySelectorAll('input[name="slot"]');
                 radios.forEach(function(radio) {
                     radio.addEventListener('change', function() {
@@ -2525,6 +2514,7 @@
                 updateFeedback();
             }
 
+            // Event listeners de la app de reservas
             nombreInput.addEventListener('input', saveFormDataToCookies);
             emailInput.addEventListener('input', saveFormDataToCookies);
             telefonoInput.addEventListener('input', saveFormDataToCookies);
@@ -2609,7 +2599,7 @@
                         saveFormDataToCookies();
                         sendWhatsAppMessage(nombre, email, telefono, servicio, selected.value);
                         showConfirmationPopup(nombre, email, telefono, servicio, selected.value);
-                        setTimeout(function() { renderTable(); }, 2000);
+                        // No llamamos a renderTable() aquí porque el listener actualizará automáticamente
                         clearFormAndSelection();
                     } else {
                         alert('❌ Error al guardar la reserva: ' + (result.error || 'Intenta nuevamente.'));
@@ -2625,7 +2615,7 @@
 
             loadServiceConfig().then(function() {
                 loadFormDataFromCookies();
-                renderTable();
+                // El render inicial se hace después de autenticarse
             });
 
             if (getCookie('cookies_aceptadas') === 'true') {
@@ -2652,13 +2642,12 @@
             const allHours = morningHours.concat(afternoonHours);
 
             let allReservations = [];
-            let currentFilter = 'activas'; // Por defecto "Activas"
+            let currentFilter = 'activas';
             let searchTerm = '';
             let stats = { total:0, activas:0, canceladas:0, futuras:0, pasadas:0 };
             let selectedMonth = new Date();
             let unsubscribe = null;
 
-            // ===== FUNCIONES DEL PANEL =====
             function startRealtimeListener() {
                 if (unsubscribe) {
                     unsubscribe();
@@ -2833,7 +2822,6 @@
             function renderTable() {
                 const tbody = document.getElementById('reservasBody');
 
-                // 1. Aplicar filtro por estado
                 let filtered = getSortedReservations();
                 if (currentFilter === 'activas') {
                     filtered = filtered.filter(r => r.estado === 'ACTIVA' && esFutura(r.fecha, r.hora));
@@ -2843,9 +2831,8 @@
                     filtered = filtered.filter(r => r.estado === 'ACTIVA' && esFutura(r.fecha, r.hora));
                 } else if (currentFilter === 'pasadas') {
                     filtered = filtered.filter(r => r.estado === 'ACTIVA' && !esFutura(r.fecha, r.hora));
-                } // 'all' no aplica filtro extra
+                }
 
-                // 2. Aplicar búsqueda por cliente (nombre, email, teléfono)
                 if (searchTerm.trim() !== '') {
                     const term = searchTerm.trim().toLowerCase();
                     filtered = filtered.filter(r =>
@@ -2887,7 +2874,6 @@
                 }).join('');
             }
 
-            // Acciones (se mantienen iguales)
             window.sendWhatsApp = function(id) {
                 const reserva = allReservations.find(r => r.id === id);
                 if (!reserva) return alert('Reserva no encontrada');
@@ -2936,7 +2922,6 @@
                 }
             };
 
-            // Reagendar
             window.openRescheduleModal = function(id) {
                 const reserva = allReservations.find(r => r.id === id);
                 if (!reserva) return alert('Reserva no encontrada');
@@ -3041,7 +3026,6 @@
                 if (e.key === 'Escape') closeRescheduleModal();
             });
 
-            // Configuración de servicios
             let serviciosActuales = [];
             let nombreCampoActual = 'Servicio';
 
@@ -3154,7 +3138,6 @@
                 if (e.target === this) closeServiceModal();
             });
 
-            // Dashboard mensual (sin cambios)
             function updateMonthlyDashboard() {
                 const year = selectedMonth.getFullYear();
                 const month = selectedMonth.getMonth();
@@ -3268,7 +3251,6 @@
                 updateMonthlyDashboard();
             });
 
-            // Filtros y búsqueda
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -3278,13 +3260,11 @@
                 });
             });
 
-            // Búsqueda en tiempo real
             document.getElementById('searchInput').addEventListener('input', function() {
                 searchTerm = this.value;
                 renderTable();
             });
 
-            // Export CSV
             window.exportCSV = function() {
                 const headers = ['ID', 'Fecha', 'Hora', 'Nombre', 'Email', 'Teléfono', 'Servicio', 'Fecha Reserva', 'Estado'];
                 const rows = allReservations.map(r => [r.id, r.fecha, r.hora, r.nombre, r.email, r.telefono, r.servicio, r
@@ -3300,11 +3280,8 @@
                 a.click();
             };
 
-            // Iniciar el panel
             loadServiceConfig();
             startRealtimeListener();
-
-            // Asegurar que el filtro "Activas" esté activo por defecto
             document.querySelector('.filter-btn[data-filter="activas"]').classList.add('active');
         })();
     </script>
