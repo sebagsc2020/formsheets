@@ -28,60 +28,51 @@
             font-family: system-ui, -apple-system, sans-serif;
         }
 
-        /* ---------- WRAPPER PRINCIPAL (para desplazar el contenedor) ---------- */
-        .main-wrapper {
+        /* ---------- CONTENEDOR PRINCIPAL (con margen derecho para la pestaña) ---------- */
+        .main-container {
             position: absolute;
             top: 15px;
             left: 15px;
+            right: 55px; /* 40px (handle) + 15px margen */
             bottom: 15px;
-            right: 55px; /* 40px (handle) + 15px margen por defecto (cerrado) */
-            transition: right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            z-index: 1;
-        }
-        /* Cuando el drawer está abierto, el wrapper se desplaza a la izquierda */
-        .main-wrapper.shifted {
-            right: calc(360px + 30px); /* 360px drawer + 30px separación */
-        }
-
-        .main-container {
-            width: 100%;
-            height: 100%;
             background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            z-index: 1;
             overflow: hidden;
         }
 
-        /* ---------- DRAWER (ancho fijo) ---------- */
+        /* ---------- DRAWER (ancho variable) ---------- */
         .drawer {
             position: fixed;
             top: 15px;
             right: 0;
             bottom: 15px;
-            width: 360px;
+            width: 360px; /* ancho cerrado */
             background: #1a1a1a;
             border-radius: 16px 0 0 16px;
             box-shadow: -4px 0 24px rgba(0, 0, 0, 0.30);
             transform: translateX(calc(100% - 55px)); /* 40px handle + 15px margen */
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            will-change: transform;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: transform, width;
             display: flex;
             flex-direction: column;
-            z-index: 20;
+            z-index: 20; /* por encima del contenedor principal */
             overflow: hidden;
         }
         .drawer.open {
+            width: 100vw;
             transform: translateX(0);
         }
 
-        /* ---------- PESTAÑA (más grande) ---------- */
+        /* ---------- PESTAÑA (altura total) ---------- */
         .drawer-handle {
             position: absolute;
             left: 0;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 0;
+            bottom: 0; /* altura total del drawer */
             width: 40px;
-            height: 150px;
             background: #f4f6f9;
             border-radius: 16px 0 0 16px;
             border-right: 1px solid #e9ecf0;
@@ -893,16 +884,16 @@
             }
             .drawer-handle {
                 width: 36px;
-                height: 120px;
             }
             .drawer-content {
                 margin-left: 36px;
             }
-            .main-wrapper {
+            .main-container {
                 right: 51px;
             }
-            .main-wrapper.shifted {
-                right: calc(280px + 30px);
+            .drawer.open {
+                width: 100vw;
+                transform: translateX(0);
             }
             .drawer-content .stats-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -1649,92 +1640,90 @@
     </style>
 </head>
 <body>
-    <!-- ===== WRAPPER PRINCIPAL ===== -->
-    <div class="main-wrapper" id="mainWrapper">
-        <div class="main-container">
-            <!-- ===== APP DE RESERVAS (contenido principal) ===== -->
-            <div class="card">
-                <h1>
-                    <span><i class="fas fa-calendar-check"></i></span>
-                    <span>Reserva tu Horario</span>
-                </h1>
+    <!-- ===== CONTENEDOR PRINCIPAL ===== -->
+    <div class="main-container">
+        <!-- ===== APP DE RESERVAS ===== -->
+        <div class="card">
+            <h1>
+                <span><i class="fas fa-calendar-check"></i></span>
+                <span>Reserva tu Horario</span>
+            </h1>
 
-                <div class="cookie-notice" id="cookieNotice">
-                    <p><i class="fas fa-cookie-bite"></i> Este sitio utiliza cookies para recordar tus datos y preferencias.</p>
-                    <div>
-                        <button class="cookie-btn" id="acceptCookiesBtn"><i class="fas fa-check"></i> Aceptar cookies</button>
-                        <button class="cookie-btn" id="clearCookiesBtn"><i class="fas fa-trash"></i> Borrar cookies</button>
+            <div class="cookie-notice" id="cookieNotice">
+                <p><i class="fas fa-cookie-bite"></i> Este sitio utiliza cookies para recordar tus datos y preferencias.</p>
+                <div>
+                    <button class="cookie-btn" id="acceptCookiesBtn"><i class="fas fa-check"></i> Aceptar cookies</button>
+                    <button class="cookie-btn" id="clearCookiesBtn"><i class="fas fa-trash"></i> Borrar cookies</button>
+                </div>
+            </div>
+
+            <div class="week-navigation">
+                <div class="week-nav-buttons">
+                    <button id="prevWeekBtn"><i class="fas fa-chevron-left"></i> Semana anterior</button>
+                    <button id="nextWeekBtn">Semana siguiente <i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="week-label" id="weekLabel">Septiembre 2026</div>
+            </div>
+
+            <div class="selected-display" id="selectedDisplay">
+                <i class="fas fa-check-circle"></i>
+                <span class="label-text">Horario seleccionado:</span>
+                <span class="selected-text" id="selectedText">—</span>
+            </div>
+
+            <div class="two-column-layout">
+                <div class="left-col">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr id="headerRow">
+                                    <th>Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaHorarios"></tbody>
+                        </table>
                     </div>
                 </div>
 
-                <div class="week-navigation">
-                    <div class="week-nav-buttons">
-                        <button id="prevWeekBtn"><i class="fas fa-chevron-left"></i> Semana anterior</button>
-                        <button id="nextWeekBtn">Semana siguiente <i class="fas fa-chevron-right"></i></button>
-                    </div>
-                    <div class="week-label" id="weekLabel">Septiembre 2026</div>
-                </div>
-
-                <div class="selected-display" id="selectedDisplay">
-                    <i class="fas fa-check-circle"></i>
-                    <span class="label-text">Horario seleccionado:</span>
-                    <span class="selected-text" id="selectedText">—</span>
-                </div>
-
-                <div class="two-column-layout">
-                    <div class="left-col">
-                        <div class="table-responsive">
-                            <table>
-                                <thead>
-                                    <tr id="headerRow">
-                                        <th>Hora</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tablaHorarios"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="right-col">
-                        <form id="reservationForm">
-                            <div class="form-grid">
-                                <div class="field-group">
-                                    <label for="nombre"><i class="far fa-user"></i> Nombre</label>
-                                    <input type="text" id="nombre" placeholder="Ej: Ana Pérez" autocomplete="on" required />
-                                    <span class="hint">Nombre completo</span>
-                                </div>
-                                <div class="field-group">
-                                    <label for="email"><i class="far fa-envelope"></i> Email</label>
-                                    <input type="email" id="email" placeholder="ejemplo@email.com" autocomplete="on" required />
-                                    <span class="hint">Correo electrónico</span>
-                                </div>
-                                <div class="field-group">
-                                    <label for="telefono"><i class="fas fa-phone-alt"></i> Teléfono</label>
-                                    <input type="tel" id="telefono" placeholder="+34 600 000 000" autocomplete="on" required />
-                                    <span class="hint">Incluye código de país</span>
-                                </div>
-                                <div class="field-group" id="servicioGroup">
-                                    <label for="servicio"><i class="fas fa-concierge-bell"></i> <span id="servicioLabel">Servicio</span></label>
-                                    <select id="servicio" required>
-                                        <option value="">Selecciona un servicio...</option>
-                                    </select>
-                                    <span class="hint">Tipo de servicio</span>
-                                </div>
-                                <div class="btn-wrapper">
-                                    <label class="btn-label" aria-hidden="true">Reservar</label>
-                                    <button type="submit" class="btn-submit" id="submitBtn">
-                                        <i class="fas fa-calendar-check"></i> Reservar
-                                    </button>
-                                </div>
+                <div class="right-col">
+                    <form id="reservationForm">
+                        <div class="form-grid">
+                            <div class="field-group">
+                                <label for="nombre"><i class="far fa-user"></i> Nombre</label>
+                                <input type="text" id="nombre" placeholder="Ej: Ana Pérez" autocomplete="on" required />
+                                <span class="hint">Nombre completo</span>
                             </div>
-                        </form>
-                    </div>
+                            <div class="field-group">
+                                <label for="email"><i class="far fa-envelope"></i> Email</label>
+                                <input type="email" id="email" placeholder="ejemplo@email.com" autocomplete="on" required />
+                                <span class="hint">Correo electrónico</span>
+                            </div>
+                            <div class="field-group">
+                                <label for="telefono"><i class="fas fa-phone-alt"></i> Teléfono</label>
+                                <input type="tel" id="telefono" placeholder="+34 600 000 000" autocomplete="on" required />
+                                <span class="hint">Incluye código de país</span>
+                            </div>
+                            <div class="field-group" id="servicioGroup">
+                                <label for="servicio"><i class="fas fa-concierge-bell"></i> <span id="servicioLabel">Servicio</span></label>
+                                <select id="servicio" required>
+                                    <option value="">Selecciona un servicio...</option>
+                                </select>
+                                <span class="hint">Tipo de servicio</span>
+                            </div>
+                            <div class="btn-wrapper">
+                                <label class="btn-label" aria-hidden="true">Reservar</label>
+                                <button type="submit" class="btn-submit" id="submitBtn">
+                                    <i class="fas fa-calendar-check"></i> Reservar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== DRAWER (segundo contenedor) ===== -->
+    <!-- ===== DRAWER ===== -->
     <div class="drawer" id="drawer">
         <div class="drawer-handle" id="drawerHandle">
             <span></span><span></span><span></span>
@@ -1979,23 +1968,20 @@
         (function() {
             const drawer = document.getElementById('drawer');
             const handle = document.getElementById('drawerHandle');
-            const mainWrapper = document.getElementById('mainWrapper');
             let isDrawerDragging = false;
             let drawerStartX = 0;
             let drawerStartTranslate = 0;
             let currentTranslate = 0;
             let isOpen = false;
 
-            // Constantes para cálculo
+            // Constantes
+            const MARGIN_RIGHT = 15;
             const HANDLE_WIDTH = window.innerWidth <= 600 ? 36 : 40;
-            const DRAWER_WIDTH = window.innerWidth <= 600 ? 280 : 360;
-            const MARGIN_RIGHT = 15; // margen del handle en estado cerrado
-            const SEPARATION = 30; // separación entre contenedores cuando está abierto
+            const CLOSED_WIDTH = window.innerWidth <= 600 ? 280 : 360;
 
-            // Máximo desplazamiento (cerrado): drawerWidth - handleWidth - margen
-            const getMaxTranslate = () => {
-                return DRAWER_WIDTH - HANDLE_WIDTH - MARGIN_RIGHT;
-            };
+            function getMaxTranslate() {
+                return CLOSED_WIDTH - HANDLE_WIDTH - MARGIN_RIGHT;
+            }
 
             function updateDrawer(translateX, animate) {
                 if (animate === undefined) animate = true;
@@ -2006,22 +1992,30 @@
                 if (!animate) {
                     drawer.style.transition = 'none';
                 } else {
-                    drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
                 }
+
                 drawer.style.transform = 'translateX(' + clamped + 'px)';
 
-                // Determinar si está abierto (translateX < umbral)
+                // Decidir si está abierto (translateX < umbral)
                 const threshold = maxT * 0.5;
                 const shouldOpen = clamped < threshold;
 
                 if (shouldOpen !== isOpen) {
                     isOpen = shouldOpen;
-                    drawer.classList.toggle('open', isOpen);
-                    // Desplazar el wrapper principal para dejar separación
                     if (isOpen) {
-                        mainWrapper.classList.add('shifted');
+                        drawer.style.width = '100vw';
+                        drawer.style.transform = 'translateX(0)';
+                        currentTranslate = 0;
+                        drawer.classList.add('open');
                     } else {
-                        mainWrapper.classList.remove('shifted');
+                        drawer.style.width = CLOSED_WIDTH + 'px';
+                        const newMax = getMaxTranslate();
+                        if (clamped !== newMax) {
+                            drawer.style.transform = 'translateX(' + newMax + 'px)';
+                            currentTranslate = newMax;
+                        }
+                        drawer.classList.remove('open');
                     }
                 }
             }
@@ -2032,7 +2026,8 @@
                 if (currentTranslate < threshold) {
                     updateDrawer(0, true);
                 } else {
-                    updateDrawer(maxT, true);
+                    const closedMax = getMaxTranslate();
+                    updateDrawer(closedMax, true);
                 }
             }
 
@@ -2055,18 +2050,19 @@
                 newTranslate = Math.min(Math.max(newTranslate, 0), maxT);
                 drawer.style.transform = 'translateX(' + newTranslate + 'px)';
                 currentTranslate = newTranslate;
-                // Actualizar clase visual sin cambiar el desplazamiento del wrapper (solo al soltar)
                 const threshold = maxT * 0.5;
-                const shouldOpen = newTranslate < threshold;
-                drawer.classList.toggle('open', shouldOpen);
-                // No movemos el wrapper hasta el snap
+                if (newTranslate < threshold) {
+                    drawer.classList.add('open');
+                } else {
+                    drawer.classList.remove('open');
+                }
             }
 
             function onDrawerMouseUp(e) {
                 if (!isDrawerDragging) return;
                 isDrawerDragging = false;
                 document.body.style.cursor = '';
-                drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
                 snapDrawer();
             }
 
@@ -2088,42 +2084,35 @@
                 }
             });
 
-            // Resize
             window.addEventListener('resize', function() {
-                // Actualizar constantes (si cambia el ancho de la ventana)
+                // Actualizar constantes
                 const isMobile = window.innerWidth <= 600;
                 const newHandleWidth = isMobile ? 36 : 40;
-                const newDrawerWidth = isMobile ? 280 : 360;
-                const maxT = newDrawerWidth - newHandleWidth - MARGIN_RIGHT;
-                // Si el drawer está abierto, mantenerlo abierto; si no, reajustar
+                const newClosedWidth = isMobile ? 280 : 360;
+                const maxT = newClosedWidth - newHandleWidth - MARGIN_RIGHT;
                 if (isOpen) {
-                    drawer.style.transition = 'none';
+                    drawer.style.width = '100vw';
                     drawer.style.transform = 'translateX(0)';
                     currentTranslate = 0;
-                    mainWrapper.classList.add('shifted');
                 } else {
+                    drawer.style.width = newClosedWidth + 'px';
                     drawer.style.transition = 'none';
                     drawer.style.transform = 'translateX(' + maxT + 'px)';
                     currentTranslate = maxT;
-                    mainWrapper.classList.remove('shifted');
+                    drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
                 }
-                // Restaurar transición
-                requestAnimationFrame(function() {
-                    drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-                });
             });
 
-            // Inicialización
             function initDrawer() {
                 const maxT = getMaxTranslate();
+                drawer.style.width = CLOSED_WIDTH + 'px';
                 drawer.style.transition = 'none';
                 drawer.style.transform = 'translateX(' + maxT + 'px)';
                 currentTranslate = maxT;
                 drawer.classList.remove('open');
                 isOpen = false;
-                mainWrapper.classList.remove('shifted');
                 requestAnimationFrame(function() {
-                    drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
                 });
             }
 
