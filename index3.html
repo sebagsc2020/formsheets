@@ -4,15 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reservas + Panel Admin</title>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <style>
         /* ============================================================
-           ESTILOS BASE (sin scroll, márgenes, etc.)
+           ESTILOS BASE
            ============================================================ */
         * {
             margin: 0;
@@ -30,7 +28,7 @@
             font-family: system-ui, -apple-system, sans-serif;
         }
 
-        /* ---------- CONTENEDOR PRINCIPAL (margen derecho 47px para dejar paso a la pestaña) ---------- */
+        /* ---------- CONTENEDOR PRINCIPAL ---------- */
         .main-container {
             position: absolute;
             top: 15px;
@@ -44,26 +42,25 @@
             overflow: hidden;
         }
 
-        /* ---------- DRAWER (ahora con fondo oscuro y sin carrusel) ---------- */
+        /* ---------- DRAWER (contenedor del panel admin) ---------- */
         .drawer {
             position: fixed;
             top: 15px;
             right: 0;
             bottom: 15px;
             width: 360px;
-            background: #1a1a1a; /* fondo oscuro para el panel admin */
+            background: #1a1a1a;
             border-radius: 16px 0 0 16px;
             box-shadow: -4px 0 24px rgba(0, 0, 0, 0.30);
-            transform: translateX(calc(100% - 47px)); /* 32px + 15px */
+            transform: translateX(calc(100% - 47px));
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
                         width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             will-change: transform, width;
             display: flex;
             flex-direction: column;
-            z-index: 10;
+            z-index: 20;
             overflow: hidden;
         }
-
         .drawer.open {
             width: 100vw;
             transform: translateX(0);
@@ -87,14 +84,12 @@
             justify-content: center;
             gap: 6px;
             transition: background 0.2s;
-            z-index: 5;
+            z-index: 30;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-
         .drawer-handle:hover {
             background: #eaedf2;
         }
-
         .drawer-handle span {
             display: block;
             width: 6px;
@@ -102,7 +97,6 @@
             background: #a0aab6;
             border-radius: 50%;
         }
-
         .drawer-handle .bar {
             width: 16px;
             height: 2px;
@@ -111,13 +105,14 @@
             margin: 2px 0;
         }
 
-        /* ---------- CONTENEDOR INTERNO DEL DRAWER (para el panel admin) ---------- */
+        /* ---------- CONTENEDOR INTERNO DEL DRAWER (scroll) ---------- */
         .drawer-content {
             flex: 1;
             overflow-y: auto;
             padding: 0.5rem 0.8rem;
             scrollbar-width: thin;
             scrollbar-color: #444 #222;
+            pointer-events: auto;
         }
         .drawer-content::-webkit-scrollbar {
             width: 6px;
@@ -130,8 +125,50 @@
             border-radius: 4px;
         }
 
-        /* ---------- ESTILOS DEL PANEL ADMIN (adaptados al drawer) ---------- */
-        /* Reutilizamos los estilos del admin pero limitados al drawer-content */
+        /* ---------- PLACEHOLDER DE AUTENTICACIÓN ---------- */
+        .auth-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #ccc;
+            text-align: center;
+            padding: 1.5rem;
+        }
+        .auth-placeholder i {
+            font-size: 3rem;
+            color: #d4af37;
+            margin-bottom: 0.8rem;
+        }
+        .auth-placeholder h2 {
+            color: #e8e8e8;
+            margin-bottom: 0.5rem;
+        }
+        .auth-placeholder p {
+            color: #999;
+            margin-bottom: 1.2rem;
+            font-size: 0.9rem;
+        }
+        .auth-placeholder .btn {
+            background: linear-gradient(135deg, #e5c147 0%, #d4af37 50%, #b8941f 100%);
+            border: none;
+            color: #1a1a1a;
+            padding: 0.6rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: 0.2s;
+        }
+        .auth-placeholder .btn:hover {
+            transform: scale(1.02);
+        }
+
+        /* ---------- ESTILOS DEL PANEL ADMIN (exactamente igual que en !DOCTYPE html.txt) ---------- */
+        /* Todos los estilos del panel admin se copian tal cual del archivo, adaptados al .drawer-content */
         .drawer-content .container {
             max-width: 100%;
             margin: 0 auto;
@@ -820,7 +857,7 @@
                 width: 100vw;
             }
             .drawer:not(.open) {
-                transform: translateX(calc(100% - 43px)); /* 28px + 15px */
+                transform: translateX(calc(100% - 43px));
             }
             .main-container {
                 right: 43px;
@@ -870,7 +907,7 @@
         }
 
         /* ============================================================
-           ESTILOS DE LA APP DE RESERVAS (para el contenedor principal)
+           ESTILOS DE LA APP DE RESERVAS (contenedor principal)
            ============================================================ */
         .card {
             width: 100%;
@@ -1324,7 +1361,8 @@
             font-size: 0.75rem;
             color: #1a1a1a;
         }
-        /* POPUP (de la app de reservas) */
+
+        /* POPUP de la app de reservas */
         .popup-overlay {
             display: none;
             position: fixed;
@@ -1374,7 +1412,7 @@
         .popup-close-btn { background: #444; border: 1px solid #555; color: #e8e8e8; padding: 0.4rem 1rem; border-radius: 4px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.15s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .popup-close-btn:hover { background: #555; border-color: #666; }
 
-        /* MODALES DEL ADMIN (fuera del drawer) */
+        /* MODALES DEL ADMIN (incluyendo login) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -1511,7 +1549,7 @@
             background: #3a8eef;
         }
 
-        /* Responsive de la app de reservas (sin cambios) */
+        /* Responsive de la app de reservas */
         @media (max-width: 768px) {
             .two-column-layout { flex-direction: column; gap: 0.4rem; }
             .left-col, .right-col { flex: 1 1 100%; min-width: 0; }
@@ -1660,27 +1698,16 @@
             <div class="bar"></div>
         </div>
 
-        <!-- Contenido del panel admin -->
         <div class="drawer-content" id="drawerContent">
-            <!-- ===== LOGIN SCREEN (dentro del drawer) ===== -->
-            <div id="loginScreen" class="login-box">
-                <i class="fas fa-lock lock"></i>
-                <h2>Panel de Administración</h2>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" id="emailInput" placeholder="admin@ejemplo.com" required autofocus>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-key"></i> Contraseña</label>
-                        <input type="password" id="passwordInput" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> Ingresar</button>
-                </form>
-                <p id="loginError" style="color: #ff6b6b; text-align: center; margin-top: 0.6rem; font-size: 0.75rem; display: none;"></p>
+            <!-- Placeholder cuando no hay autenticación -->
+            <div id="authPlaceholder" class="auth-placeholder">
+                <i class="fas fa-lock"></i>
+                <h2>Área de Administración</h2>
+                <p>Inicia sesión para gestionar las reservas.</p>
+                <button class="btn" onclick="openLoginModal()"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</button>
             </div>
 
-            <!-- ===== PANEL ADMIN (oculto por defecto) ===== -->
+            <!-- Panel Admin (oculto hasta autenticarse) -->
             <div id="adminPanel" style="display: none;">
                 <div class="header-actions">
                     <h1><i class="fas fa-user-shield"></i> Panel de Administración</h1>
@@ -1827,7 +1854,28 @@
         </div>
     </div>
 
-    <!-- ===== MODALES DEL ADMIN (fuera del drawer) ===== -->
+    <!-- ===== MODALES DEL ADMIN (incluyendo LOGIN) ===== -->
+    <!-- Modal de Login -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-container">
+            <i class="fas fa-lock" style="display: block; text-align: center; font-size: 2.5rem; color: #d4af37; margin-bottom: 0.5rem;"></i>
+            <h2 style="text-align: center;">Acceso Administrativo</h2>
+            <div class="subtitle" style="text-align: center;">Ingresa tus credenciales para gestionar el sistema</div>
+            <form id="loginFormModal">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="emailInputModal" placeholder="admin@ejemplo.com" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> Contraseña</label>
+                    <input type="password" id="passwordInputModal" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn" id="loginModalBtn"><i class="fas fa-sign-in-alt"></i> Ingresar</button>
+            </form>
+            <p id="loginErrorModal" style="color: #ff6b6b; text-align: center; margin-top: 0.6rem; font-size: 0.75rem; display: none;"></p>
+        </div>
+    </div>
+
     <!-- Modal Reagendar -->
     <div class="modal-overlay" id="rescheduleModal">
         <div class="modal-container">
@@ -1915,7 +1963,7 @@
 
     <script>
         // ===================================================================
-        // 1. DRAWER (cajón lateral) - lógica
+        // 1. DRAWER - lógica (arrastre y apertura)
         // ===================================================================
         (function() {
             const drawer = document.getElementById('drawer');
@@ -2080,10 +2128,9 @@
         })();
 
         // ===================================================================
-        // 2. APLICACIÓN DE RESERVAS (lógica original)
+        // 2. APLICACIÓN DE RESERVAS (para el contenedor principal)
         // ===================================================================
         (function() {
-            // Firebase ya inicializado arriba, solo usamos las instancias
             const db = firebase.firestore();
             const auth = firebase.auth();
 
@@ -2675,10 +2722,9 @@
         })();
 
         // ===================================================================
-        // 3. PANEL ADMIN (lógica del archivo !DOCTYPE html.txt)
+        // 3. PANEL ADMIN (con login en modal) - lógica del !DOCTYPE html.txt
         // ===================================================================
         (function() {
-            // Ya tenemos Firebase inicializado
             const db = firebase.firestore();
             const auth = firebase.auth();
 
@@ -2700,30 +2746,84 @@
             let currentUser = null;
             let unsubscribe = null;
 
-            // ===== LOGIN =====
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
+            // Elementos
+            const authPlaceholder = document.getElementById('authPlaceholder');
+            const adminPanel = document.getElementById('adminPanel');
+            const loginModal = document.getElementById('loginModal');
+
+            // ===== FUNCIONES DE AUTENTICACIÓN =====
+            function checkAuthState() {
+                const user = auth.currentUser;
+                if (user && user.email) {
+                    // Usuario autenticado con email
+                    currentUser = user;
+                    authPlaceholder.style.display = 'none';
+                    adminPanel.style.display = 'block';
+                    document.getElementById('userEmailDisplay').innerHTML = `Hola, <strong>${user.email}</strong>`;
+                    startRealtimeListener();
+                } else {
+                    // No autenticado
+                    authPlaceholder.style.display = 'flex';
+                    adminPanel.style.display = 'none';
+                    if (unsubscribe) {
+                        unsubscribe();
+                        unsubscribe = null;
+                    }
+                }
+            }
+
+            // Observar cambios de autenticación
+            auth.onAuthStateChanged(function(user) {
+                if (user && user.email) {
+                    currentUser = user;
+                    authPlaceholder.style.display = 'none';
+                    adminPanel.style.display = 'block';
+                    document.getElementById('userEmailDisplay').innerHTML = `Hola, <strong>${user.email}</strong>`;
+                    startRealtimeListener();
+                } else {
+                    authPlaceholder.style.display = 'flex';
+                    adminPanel.style.display = 'none';
+                    if (unsubscribe) {
+                        unsubscribe();
+                        unsubscribe = null;
+                    }
+                }
+            });
+
+            // ===== LOGIN (modal) =====
+            window.openLoginModal = function() {
+                loginModal.classList.add('show');
+                document.getElementById('emailInputModal').focus();
+            };
+
+            function closeLoginModal() {
+                loginModal.classList.remove('show');
+                document.getElementById('loginErrorModal').style.display = 'none';
+            }
+
+            document.getElementById('loginFormModal').addEventListener('submit', function(e) {
                 e.preventDefault();
-                const email = document.getElementById('emailInput').value.trim();
-                const password = document.getElementById('passwordInput').value;
-                const errorEl = document.getElementById('loginError');
+                e.stopPropagation();
+
+                const email = document.getElementById('emailInputModal').value.trim();
+                const password = document.getElementById('passwordInputModal').value;
+                const errorEl = document.getElementById('loginErrorModal');
                 errorEl.style.display = 'none';
                 if (!email || !password) {
                     errorEl.textContent = '❌ Completa ambos campos';
                     errorEl.style.display = 'block';
                     return;
                 }
-                const submitBtn = this.querySelector('.btn');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Autenticando...';
+                const btn = document.getElementById('loginModalBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Autenticando...';
                 auth.signInWithEmailAndPassword(email, password)
-                    .then((userCredential) => {
-                        currentUser = userCredential.user;
-                        document.getElementById('loginScreen').style.display = 'none';
-                        document.getElementById('adminPanel').style.display = 'block';
-                        document.getElementById('userEmailDisplay').innerHTML = `Hola, <strong>${currentUser.email}</strong>`;
-                        startRealtimeListener();
+                    .then(function(userCredential) {
+                        closeLoginModal();
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar';
                     })
-                    .catch((error) => {
+                    .catch(function(error) {
                         let msg = '❌ Error de autenticación. ';
                         switch(error.code) {
                             case 'auth/user-not-found': msg += 'Usuario no encontrado.'; break;
@@ -2734,11 +2834,20 @@
                         }
                         errorEl.textContent = msg;
                         errorEl.style.display = 'block';
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar';
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar';
                     });
             });
 
+            // Cerrar modal con ESC o clic fuera
+            loginModal.addEventListener('click', function(e) {
+                if (e.target === this) closeLoginModal();
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeLoginModal();
+            });
+
+            // ===== FUNCIONES DEL PANEL =====
             function startRealtimeListener() {
                 if (unsubscribe) {
                     unsubscribe();
@@ -2947,7 +3056,7 @@
                 }).join('');
             }
 
-            // Acciones
+            // Acciones (se mantienen igual)
             window.sendWhatsApp = function(id) {
                 const reserva = allReservations.find(r => r.id === id);
                 if (!reserva) return alert('Reserva no encontrada');
@@ -3357,16 +3466,15 @@
                     unsubscribe = null;
                 }
                 auth.signOut().then(() => {
-                    document.getElementById('adminPanel').style.display = 'none';
-                    document.getElementById('loginScreen').style.display = 'block';
-                    document.getElementById('emailInput').value = '';
-                    document.getElementById('passwordInput').value = '';
-                    currentUser = null;
+                    // El onAuthStateChanged se encargará de mostrar el placeholder
                 }).catch(console.error);
             };
 
             // Cargar configuración de servicios al iniciar
             loadServiceConfig();
+
+            // Inicializar el estado de autenticación
+            checkAuthState();
         })();
     </script>
 </body>
