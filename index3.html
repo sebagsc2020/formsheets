@@ -28,21 +28,31 @@
             font-family: system-ui, -apple-system, sans-serif;
         }
 
-        /* ---------- CONTENEDOR PRINCIPAL ---------- */
-        .main-container {
+        /* ---------- WRAPPER PRINCIPAL (para desplazar el contenedor) ---------- */
+        .main-wrapper {
             position: absolute;
             top: 15px;
             left: 15px;
-            right: 47px;
             bottom: 15px;
+            right: 55px; /* 40px (handle) + 15px margen por defecto (cerrado) */
+            transition: right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1;
+        }
+        /* Cuando el drawer está abierto, el wrapper se desplaza a la izquierda */
+        .main-wrapper.shifted {
+            right: calc(360px + 30px); /* 360px drawer + 30px separación */
+        }
+
+        .main-container {
+            width: 100%;
+            height: 100%;
             background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            z-index: 1;
             overflow: hidden;
         }
 
-        /* ---------- DRAWER (contenedor del panel admin) ---------- */
+        /* ---------- DRAWER (ancho fijo) ---------- */
         .drawer {
             position: fixed;
             top: 15px;
@@ -52,28 +62,26 @@
             background: #1a1a1a;
             border-radius: 16px 0 0 16px;
             box-shadow: -4px 0 24px rgba(0, 0, 0, 0.30);
-            transform: translateX(calc(100% - 47px));
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            will-change: transform, width;
+            transform: translateX(calc(100% - 55px)); /* 40px handle + 15px margen */
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: transform;
             display: flex;
             flex-direction: column;
             z-index: 20;
             overflow: hidden;
         }
         .drawer.open {
-            width: 100vw;
             transform: translateX(0);
         }
 
-        /* ---------- PESTAÑA ---------- */
+        /* ---------- PESTAÑA (más grande) ---------- */
         .drawer-handle {
             position: absolute;
             left: 0;
             top: 50%;
             transform: translateY(-50%);
-            width: 32px;
-            height: 120px;
+            width: 40px;
+            height: 150px;
             background: #f4f6f9;
             border-radius: 16px 0 0 16px;
             border-right: 1px solid #e9ecf0;
@@ -82,7 +90,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
             transition: background 0.2s;
             z-index: 30;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -92,20 +100,20 @@
         }
         .drawer-handle span {
             display: block;
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             background: #a0aab6;
             border-radius: 50%;
         }
         .drawer-handle .bar {
-            width: 16px;
-            height: 2px;
+            width: 20px;
+            height: 3px;
             background: #a0aab6;
             border-radius: 2px;
-            margin: 2px 0;
+            margin: 3px 0;
         }
 
-        /* ---------- CONTENEDOR INTERNO DEL DRAWER (scroll) ---------- */
+        /* ---------- CONTENIDO DEL DRAWER ---------- */
         .drawer-content {
             flex: 1;
             overflow-y: auto;
@@ -113,6 +121,7 @@
             scrollbar-width: thin;
             scrollbar-color: #444 #222;
             pointer-events: auto;
+            margin-left: 40px; /* espacio para la pestaña */
         }
         .drawer-content::-webkit-scrollbar {
             width: 6px;
@@ -125,15 +134,16 @@
             border-radius: 4px;
         }
 
-        /* ---------- ESTILOS DEL PANEL ADMIN (desde !DOCTYPE html.txt) ---------- */
-        /* Se mantienen los estilos exactos del panel admin */
+        /* ============================================================
+           ESTILOS DEL PANEL ADMIN (copiados de !DOCTYPE html.txt)
+           ============================================================ */
         .drawer-content .container {
             max-width: 100%;
             margin: 0 auto;
             color: #e8e8e8;
         }
         .drawer-content h1 {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             margin-bottom: 0.8rem;
             display: flex;
             align-items: center;
@@ -146,10 +156,10 @@
             background: linear-gradient(135deg, #e5c147 0%, #d4af37 50%, #b8941f 100%);
             border: none;
             color: #1a1a1a;
-            padding: 0.7rem 1.2rem;
+            padding: 0.6rem 1rem;
             border-radius: 4px;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             cursor: pointer;
             width: 100%;
             text-transform: uppercase;
@@ -171,15 +181,15 @@
             flex-wrap: wrap;
         }
         .drawer-content .action-btn {
-            width: 26px;
-            height: 26px;
+            width: 24px;
+            height: 24px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             transition: all 0.15s;
             text-decoration: none;
             position: relative;
@@ -245,6 +255,7 @@
             pointer-events: none;
             z-index: 10;
         }
+        /* Modales dentro del drawer (se mantienen igual) */
         .drawer-content .modal-overlay {
             display: none;
             position: fixed;
@@ -492,7 +503,7 @@
         }
         .drawer-content .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 0.5rem;
             margin-bottom: 0.8rem;
         }
@@ -500,21 +511,21 @@
             background: #2a2a2a;
             border: 1px solid #3a3a3a;
             border-radius: 4px;
-            padding: 0.6rem 0.3rem;
+            padding: 0.5rem 0.2rem;
             text-align: center;
         }
         .drawer-content .stat-card .number {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #d4af37;
             display: block;
         }
         .drawer-content .stat-card .number.small {
-            font-size: 1.1rem;
+            font-size: 1rem;
             padding-top: 0.1rem;
         }
         .drawer-content .stat-card .label {
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -531,7 +542,7 @@
             background: #2a2a2a;
             border: 1px solid #3a3a3a;
             border-radius: 4px;
-            padding: 0.8rem;
+            padding: 0.6rem;
             margin-top: 0.8rem;
         }
         .drawer-content .dashboard-header {
@@ -543,7 +554,7 @@
             gap: 0.3rem;
         }
         .drawer-content .dashboard-header h2 {
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: #e8e8e8;
         }
         .drawer-content .month-selector {
@@ -555,10 +566,10 @@
             background: #333;
             border: 1px solid #444;
             color: #ccc;
-            padding: 0.2rem 0.5rem;
+            padding: 0.2rem 0.4rem;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             transition: 0.15s;
         }
         .drawer-content .month-selector button:hover {
@@ -572,42 +583,42 @@
             background: #d4af37;
             color: #1a1a1a;
             font-weight: 600;
-            padding: 0.2rem 0.8rem;
+            padding: 0.2rem 0.6rem;
         }
         .drawer-content .dashboard-content {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.6rem;
             align-items: stretch;
         }
         .drawer-content .dashboard-content > * {
-            flex: 1 1 calc(50% - 0.5rem);
-            min-width: 250px;
+            flex: 1 1 calc(50% - 0.3rem);
+            min-width: 200px;
             display: flex;
             flex-direction: column;
         }
         .drawer-content .chart-container {
             background: #222;
             border-radius: 4px;
-            padding: 0.8rem;
+            padding: 0.5rem;
             border: 1px solid #353535;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
         .drawer-content .chart-title {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 0.6rem;
+            margin-bottom: 0.4rem;
             text-align: center;
         }
         .drawer-content .donut-chart {
             position: relative;
-            width: 160px;
-            height: 160px;
-            margin: 0 auto 0.6rem;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 0.4rem;
             flex-shrink: 0;
         }
         .drawer-content .donut-chart svg {
@@ -623,13 +634,13 @@
             text-align: center;
         }
         .drawer-content .donut-center .percentage {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: #d4af37;
             line-height: 1;
         }
         .drawer-content .donut-center .label {
-            font-size: 0.6rem;
+            font-size: 0.5rem;
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -638,14 +649,14 @@
         .drawer-content .chart-legend {
             display: flex;
             flex-direction: column;
-            gap: 0.2rem;
-            margin-top: 0.4rem;
+            gap: 0.1rem;
+            margin-top: 0.2rem;
         }
         .drawer-content .legend-item {
             display: flex;
             align-items: center;
             gap: 0.3rem;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
         .drawer-content .legend-color {
             width: 10px;
@@ -664,37 +675,37 @@
         .drawer-content .right-column {
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 0.4rem;
             flex: 1;
         }
         .drawer-content .metrics-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
+            gap: 0.3rem;
             flex: 1;
         }
         .drawer-content .metric-card {
             background: #222;
             border-radius: 4px;
-            padding: 0.5rem;
+            padding: 0.4rem;
             border: 1px solid #353535;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
         .drawer-content .metric-card .metric-icon {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #d4af37;
-            margin-bottom: 0.1rem;
+            margin-bottom: 0.05rem;
         }
         .drawer-content .metric-card .metric-value {
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             font-weight: 700;
             color: #e8e8e8;
             margin-bottom: 0.05rem;
         }
         .drawer-content .metric-card .metric-label {
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             color: #888;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -707,7 +718,7 @@
             display: flex;
             align-items: flex-end;
             gap: 0.2rem;
-            height: 70px;
+            height: 60px;
             padding: 0.2rem 0;
         }
         .drawer-content .bar {
@@ -723,25 +734,25 @@
         }
         .drawer-content .bar-label {
             position: absolute;
-            bottom: -16px;
+            bottom: -14px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.5rem;
+            font-size: 0.45rem;
             color: #888;
         }
         .drawer-content .bar-value {
             position: absolute;
-            top: -14px;
+            top: -12px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             color: #d4af37;
             font-weight: 600;
         }
         .drawer-content .toolbar {
             display: flex;
-            gap: 0.3rem;
-            margin-bottom: 0.4rem;
+            gap: 0.2rem;
+            margin-bottom: 0.3rem;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
@@ -757,10 +768,10 @@
             background: #333;
             border: 1px solid #444;
             color: #ccc;
-            padding: 0.2rem 0.6rem;
+            padding: 0.15rem 0.5rem;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             transition: 0.15s;
         }
         .drawer-content .filter-btn:hover {
@@ -781,21 +792,21 @@
         .drawer-content table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
         .drawer-content th {
             background: #2a2a2a;
             color: #d0d0d0;
             font-weight: 600;
-            padding: 0.3rem 0.3rem;
+            padding: 0.2rem 0.2rem;
             text-align: left;
             border-bottom: 2px solid #3a3a3a;
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
         .drawer-content td {
-            padding: 0.25rem 0.3rem;
+            padding: 0.2rem 0.2rem;
             border-bottom: 1px solid #333;
             vertical-align: middle;
         }
@@ -804,9 +815,9 @@
         }
         .drawer-content .badge {
             display: inline-block;
-            padding: 0.1rem 0.4rem;
+            padding: 0.1rem 0.3rem;
             border-radius: 4px;
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -820,24 +831,24 @@
         }
         .drawer-content .empty-state {
             text-align: center;
-            padding: 1.5rem 0.3rem;
+            padding: 1rem 0.3rem;
             color: #666;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
         .drawer-content .empty-state i {
-            font-size: 2rem;
-            margin-bottom: 0.3rem;
+            font-size: 1.5rem;
+            margin-bottom: 0.2rem;
             color: #444;
             display: block;
         }
         .drawer-content .loading {
             text-align: center;
-            padding: 1.5rem;
+            padding: 1rem;
             color: #888;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
         .drawer-content .loading i {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: #d4af37;
             animation: spin 1s linear infinite;
         }
@@ -874,79 +885,63 @@
             box-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
         }
 
-        @media (max-width: 768px) {
-            .drawer-content th,
-            .drawer-content td {
-                padding: 0.2rem 0.2rem;
-                font-size: 0.65rem;
+        /* ---------- RESPONSIVE DRAWER ---------- */
+        @media (max-width: 600px) {
+            .drawer {
+                width: 280px;
+                transform: translateX(calc(100% - 51px)); /* 36px + 15px */
             }
-            .drawer-content .hide-mobile {
-                display: none;
+            .drawer-handle {
+                width: 36px;
+                height: 120px;
+            }
+            .drawer-content {
+                margin-left: 36px;
+            }
+            .main-wrapper {
+                right: 51px;
+            }
+            .main-wrapper.shifted {
+                right: calc(280px + 30px);
+            }
+            .drawer-content .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .drawer-content .dashboard-content > * {
+                flex: 1 1 100%;
             }
             .drawer-content .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-            .drawer-content .donut-chart {
-                width: 130px;
-                height: 130px;
-            }
-            .drawer-content .donut-center .percentage {
-                font-size: 1.4rem;
-            }
-            .drawer-content .action-btn {
-                width: 22px;
-                height: 22px;
-                font-size: 0.65rem;
-            }
-            .drawer-content .stat-card .number.small {
-                font-size: 1rem;
+                grid-template-columns: 1fr 1fr;
             }
             .drawer-content .today-item {
                 flex-wrap: wrap;
                 gap: 0.3rem;
             }
             .drawer-content .today-time {
-                font-size: 0.9rem;
-                min-width: 40px;
+                font-size: 0.85rem;
+                min-width: 36px;
             }
-            .drawer-content .today-agenda {
-                padding: 0.4rem;
+            .drawer-content .header-actions h1 {
+                font-size: 1.1rem;
             }
-            .drawer-content .stat-card {
-                padding: 0.4rem 0.2rem;
-            }
-            .drawer-content .dashboard-content {
-                flex-direction: column;
-            }
-            .drawer-content .dashboard-content > * {
-                flex: 1 1 100%;
-            }
-            .drawer-content .modal-container {
-                padding: 1rem;
-                max-width: 95%;
-            }
-        }
-
-        /* Ajustes para móvil del drawer */
-        @media (max-width: 600px) {
-            .drawer {
-                width: 280px;
-            }
-            .drawer-handle {
-                width: 28px;
+            .drawer-content .donut-chart {
+                width: 100px;
                 height: 100px;
             }
-            .drawer.open {
-                width: 100vw;
+            .drawer-content .donut-center .percentage {
+                font-size: 1.2rem;
             }
-            .drawer:not(.open) {
-                transform: translateX(calc(100% - 43px));
+            .drawer-content .action-btn {
+                width: 22px;
+                height: 22px;
+                font-size: 0.65rem;
             }
-            .main-container {
-                right: 43px;
+            .drawer-content th, .drawer-content td {
+                font-size: 0.55rem;
+                padding: 0.15rem 0.1rem;
             }
-            .drawer-content {
-                padding: 0.3rem 0.4rem;
+            .drawer-content .hide-mobile {
+                display: none;
             }
         }
 
@@ -1654,90 +1649,92 @@
     </style>
 </head>
 <body>
+    <!-- ===== WRAPPER PRINCIPAL ===== -->
+    <div class="main-wrapper" id="mainWrapper">
+        <div class="main-container">
+            <!-- ===== APP DE RESERVAS (contenido principal) ===== -->
+            <div class="card">
+                <h1>
+                    <span><i class="fas fa-calendar-check"></i></span>
+                    <span>Reserva tu Horario</span>
+                </h1>
 
-    <!-- ===== CONTENEDOR PRINCIPAL (con la app de reservas) ===== -->
-    <div class="main-container">
-        <div class="card">
-            <h1>
-                <span><i class="fas fa-calendar-check"></i></span>
-                <span>Reserva tu Horario</span>
-            </h1>
-
-            <div class="cookie-notice" id="cookieNotice">
-                <p><i class="fas fa-cookie-bite"></i> Este sitio utiliza cookies para recordar tus datos y preferencias.</p>
-                <div>
-                    <button class="cookie-btn" id="acceptCookiesBtn"><i class="fas fa-check"></i> Aceptar cookies</button>
-                    <button class="cookie-btn" id="clearCookiesBtn"><i class="fas fa-trash"></i> Borrar cookies</button>
-                </div>
-            </div>
-
-            <div class="week-navigation">
-                <div class="week-nav-buttons">
-                    <button id="prevWeekBtn"><i class="fas fa-chevron-left"></i> Semana anterior</button>
-                    <button id="nextWeekBtn">Semana siguiente <i class="fas fa-chevron-right"></i></button>
-                </div>
-                <div class="week-label" id="weekLabel">Septiembre 2026</div>
-            </div>
-
-            <div class="selected-display" id="selectedDisplay">
-                <i class="fas fa-check-circle"></i>
-                <span class="label-text">Horario seleccionado:</span>
-                <span class="selected-text" id="selectedText">—</span>
-            </div>
-
-            <div class="two-column-layout">
-                <div class="left-col">
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr id="headerRow">
-                                    <th>Hora</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tablaHorarios"></tbody>
-                        </table>
+                <div class="cookie-notice" id="cookieNotice">
+                    <p><i class="fas fa-cookie-bite"></i> Este sitio utiliza cookies para recordar tus datos y preferencias.</p>
+                    <div>
+                        <button class="cookie-btn" id="acceptCookiesBtn"><i class="fas fa-check"></i> Aceptar cookies</button>
+                        <button class="cookie-btn" id="clearCookiesBtn"><i class="fas fa-trash"></i> Borrar cookies</button>
                     </div>
                 </div>
 
-                <div class="right-col">
-                    <form id="reservationForm">
-                        <div class="form-grid">
-                            <div class="field-group">
-                                <label for="nombre"><i class="far fa-user"></i> Nombre</label>
-                                <input type="text" id="nombre" placeholder="Ej: Ana Pérez" autocomplete="on" required />
-                                <span class="hint">Nombre completo</span>
-                            </div>
-                            <div class="field-group">
-                                <label for="email"><i class="far fa-envelope"></i> Email</label>
-                                <input type="email" id="email" placeholder="ejemplo@email.com" autocomplete="on" required />
-                                <span class="hint">Correo electrónico</span>
-                            </div>
-                            <div class="field-group">
-                                <label for="telefono"><i class="fas fa-phone-alt"></i> Teléfono</label>
-                                <input type="tel" id="telefono" placeholder="+34 600 000 000" autocomplete="on" required />
-                                <span class="hint">Incluye código de país</span>
-                            </div>
-                            <div class="field-group" id="servicioGroup">
-                                <label for="servicio"><i class="fas fa-concierge-bell"></i> <span id="servicioLabel">Servicio</span></label>
-                                <select id="servicio" required>
-                                    <option value="">Selecciona un servicio...</option>
-                                </select>
-                                <span class="hint">Tipo de servicio</span>
-                            </div>
-                            <div class="btn-wrapper">
-                                <label class="btn-label" aria-hidden="true">Reservar</label>
-                                <button type="submit" class="btn-submit" id="submitBtn">
-                                    <i class="fas fa-calendar-check"></i> Reservar
-                                </button>
-                            </div>
+                <div class="week-navigation">
+                    <div class="week-nav-buttons">
+                        <button id="prevWeekBtn"><i class="fas fa-chevron-left"></i> Semana anterior</button>
+                        <button id="nextWeekBtn">Semana siguiente <i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="week-label" id="weekLabel">Septiembre 2026</div>
+                </div>
+
+                <div class="selected-display" id="selectedDisplay">
+                    <i class="fas fa-check-circle"></i>
+                    <span class="label-text">Horario seleccionado:</span>
+                    <span class="selected-text" id="selectedText">—</span>
+                </div>
+
+                <div class="two-column-layout">
+                    <div class="left-col">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr id="headerRow">
+                                        <th>Hora</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaHorarios"></tbody>
+                            </table>
                         </div>
-                    </form>
+                    </div>
+
+                    <div class="right-col">
+                        <form id="reservationForm">
+                            <div class="form-grid">
+                                <div class="field-group">
+                                    <label for="nombre"><i class="far fa-user"></i> Nombre</label>
+                                    <input type="text" id="nombre" placeholder="Ej: Ana Pérez" autocomplete="on" required />
+                                    <span class="hint">Nombre completo</span>
+                                </div>
+                                <div class="field-group">
+                                    <label for="email"><i class="far fa-envelope"></i> Email</label>
+                                    <input type="email" id="email" placeholder="ejemplo@email.com" autocomplete="on" required />
+                                    <span class="hint">Correo electrónico</span>
+                                </div>
+                                <div class="field-group">
+                                    <label for="telefono"><i class="fas fa-phone-alt"></i> Teléfono</label>
+                                    <input type="tel" id="telefono" placeholder="+34 600 000 000" autocomplete="on" required />
+                                    <span class="hint">Incluye código de país</span>
+                                </div>
+                                <div class="field-group" id="servicioGroup">
+                                    <label for="servicio"><i class="fas fa-concierge-bell"></i> <span id="servicioLabel">Servicio</span></label>
+                                    <select id="servicio" required>
+                                        <option value="">Selecciona un servicio...</option>
+                                    </select>
+                                    <span class="hint">Tipo de servicio</span>
+                                </div>
+                                <div class="btn-wrapper">
+                                    <label class="btn-label" aria-hidden="true">Reservar</label>
+                                    <button type="submit" class="btn-submit" id="submitBtn">
+                                        <i class="fas fa-calendar-check"></i> Reservar
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== DRAWER (contenedor del panel admin) ===== -->
+    <!-- ===== DRAWER (segundo contenedor) ===== -->
     <div class="drawer" id="drawer">
         <div class="drawer-handle" id="drawerHandle">
             <span></span><span></span><span></span>
@@ -1746,7 +1743,7 @@
         </div>
 
         <div class="drawer-content" id="drawerContent">
-            <!-- ===== PANEL ADMIN (copiado de !DOCTYPE html.txt) ===== -->
+            <!-- ===== PANEL ADMIN ===== -->
             <div id="adminPanel" class="container">
                 <div class="header-actions">
                     <h1><i class="fas fa-user-shield"></i> Panel de Administración</h1>
@@ -1982,32 +1979,23 @@
         (function() {
             const drawer = document.getElementById('drawer');
             const handle = document.getElementById('drawerHandle');
+            const mainWrapper = document.getElementById('mainWrapper');
             let isDrawerDragging = false;
             let drawerStartX = 0;
             let drawerStartTranslate = 0;
             let currentTranslate = 0;
             let isOpen = false;
 
-            const MARGIN_RIGHT = 15;
-            const HANDLE_W_DESKTOP = 32;
-            const HANDLE_W_MOBILE = 28;
-            const CLOSED_W_DESKTOP = 360;
-            const CLOSED_W_MOBILE = 280;
+            // Constantes para cálculo
+            const HANDLE_WIDTH = window.innerWidth <= 600 ? 36 : 40;
+            const DRAWER_WIDTH = window.innerWidth <= 600 ? 280 : 360;
+            const MARGIN_RIGHT = 15; // margen del handle en estado cerrado
+            const SEPARATION = 30; // separación entre contenedores cuando está abierto
 
-            function getHandleWidth() {
-                return window.innerWidth <= 600 ? HANDLE_W_MOBILE : HANDLE_W_DESKTOP;
-            }
-
-            function getClosedWidth() {
-                return window.innerWidth <= 600 ? CLOSED_W_MOBILE : CLOSED_W_DESKTOP;
-            }
-
-            function getMaxTranslate() {
-                const closedW = getClosedWidth();
-                const handleW = getHandleWidth();
-                const max = closedW - handleW - MARGIN_RIGHT;
-                return max < 0 ? 0 : max;
-            }
+            // Máximo desplazamiento (cerrado): drawerWidth - handleWidth - margen
+            const getMaxTranslate = () => {
+                return DRAWER_WIDTH - HANDLE_WIDTH - MARGIN_RIGHT;
+            };
 
             function updateDrawer(translateX, animate) {
                 if (animate === undefined) animate = true;
@@ -2018,30 +2006,22 @@
                 if (!animate) {
                     drawer.style.transition = 'none';
                 } else {
-                    drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
                 }
-
                 drawer.style.transform = 'translateX(' + clamped + 'px)';
 
+                // Determinar si está abierto (translateX < umbral)
                 const threshold = maxT * 0.5;
                 const shouldOpen = clamped < threshold;
 
                 if (shouldOpen !== isOpen) {
                     isOpen = shouldOpen;
+                    drawer.classList.toggle('open', isOpen);
+                    // Desplazar el wrapper principal para dejar separación
                     if (isOpen) {
-                        drawer.style.width = '100vw';
-                        drawer.style.transform = 'translateX(0)';
-                        currentTranslate = 0;
-                        drawer.classList.add('open');
+                        mainWrapper.classList.add('shifted');
                     } else {
-                        const closedW = getClosedWidth();
-                        drawer.style.width = closedW + 'px';
-                        const newMax = getMaxTranslate();
-                        if (clamped !== newMax) {
-                            drawer.style.transform = 'translateX(' + newMax + 'px)';
-                            currentTranslate = newMax;
-                        }
-                        drawer.classList.remove('open');
+                        mainWrapper.classList.remove('shifted');
                     }
                 }
             }
@@ -2052,13 +2032,13 @@
                 if (currentTranslate < threshold) {
                     updateDrawer(0, true);
                 } else {
-                    const closedMax = getMaxTranslate();
-                    updateDrawer(closedMax, true);
+                    updateDrawer(maxT, true);
                 }
             }
 
+            // Eventos de la pestaña
             function onDrawerMouseDown(e) {
-                if (!handle.contains(e.target) && !handle.contains(e.target.closest('.drawer-handle'))) return;
+                if (!handle.contains(e.target)) return;
                 isDrawerDragging = true;
                 drawerStartX = e.clientX;
                 drawerStartTranslate = currentTranslate;
@@ -2075,18 +2055,18 @@
                 newTranslate = Math.min(Math.max(newTranslate, 0), maxT);
                 drawer.style.transform = 'translateX(' + newTranslate + 'px)';
                 currentTranslate = newTranslate;
+                // Actualizar clase visual sin cambiar el desplazamiento del wrapper (solo al soltar)
                 const threshold = maxT * 0.5;
-                if (newTranslate < threshold) {
-                    drawer.classList.add('open');
-                } else {
-                    drawer.classList.remove('open');
-                }
+                const shouldOpen = newTranslate < threshold;
+                drawer.classList.toggle('open', shouldOpen);
+                // No movemos el wrapper hasta el snap
             }
 
             function onDrawerMouseUp(e) {
                 if (!isDrawerDragging) return;
                 isDrawerDragging = false;
                 document.body.style.cursor = '';
+                drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
                 snapDrawer();
             }
 
@@ -2108,33 +2088,42 @@
                 }
             });
 
+            // Resize
             window.addEventListener('resize', function() {
-                const maxT = getMaxTranslate();
+                // Actualizar constantes (si cambia el ancho de la ventana)
+                const isMobile = window.innerWidth <= 600;
+                const newHandleWidth = isMobile ? 36 : 40;
+                const newDrawerWidth = isMobile ? 280 : 360;
+                const maxT = newDrawerWidth - newHandleWidth - MARGIN_RIGHT;
+                // Si el drawer está abierto, mantenerlo abierto; si no, reajustar
                 if (isOpen) {
-                    drawer.style.width = '100vw';
+                    drawer.style.transition = 'none';
                     drawer.style.transform = 'translateX(0)';
                     currentTranslate = 0;
+                    mainWrapper.classList.add('shifted');
                 } else {
-                    const closedW = getClosedWidth();
-                    drawer.style.width = closedW + 'px';
                     drawer.style.transition = 'none';
                     drawer.style.transform = 'translateX(' + maxT + 'px)';
                     currentTranslate = maxT;
-                    drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    mainWrapper.classList.remove('shifted');
                 }
+                // Restaurar transición
+                requestAnimationFrame(function() {
+                    drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                });
             });
 
+            // Inicialización
             function initDrawer() {
-                const closedW = getClosedWidth();
                 const maxT = getMaxTranslate();
-                drawer.style.width = closedW + 'px';
                 drawer.style.transition = 'none';
                 drawer.style.transform = 'translateX(' + maxT + 'px)';
                 currentTranslate = maxT;
                 drawer.classList.remove('open');
                 isOpen = false;
+                mainWrapper.classList.remove('shifted');
                 requestAnimationFrame(function() {
-                    drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    drawer.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
                 });
             }
 
