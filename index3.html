@@ -28,7 +28,7 @@
             font-family: system-ui, -apple-system, sans-serif;
         }
 
-        /* ---------- CONTENEDOR PRINCIPAL (con margen derecho para la pestaña) ---------- */
+        /* ---------- CONTENEDOR PRINCIPAL (margen derecho 55px) ---------- */
         .main-container {
             position: absolute;
             top: 15px;
@@ -48,7 +48,7 @@
             top: 15px;
             right: 0;
             bottom: 15px;
-            width: 360px; /* ancho cerrado */
+            width: 360px;
             background: #1a1a1a;
             border-radius: 16px 0 0 16px;
             box-shadow: -4px 0 24px rgba(0, 0, 0, 0.30);
@@ -58,7 +58,7 @@
             will-change: transform, width;
             display: flex;
             flex-direction: column;
-            z-index: 20; /* por encima del contenedor principal */
+            z-index: 20;
             overflow: hidden;
         }
         .drawer.open {
@@ -71,7 +71,7 @@
             position: absolute;
             left: 0;
             top: 0;
-            bottom: 0; /* altura total del drawer */
+            bottom: 0;
             width: 40px;
             background: #f4f6f9;
             border-radius: 16px 0 0 16px;
@@ -126,7 +126,7 @@
         }
 
         /* ============================================================
-           ESTILOS DEL PANEL ADMIN (copiados de !DOCTYPE html.txt)
+           ESTILOS DEL PANEL ADMIN
            ============================================================ */
         .drawer-content .container {
             max-width: 100%;
@@ -246,133 +246,6 @@
             pointer-events: none;
             z-index: 10;
         }
-        /* Modales dentro del drawer (se mantienen igual) */
-        .drawer-content .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-        }
-        .drawer-content .modal-overlay.show {
-            display: flex;
-        }
-        .drawer-content .modal-container {
-            background: #2a2a2a;
-            border-radius: 8px;
-            border: 1px solid #444;
-            padding: 1.5rem;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .drawer-content .modal-container h2 {
-            color: #e8e8e8;
-            margin-bottom: 0.5rem;
-        }
-        .drawer-content .modal-container .subtitle {
-            color: #999;
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-        }
-        .drawer-content .modal-container .form-group {
-            margin-bottom: 0.6rem;
-        }
-        .drawer-content .modal-container .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: #999;
-            margin-bottom: 0.2rem;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-        .drawer-content .modal-container .form-group input,
-        .drawer-content .modal-container .form-group select {
-            width: 100%;
-            padding: 0.6rem 0.8rem;
-            background: #1e1e1e;
-            border: 1px solid #3d3d3d;
-            border-radius: 4px;
-            color: #e0e0e0;
-            font-size: 1rem;
-            outline: none;
-        }
-        .drawer-content .modal-container .form-group input:focus,
-        .drawer-content .modal-container .form-group select:focus {
-            border-color: #d4af37;
-        }
-        .drawer-content .modal-container .form-group select option {
-            background: #1e1e1e;
-        }
-        .drawer-content .modal-container .btn {
-            padding: 0.5rem;
-            font-size: 0.85rem;
-        }
-        .drawer-content .modal-container .btn-secondary {
-            background: #444;
-            color: #e8e8e8;
-            border: 1px solid #555;
-        }
-        .drawer-content .modal-container .btn-secondary:hover {
-            background: #555;
-        }
-        .drawer-content .modal-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-        .drawer-content .modal-actions .btn {
-            flex: 1;
-        }
-        .drawer-content .modal-container .servicio-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.3rem;
-        }
-        .drawer-content .modal-container .servicio-item input {
-            flex: 1;
-        }
-        .drawer-content .modal-container .servicio-item .btn-remove {
-            background: #a33;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            width: 28px;
-            height: 28px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-        .drawer-content .modal-container .servicio-item .btn-remove:hover {
-            background: #c44;
-        }
-        .drawer-content .modal-container .add-servicio {
-            display: flex;
-            gap: 0.4rem;
-            margin-top: 0.3rem;
-        }
-        .drawer-content .modal-container .add-servicio input {
-            flex: 1;
-        }
-        .drawer-content .modal-container .add-servicio button {
-            background: #4a9eff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 0.4rem 0.8rem;
-            cursor: pointer;
-        }
-        .drawer-content .modal-container .add-servicio button:hover {
-            background: #3a8eef;
-        }
-
         .drawer-content .today-agenda {
             background: linear-gradient(135deg, #2a2a2a 0%, #2e2818 100%);
             border: 1px solid #8b7424;
@@ -1875,7 +1748,7 @@
         </div>
     </div>
 
-    <!-- ===== MODALES DEL ADMIN (fuera del drawer) ===== -->
+    <!-- ===== MODALES DEL ADMIN ===== -->
     <!-- Modal Reagendar -->
     <div class="modal-overlay" id="rescheduleModal">
         <div class="modal-container">
@@ -1963,6 +1836,22 @@
 
     <script>
         // ===================================================================
+        // CONFIGURACIÓN DE FIREBASE (usando el mismo SDK compat)
+        // ===================================================================
+        console.log('Inicializando Firebase...');
+        const firebaseConfig = {
+            apiKey: "AIzaSyBCXprwlz801V0co99vpWwm17WUbWYGkk8",
+            authDomain: "reservascitas1.firebaseapp.com",
+            databaseURL: "https://reservascitas1-default-rtdb.firebaseio.com",
+            projectId: "reservascitas1",
+            storageBucket: "reservascitas1.firebasestorage.app",
+            messagingSenderId: "766960713190",
+            appId: "1:766960713190:web:adbaa9a25ae3cf0c896a27"
+        };
+        firebase.initializeApp(firebaseConfig);
+        console.log('Firebase inicializado correctamente');
+
+        // ===================================================================
         // 1. DRAWER - lógica (arrastre y apertura)
         // ===================================================================
         (function() {
@@ -1974,7 +1863,6 @@
             let currentTranslate = 0;
             let isOpen = false;
 
-            // Constantes
             const MARGIN_RIGHT = 15;
             const HANDLE_WIDTH = window.innerWidth <= 600 ? 36 : 40;
             const CLOSED_WIDTH = window.innerWidth <= 600 ? 280 : 360;
@@ -1997,7 +1885,6 @@
 
                 drawer.style.transform = 'translateX(' + clamped + 'px)';
 
-                // Decidir si está abierto (translateX < umbral)
                 const threshold = maxT * 0.5;
                 const shouldOpen = clamped < threshold;
 
@@ -2031,7 +1918,6 @@
                 }
             }
 
-            // Eventos de la pestaña
             function onDrawerMouseDown(e) {
                 if (!handle.contains(e.target)) return;
                 isDrawerDragging = true;
@@ -2085,7 +1971,6 @@
             });
 
             window.addEventListener('resize', function() {
-                // Actualizar constantes
                 const isMobile = window.innerWidth <= 600;
                 const newHandleWidth = isMobile ? 36 : 40;
                 const newClosedWidth = isMobile ? 280 : 360;
@@ -2166,7 +2051,7 @@
 
             auth.signInAnonymously()
                 .then(function() {
-                    console.log('✅ Autenticación anónima exitosa');
+                    console.log('✅ Autenticación anónima exitosa (app reservas)');
                     authReady = true;
                     loadFormDataFromCookies();
                     renderTable();
@@ -2263,6 +2148,7 @@
                             servicio: data.servicio || ''
                         });
                     });
+                    console.log('📦 Reservas cargadas desde Firestore (app):', reservas.length);
                     return reservas;
                 } catch (error) {
                     console.error('Error al cargar reservas desde Firestore:', error);
@@ -2730,7 +2616,7 @@
             const morningHours = [9,10,11,12];
             const afternoonHours = [16,17,18,19,20];
             const allHours = morningHours.concat(afternoonHours);
-            
+
             let allReservations = [];
             let currentFilter = 'all';
             let stats = { total:0, activas:0, canceladas:0, futuras:0, pasadas:0 };
@@ -2762,10 +2648,11 @@
                         });
                     });
                     allReservations = reservas;
+                    console.log('📦 Reservas cargadas en panel admin:', allReservations.length);
                     calculateStats();
                     renderData();
                 }, (error) => {
-                    console.error('Error en listener:', error);
+                    console.error('Error en listener del panel admin:', error);
                     tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Error al conectar con Firestore. Verifica permisos.</td></tr>';
                 });
             }
@@ -2812,7 +2699,7 @@
                     if (targetDow === undefined || isNaN(dayNum)) return null;
                     const now = new Date();
                     const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 62);
-                    for (let i=0; i<470; i++) {
+                    for (let i = 0; i < 470; i++) {
                         const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
                         if (d.getDate() === dayNum && d.getDay() === targetDow) {
                             d.setHours(h, m, 0, 0);
@@ -2820,7 +2707,7 @@
                         }
                     }
                     return null;
-                } catch(e) { return null; }
+                } catch (e) { return null; }
             }
 
             function renderTodayAgenda() {
@@ -2831,8 +2718,8 @@
                 dateLabel.textContent = `${LONG_DAYS[now.getDay()]} ${String(now.getDate()).padStart(2,'0')} de ${MONTH_NAMES[now.getMonth()]}, ${now.getFullYear()}`;
                 const todayRes = allReservations
                     .map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }))
-                    .filter(x => x.d && x.d.getDate()===now.getDate() && x.d.getMonth()===now.getMonth() && x.d.getFullYear()===now.getFullYear())
-                    .sort((a,b) => a.d - b.d);
+                    .filter(x => x.d && x.d.getDate() === now.getDate() && x.d.getMonth() === now.getMonth() && x.d.getFullYear() === now.getFullYear())
+                    .sort((a, b) => a.d - b.d);
                 countEl.textContent = todayRes.length === 1 ? '1 cita' : todayRes.length + ' citas';
                 if (todayRes.length === 0) {
                     listEl.innerHTML = `<div class="today-empty"><i class="fas fa-mug-hot"></i>No hay reservas para hoy. ¡Día libre! 🎉</div>`;
@@ -2842,7 +2729,7 @@
                 listEl.innerHTML = todayRes.map((item, idx) => {
                     const isPast = item.d < now;
                     const isNext = (idx === nextIndex);
-                    const timeStr = String(item.d.getHours()).padStart(2,'0')+':'+String(item.d.getMinutes()).padStart(2,'0');
+                    const timeStr = String(item.d.getHours()).padStart(2, '0') + ':' + String(item.d.getMinutes()).padStart(2, '0');
                     let estadoLabel = item.r.estado;
                     if (item.r.estado === 'ACTIVA') estadoLabel = isPast ? 'Pasada' : 'Activa';
                     else if (item.r.estado === 'CANCELADA') estadoLabel = 'Cancelada';
@@ -2870,15 +2757,15 @@
                     .filter(r => r.estado !== 'CANCELADA')
                     .map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }))
                     .filter(x => x.d && x.d >= now)
-                    .sort((a,b) => a.d - b.d);
+                    .sort((a, b) => a.d - b.d);
                 return candidates.length ? candidates[0] : null;
             }
 
             function formatCountdown(ms) {
                 if (ms <= 0) return '¡Ahora!';
-                const mins = Math.floor(ms/60000);
-                const days = Math.floor(mins/1440);
-                const hours = Math.floor((mins%1440)/60);
+                const mins = Math.floor(ms / 60000);
+                const days = Math.floor(mins / 1440);
+                const hours = Math.floor((mins % 1440) / 60);
                 const minutes = mins % 60;
                 if (days > 0) return `${days}d ${hours}h`;
                 if (hours > 0) return `${hours}h ${minutes}m`;
@@ -2889,7 +2776,7 @@
                 const numberEl = document.getElementById('statCountdown');
                 const labelEl = document.getElementById('statNextInfo');
                 const next = getNextUpcoming();
-                if (!next) { numberEl.textContent='—'; labelEl.textContent='Sin reservas próximas'; return; }
+                if (!next) { numberEl.textContent = '—'; labelEl.textContent = 'Sin reservas próximas'; return; }
                 numberEl.textContent = formatCountdown(next.d - new Date());
                 labelEl.textContent = `Próxima: ${next.r.fecha} · ${next.r.hora}`;
             }
@@ -2897,8 +2784,8 @@
             function getSortedReservations() {
                 const now = new Date();
                 const withDates = allReservations.map(r => ({ r, d: parseReservaDate(r.fecha, r.hora) }));
-                const upcoming = withDates.filter(x => x.d && x.d >= now).sort((a,b) => a.d - b.d);
-                const past = withDates.filter(x => !x.d || x.d < now).sort((a,b) => (b.d?b.d.getTime():0) - (a.d?a.d.getTime():0));
+                const upcoming = withDates.filter(x => x.d && x.d >= now).sort((a, b) => a.d - b.d);
+                const past = withDates.filter(x => !x.d || x.d < now).sort((a, b) => (b.d ? b.d.getTime() : 0) - (a.d ? a.d.getTime() : 0));
                 return upcoming.concat(past).map(x => x.r);
             }
 
@@ -2922,8 +2809,8 @@
                 tbody.innerHTML = filtered.map(r => {
                     let badgeClass = 'badge-activa';
                     let estadoLabel = 'Activa';
-                    if (r.estado === 'CANCELADA') { badgeClass = 'badge-cancelada'; estadoLabel = 'Cancelada'; }
-                    else if (r.estado === 'ACTIVA' && !esFutura(r.fecha, r.hora)) { badgeClass = 'badge-activa'; estadoLabel = 'Pasada'; }
+                    if (r.estado === 'CANCELADA') { badgeClass = 'badge-cancelada'; estadoLabel = 'Cancelada'; } else if (r.estado === 'ACTIVA' && !esFutura(r.fecha, r.hora)) { badgeClass = 'badge-activa';
+                        estadoLabel = 'Pasada'; }
                     const actionsHtml = `
                         <div class="action-buttons">
                             <button class="action-btn btn-whatsapp" onclick="sendWhatsApp('${r.id}')" title="Enviar WhatsApp"><i class="fab fa-whatsapp"></i></button>
@@ -2946,7 +2833,7 @@
                 }).join('');
             }
 
-            // Acciones
+            // Acciones (se mantienen iguales)
             window.sendWhatsApp = function(id) {
                 const reserva = allReservations.find(r => r.id === id);
                 if (!reserva) return alert('Reserva no encontrada');
@@ -2958,7 +2845,8 @@
                 if (phone.startsWith('15') && phone.length >= 10) phone = phone.substring(2);
                 if (phone.length <= 10) phone = DEFAULT_COUNTRY_CODE + phone;
                 else if (phone.length === 11 && phone.startsWith('9')) phone = DEFAULT_COUNTRY_CODE + phone;
-                const message = `Hola ${reserva.nombre}! 👋\n\nTe contactamos desde *${STUDIO_NAME}* sobre tu reserva:\n📅 *Fecha:* ${reserva.fecha}\n🕐 *Hora:* ${reserva.hora}\n🛠 Servicio: ${reserva.servicio}\n\nPor favor confirma tu asistencia. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n¡Te esperamos! 🎨`;
+                const message =
+                    `Hola ${reserva.nombre}! 👋\n\nTe contactamos desde *${STUDIO_NAME}* sobre tu reserva:\n📅 *Fecha:* ${reserva.fecha}\n🕐 *Hora:* ${reserva.hora}\n🛠 Servicio: ${reserva.servicio}\n\nPor favor confirma tu asistencia. Si necesitás reprogramar o cancelar, avisanos con al menos 24 horas de anticipación.\n\n¡Te esperamos! 🎨`;
                 const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
                 const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
                 if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') window.location.href = url;
@@ -3026,14 +2914,14 @@
                     });
                     const options = [];
                     const today = new Date();
-                    for (let d=0; d<14; d++) {
+                    for (let d = 0; d < 14; d++) {
                         const date = new Date(today);
                         date.setDate(date.getDate() + d);
-                        const dayNum = String(date.getDate()).padStart(2,'0');
-                        const dayName = LONG_DAYS[date.getDay()].substring(0,3);
+                        const dayNum = String(date.getDate()).padStart(2, '0');
+                        const dayName = LONG_DAYS[date.getDay()].substring(0, 3);
                         const dayLabel = dayName + ' ' + dayNum;
                         const hourSlots = allHours.filter(h => {
-                            if (d===0) {
+                            if (d === 0) {
                                 const nowH = now.getHours();
                                 if (h < nowH) return false;
                                 if (h === nowH && now.getMinutes() >= 30) return false;
@@ -3041,7 +2929,7 @@
                             return true;
                         });
                         hourSlots.forEach(h => {
-                            const horaStr = String(h).padStart(2,'0') + ':00';
+                            const horaStr = String(h).padStart(2, '0') + ':00';
                             const key = dayLabel + ' ' + horaStr;
                             if (!ocupados.has(key)) {
                                 options.push({ label: key, value: key });
@@ -3217,7 +3105,7 @@
                 const year = selectedMonth.getFullYear();
                 const month = selectedMonth.getMonth();
                 document.getElementById('currentMonthLabel').textContent = `${MONTH_NAMES[month]} ${year}`;
-                
+
                 let diasHabiles = 0;
                 const firstDay = new Date(year, month, 1);
                 const lastDay = new Date(year, month + 1, 0);
@@ -3228,38 +3116,38 @@
                     }
                 }
                 const capacidadTotal = diasHabiles * HOURS_PER_DAY;
-                
+
                 const monthReservations = allReservations.filter(r => {
                     const d = parseReservaDate(r.fecha, r.hora);
                     return d && d.getMonth() === month && d.getFullYear() === year;
                 });
-                
+
                 const activas = monthReservations.filter(r => r.estado === 'ACTIVA').length;
                 const canceladas = monthReservations.filter(r => r.estado === 'CANCELADA').length;
                 const libres = capacidadTotal - activas;
-                
+
                 const occupancyPercentage = capacidadTotal > 0 ? Math.round((activas / capacidadTotal) * 100) : 0;
-                
+
                 updateDonutChart(occupancyPercentage);
-                
+
                 document.getElementById('legendActivas').textContent = activas;
                 document.getElementById('legendCanceladas').textContent = canceladas;
                 document.getElementById('legendDisponibles').textContent = libres;
                 document.getElementById('occupancyPercentage').textContent = occupancyPercentage + '%';
                 document.getElementById('capacityLabel').textContent = `Capacidad: ${capacidadTotal} slots (${diasHabiles} días)`;
-                
+
                 document.getElementById('metricTotalMonth').textContent = monthReservations.length;
                 document.getElementById('metricDaysInMonth').textContent = diasHabiles;
-                
+
                 const now = new Date();
                 const dayOfWeek = now.getDay();
                 const diffToMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
                 const monday = new Date(now);
                 monday.setDate(now.getDate() - diffToMonday);
-                monday.setHours(0,0,0,0);
+                monday.setHours(0, 0, 0, 0);
                 const sunday = new Date(monday);
                 sunday.setDate(monday.getDate() + 6);
-                sunday.setHours(23,59,59,999);
+                sunday.setHours(23, 59, 59, 999);
                 const weekReservations = allReservations.filter(r => {
                     const d = parseReservaDate(r.fecha, r.hora);
                     return d && d >= monday && d <= sunday;
@@ -3279,14 +3167,14 @@
                     peakDayText = `${dayWithMax} (${maxCount})`;
                 }
                 document.getElementById('metricPeakDay').textContent = peakDayText;
-                
+
                 const hourCounts = {};
                 monthReservations.filter(r => r.estado === 'ACTIVA').forEach(r => {
                     hourCounts[r.hora] = (hourCounts[r.hora] || 0) + 1;
                 });
-                const peakHour = Object.keys(hourCounts).reduce((a,b) => hourCounts[a] > hourCounts[b] ? a : b, '-');
+                const peakHour = Object.keys(hourCounts).reduce((a, b) => hourCounts[a] > hourCounts[b] ? a : b, '-');
                 document.getElementById('metricPeakHour').textContent = peakHour !== '-' ? `${peakHour} (${hourCounts[peakHour]})` : '-';
-                
+
                 const allDayCounts = {};
                 monthReservations.forEach(r => {
                     const partesFecha = r.fecha.split(' ');
@@ -3308,7 +3196,7 @@
 
             function updateDayDistribution(dayCounts) {
                 const container = document.getElementById('dayDistribution');
-                const days = ['Lun','Mar','Mié','Jue','Vie','Sáb'];
+                const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
                 const maxCount = Math.max(...days.map(d => dayCounts[d] || 0), 1);
                 container.innerHTML = days.map(day => {
                     const count = dayCounts[day] || 0;
@@ -3338,9 +3226,12 @@
 
             // Export CSV
             window.exportCSV = function() {
-                const headers = ['ID','Fecha','Hora','Nombre','Email','Teléfono','Servicio','Fecha Reserva','Estado'];
-                const rows = allReservations.map(r => [r.id, r.fecha, r.hora, r.nombre, r.email, r.telefono, r.servicio, r.fechaReserva, r.estado]);
-                const csv = [headers, ...rows].map(row => row.map(cell => `"${(cell||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+                const headers = ['ID', 'Fecha', 'Hora', 'Nombre', 'Email', 'Teléfono', 'Servicio', 'Fecha Reserva', 'Estado'];
+                const rows = allReservations.map(r => [r.id, r.fecha, r.hora, r.nombre, r.email, r.telefono, r.servicio, r
+                    .fechaReserva, r.estado
+                ]);
+                const csv = [headers, ...rows].map(row => row.map(cell => `"${(cell||'').toString().replace(/"/g,'""')}"`).join(
+                    ',')).join('\n');
                 const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
