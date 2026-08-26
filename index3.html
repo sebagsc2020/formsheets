@@ -125,104 +125,22 @@
             border-radius: 4px;
         }
 
-        /* ---------- PLACEHOLDER DE AUTENTICACIÓN ---------- */
-        .auth-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #ccc;
-            text-align: center;
-            padding: 1.5rem;
-        }
-        .auth-placeholder i {
-            font-size: 3rem;
-            color: #d4af37;
-            margin-bottom: 0.8rem;
-        }
-        .auth-placeholder h2 {
-            color: #e8e8e8;
-            margin-bottom: 0.5rem;
-        }
-        .auth-placeholder p {
-            color: #999;
-            margin-bottom: 1.2rem;
-            font-size: 0.9rem;
-        }
-        .auth-placeholder .btn {
-            background: linear-gradient(135deg, #e5c147 0%, #d4af37 50%, #b8941f 100%);
-            border: none;
-            color: #1a1a1a;
-            padding: 0.6rem 1.5rem;
-            border-radius: 4px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: 0.2s;
-        }
-        .auth-placeholder .btn:hover {
-            transform: scale(1.02);
-        }
-
-        /* ---------- ESTILOS DEL PANEL ADMIN (exactamente igual que en !DOCTYPE html.txt) ---------- */
-        /* Todos los estilos del panel admin se copian tal cual del archivo, adaptados al .drawer-content */
+        /* ---------- ESTILOS DEL PANEL ADMIN (desde !DOCTYPE html.txt) ---------- */
+        /* Se mantienen los estilos exactos del panel admin */
         .drawer-content .container {
             max-width: 100%;
             margin: 0 auto;
             color: #e8e8e8;
         }
-        .drawer-content .login-box {
-            max-width: 100%;
-            margin: 5vh auto;
-            background: #2a2a2a;
-            padding: 1.5rem;
-            border-radius: 4px;
-            border: 1px solid #3a3a3a;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        .drawer-content h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .drawer-content .login-box h2 {
-            text-align: center;
-            margin-bottom: 1.2rem;
-            color: #e8e8e8;
-        }
-        .drawer-content .login-box i.lock {
-            display: block;
-            text-align: center;
-            font-size: 3rem;
+        .drawer-content h1 i {
             color: #d4af37;
-            margin-bottom: 0.8rem;
-        }
-        .drawer-content .form-group {
-            margin-bottom: 0.8rem;
-        }
-        .drawer-content .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: #999;
-            margin-bottom: 0.2rem;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-        .drawer-content .form-group input,
-        .drawer-content .form-group select {
-            width: 100%;
-            padding: 0.6rem 0.8rem;
-            background: #1e1e1e;
-            border: 1px solid #3d3d3d;
-            border-radius: 4px;
-            color: #e0e0e0;
-            font-size: 1rem;
-            outline: none;
-        }
-        .drawer-content .form-group input:focus,
-        .drawer-content .form-group select:focus {
-            border-color: #d4af37;
-        }
-        .drawer-content .form-group select option {
-            background: #1e1e1e;
         }
         .drawer-content .btn {
             background: linear-gradient(135deg, #e5c147 0%, #d4af37 50%, #b8941f 100%);
@@ -327,13 +245,138 @@
             pointer-events: none;
             z-index: 10;
         }
+        .drawer-content .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .drawer-content .modal-overlay.show {
+            display: flex;
+        }
+        .drawer-content .modal-container {
+            background: #2a2a2a;
+            border-radius: 8px;
+            border: 1px solid #444;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .drawer-content .modal-container h2 {
+            color: #e8e8e8;
+            margin-bottom: 0.5rem;
+        }
+        .drawer-content .modal-container .subtitle {
+            color: #999;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        .drawer-content .modal-container .form-group {
+            margin-bottom: 0.6rem;
+        }
+        .drawer-content .modal-container .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #999;
+            margin-bottom: 0.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .drawer-content .modal-container .form-group input,
+        .drawer-content .modal-container .form-group select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            background: #1e1e1e;
+            border: 1px solid #3d3d3d;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 1rem;
+            outline: none;
+        }
+        .drawer-content .modal-container .form-group input:focus,
+        .drawer-content .modal-container .form-group select:focus {
+            border-color: #d4af37;
+        }
+        .drawer-content .modal-container .form-group select option {
+            background: #1e1e1e;
+        }
+        .drawer-content .modal-container .btn {
+            padding: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .drawer-content .modal-container .btn-secondary {
+            background: #444;
+            color: #e8e8e8;
+            border: 1px solid #555;
+        }
+        .drawer-content .modal-container .btn-secondary:hover {
+            background: #555;
+        }
+        .drawer-content .modal-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .drawer-content .modal-actions .btn {
+            flex: 1;
+        }
+        .drawer-content .modal-container .servicio-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+        .drawer-content .modal-container .servicio-item input {
+            flex: 1;
+        }
+        .drawer-content .modal-container .servicio-item .btn-remove {
+            background: #a33;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .drawer-content .modal-container .servicio-item .btn-remove:hover {
+            background: #c44;
+        }
+        .drawer-content .modal-container .add-servicio {
+            display: flex;
+            gap: 0.4rem;
+            margin-top: 0.3rem;
+        }
+        .drawer-content .modal-container .add-servicio input {
+            flex: 1;
+        }
+        .drawer-content .modal-container .add-servicio button {
+            background: #4a9eff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.4rem 0.8rem;
+            cursor: pointer;
+        }
+        .drawer-content .modal-container .add-servicio button:hover {
+            background: #3a8eef;
+        }
 
         .drawer-content .today-agenda {
             background: linear-gradient(135deg, #2a2a2a 0%, #2e2818 100%);
             border: 1px solid #8b7424;
             border-radius: 4px;
             padding: 0.6rem 0.8rem;
-            margin-bottom: 0.8rem;
+            margin-bottom: 1rem;
         }
         .drawer-content .today-header {
             display: flex;
@@ -447,32 +490,31 @@
             margin-bottom: 0.2rem;
             display: block;
         }
-
         .drawer-content .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 0.4rem;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.5rem;
             margin-bottom: 0.8rem;
         }
         .drawer-content .stat-card {
             background: #2a2a2a;
             border: 1px solid #3a3a3a;
             border-radius: 4px;
-            padding: 0.4rem 0.2rem;
+            padding: 0.6rem 0.3rem;
             text-align: center;
         }
         .drawer-content .stat-card .number {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: #d4af37;
             display: block;
         }
         .drawer-content .stat-card .number.small {
-            font-size: 1rem;
+            font-size: 1.1rem;
             padding-top: 0.1rem;
         }
         .drawer-content .stat-card .label {
-            font-size: 0.55rem;
+            font-size: 0.6rem;
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -485,12 +527,11 @@
         .drawer-content .stat-card.next-card .number {
             color: #e5c147;
         }
-
         .drawer-content .monthly-dashboard {
             background: #2a2a2a;
             border: 1px solid #3a3a3a;
             border-radius: 4px;
-            padding: 0.6rem;
+            padding: 0.8rem;
             margin-top: 0.8rem;
         }
         .drawer-content .dashboard-header {
@@ -502,7 +543,7 @@
             gap: 0.3rem;
         }
         .drawer-content .dashboard-header h2 {
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: #e8e8e8;
         }
         .drawer-content .month-selector {
@@ -514,10 +555,10 @@
             background: #333;
             border: 1px solid #444;
             color: #ccc;
-            padding: 0.2rem 0.4rem;
+            padding: 0.2rem 0.5rem;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             transition: 0.15s;
         }
         .drawer-content .month-selector button:hover {
@@ -531,42 +572,42 @@
             background: #d4af37;
             color: #1a1a1a;
             font-weight: 600;
-            padding: 0.2rem 0.6rem;
+            padding: 0.2rem 0.8rem;
         }
         .drawer-content .dashboard-content {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.6rem;
+            gap: 1rem;
             align-items: stretch;
         }
         .drawer-content .dashboard-content > * {
-            flex: 1 1 calc(50% - 0.3rem);
-            min-width: 200px;
+            flex: 1 1 calc(50% - 0.5rem);
+            min-width: 250px;
             display: flex;
             flex-direction: column;
         }
         .drawer-content .chart-container {
             background: #222;
             border-radius: 4px;
-            padding: 0.5rem;
+            padding: 0.8rem;
             border: 1px solid #353535;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
         .drawer-content .chart-title {
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.6rem;
             text-align: center;
         }
         .drawer-content .donut-chart {
             position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 0.4rem;
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 0.6rem;
             flex-shrink: 0;
         }
         .drawer-content .donut-chart svg {
@@ -582,13 +623,13 @@
             text-align: center;
         }
         .drawer-content .donut-center .percentage {
-            font-size: 1.4rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: #d4af37;
             line-height: 1;
         }
         .drawer-content .donut-center .label {
-            font-size: 0.5rem;
+            font-size: 0.6rem;
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -597,14 +638,14 @@
         .drawer-content .chart-legend {
             display: flex;
             flex-direction: column;
-            gap: 0.1rem;
-            margin-top: 0.2rem;
+            gap: 0.2rem;
+            margin-top: 0.4rem;
         }
         .drawer-content .legend-item {
             display: flex;
             align-items: center;
             gap: 0.3rem;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
         }
         .drawer-content .legend-color {
             width: 10px;
@@ -623,37 +664,37 @@
         .drawer-content .right-column {
             display: flex;
             flex-direction: column;
-            gap: 0.4rem;
+            gap: 0.6rem;
             flex: 1;
         }
         .drawer-content .metrics-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.3rem;
+            gap: 0.5rem;
             flex: 1;
         }
         .drawer-content .metric-card {
             background: #222;
             border-radius: 4px;
-            padding: 0.4rem;
+            padding: 0.5rem;
             border: 1px solid #353535;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
         .drawer-content .metric-card .metric-icon {
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: #d4af37;
-            margin-bottom: 0.05rem;
+            margin-bottom: 0.1rem;
         }
         .drawer-content .metric-card .metric-value {
-            font-size: 0.9rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: #e8e8e8;
             margin-bottom: 0.05rem;
         }
         .drawer-content .metric-card .metric-label {
-            font-size: 0.5rem;
+            font-size: 0.55rem;
             color: #888;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -666,7 +707,7 @@
             display: flex;
             align-items: flex-end;
             gap: 0.2rem;
-            height: 60px;
+            height: 70px;
             padding: 0.2rem 0;
         }
         .drawer-content .bar {
@@ -682,26 +723,25 @@
         }
         .drawer-content .bar-label {
             position: absolute;
-            bottom: -14px;
+            bottom: -16px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.45rem;
+            font-size: 0.5rem;
             color: #888;
         }
         .drawer-content .bar-value {
             position: absolute;
-            top: -12px;
+            top: -14px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.5rem;
+            font-size: 0.55rem;
             color: #d4af37;
             font-weight: 600;
         }
-
         .drawer-content .toolbar {
             display: flex;
-            gap: 0.2rem;
-            margin-bottom: 0.3rem;
+            gap: 0.3rem;
+            margin-bottom: 0.4rem;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
@@ -717,10 +757,10 @@
             background: #333;
             border: 1px solid #444;
             color: #ccc;
-            padding: 0.15rem 0.5rem;
+            padding: 0.2rem 0.6rem;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             transition: 0.15s;
         }
         .drawer-content .filter-btn:hover {
@@ -741,21 +781,21 @@
         .drawer-content table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.65rem;
+            font-size: 0.75rem;
         }
         .drawer-content th {
             background: #2a2a2a;
             color: #d0d0d0;
             font-weight: 600;
-            padding: 0.2rem 0.2rem;
+            padding: 0.3rem 0.3rem;
             text-align: left;
             border-bottom: 2px solid #3a3a3a;
-            font-size: 0.55rem;
+            font-size: 0.6rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
         .drawer-content td {
-            padding: 0.2rem 0.2rem;
+            padding: 0.25rem 0.3rem;
             border-bottom: 1px solid #333;
             vertical-align: middle;
         }
@@ -764,9 +804,9 @@
         }
         .drawer-content .badge {
             display: inline-block;
-            padding: 0.1rem 0.3rem;
+            padding: 0.1rem 0.4rem;
             border-radius: 4px;
-            font-size: 0.5rem;
+            font-size: 0.55rem;
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -780,24 +820,24 @@
         }
         .drawer-content .empty-state {
             text-align: center;
-            padding: 1rem 0.3rem;
+            padding: 1.5rem 0.3rem;
             color: #666;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
         }
         .drawer-content .empty-state i {
-            font-size: 1.5rem;
-            margin-bottom: 0.2rem;
+            font-size: 2rem;
+            margin-bottom: 0.3rem;
             color: #444;
             display: block;
         }
         .drawer-content .loading {
             text-align: center;
-            padding: 1rem;
+            padding: 1.5rem;
             color: #888;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
         }
         .drawer-content .loading i {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             color: #d4af37;
             animation: spin 1s linear infinite;
         }
@@ -808,22 +848,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.6rem;
             flex-wrap: wrap;
             gap: 0.3rem;
         }
-        .drawer-content .header-actions h1 {
-            font-size: 1.3rem;
-            margin-bottom: 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .drawer-content .header-actions h1 i {
-            color: #d4af37;
-        }
         .drawer-content .user-info {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: #888;
         }
         .drawer-content .user-info strong {
@@ -834,9 +864,9 @@
             color: white;
             border: none;
             border-radius: 4px;
-            padding: 0.2rem 0.6rem;
+            padding: 0.25rem 0.8rem;
             cursor: pointer;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             transition: 0.15s;
         }
         .drawer-content .btn-config:hover {
@@ -844,7 +874,60 @@
             box-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
         }
 
-        /* Ajustes para móvil */
+        @media (max-width: 768px) {
+            .drawer-content th,
+            .drawer-content td {
+                padding: 0.2rem 0.2rem;
+                font-size: 0.65rem;
+            }
+            .drawer-content .hide-mobile {
+                display: none;
+            }
+            .drawer-content .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            .drawer-content .donut-chart {
+                width: 130px;
+                height: 130px;
+            }
+            .drawer-content .donut-center .percentage {
+                font-size: 1.4rem;
+            }
+            .drawer-content .action-btn {
+                width: 22px;
+                height: 22px;
+                font-size: 0.65rem;
+            }
+            .drawer-content .stat-card .number.small {
+                font-size: 1rem;
+            }
+            .drawer-content .today-item {
+                flex-wrap: wrap;
+                gap: 0.3rem;
+            }
+            .drawer-content .today-time {
+                font-size: 0.9rem;
+                min-width: 40px;
+            }
+            .drawer-content .today-agenda {
+                padding: 0.4rem;
+            }
+            .drawer-content .stat-card {
+                padding: 0.4rem 0.2rem;
+            }
+            .drawer-content .dashboard-content {
+                flex-direction: column;
+            }
+            .drawer-content .dashboard-content > * {
+                flex: 1 1 100%;
+            }
+            .drawer-content .modal-container {
+                padding: 1rem;
+                max-width: 95%;
+            }
+        }
+
+        /* Ajustes para móvil del drawer */
         @media (max-width: 600px) {
             .drawer {
                 width: 280px;
@@ -864,45 +947,6 @@
             }
             .drawer-content {
                 padding: 0.3rem 0.4rem;
-            }
-            .drawer-content .stats-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            .drawer-content .dashboard-content > * {
-                flex: 1 1 100%;
-            }
-            .drawer-content .metrics-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .drawer-content .today-item {
-                flex-wrap: wrap;
-                gap: 0.3rem;
-            }
-            .drawer-content .today-time {
-                font-size: 0.85rem;
-                min-width: 36px;
-            }
-            .drawer-content .header-actions h1 {
-                font-size: 1rem;
-            }
-            .drawer-content .donut-chart {
-                width: 100px;
-                height: 100px;
-            }
-            .drawer-content .donut-center .percentage {
-                font-size: 1.2rem;
-            }
-            .drawer-content .action-btn {
-                width: 22px;
-                height: 22px;
-                font-size: 0.65rem;
-            }
-            .drawer-content th, .drawer-content td {
-                font-size: 0.55rem;
-                padding: 0.15rem 0.1rem;
-            }
-            .drawer-content .hide-mobile {
-                display: none;
             }
         }
 
@@ -1412,7 +1456,7 @@
         .popup-close-btn { background: #444; border: 1px solid #555; color: #e8e8e8; padding: 0.4rem 1rem; border-radius: 4px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.15s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .popup-close-btn:hover { background: #555; border-color: #666; }
 
-        /* MODALES DEL ADMIN (incluyendo login) */
+        /* MODALES DEL ADMIN (fuera del drawer) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -1473,6 +1517,9 @@
         .modal-container .form-group input:focus,
         .modal-container .form-group select:focus {
             border-color: #d4af37;
+        }
+        .modal-container .form-group select option {
+            background: #1e1e1e;
         }
         .modal-container .btn {
             background: linear-gradient(135deg, #e5c147 0%, #d4af37 50%, #b8941f 100%);
@@ -1699,24 +1746,12 @@
         </div>
 
         <div class="drawer-content" id="drawerContent">
-            <!-- Placeholder cuando no hay autenticación -->
-            <div id="authPlaceholder" class="auth-placeholder">
-                <i class="fas fa-lock"></i>
-                <h2>Área de Administración</h2>
-                <p>Inicia sesión para gestionar las reservas.</p>
-                <button class="btn" onclick="openLoginModal()"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</button>
-            </div>
-
-            <!-- Panel Admin (oculto hasta autenticarse) -->
-            <div id="adminPanel" style="display: none;">
+            <!-- ===== PANEL ADMIN (copiado de !DOCTYPE html.txt) ===== -->
+            <div id="adminPanel" class="container">
                 <div class="header-actions">
                     <h1><i class="fas fa-user-shield"></i> Panel de Administración</h1>
                     <div style="display: flex; gap: 0.3rem; align-items: center;">
-                        <span class="user-info" id="userEmailDisplay">Hola, <strong>Admin</strong></span>
                         <button class="btn-config" onclick="openServiceModal()"><i class="fas fa-cog"></i> Servicios</button>
-                        <button class="btn btn-secondary" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.7rem; border-radius: 4px;" onclick="logout()">
-                            <i class="fas fa-sign-out-alt"></i> Salir
-                        </button>
                     </div>
                 </div>
 
@@ -1854,28 +1889,7 @@
         </div>
     </div>
 
-    <!-- ===== MODALES DEL ADMIN (incluyendo LOGIN) ===== -->
-    <!-- Modal de Login -->
-    <div class="modal-overlay" id="loginModal">
-        <div class="modal-container">
-            <i class="fas fa-lock" style="display: block; text-align: center; font-size: 2.5rem; color: #d4af37; margin-bottom: 0.5rem;"></i>
-            <h2 style="text-align: center;">Acceso Administrativo</h2>
-            <div class="subtitle" style="text-align: center;">Ingresa tus credenciales para gestionar el sistema</div>
-            <form id="loginFormModal">
-                <div class="form-group">
-                    <label><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" id="emailInputModal" placeholder="admin@ejemplo.com" required autofocus>
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-key"></i> Contraseña</label>
-                    <input type="password" id="passwordInputModal" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn" id="loginModalBtn"><i class="fas fa-sign-in-alt"></i> Ingresar</button>
-            </form>
-            <p id="loginErrorModal" style="color: #ff6b6b; text-align: center; margin-top: 0.6rem; font-size: 0.75rem; display: none;"></p>
-        </div>
-    </div>
-
+    <!-- ===== MODALES DEL ADMIN (fuera del drawer) ===== -->
     <!-- Modal Reagendar -->
     <div class="modal-overlay" id="rescheduleModal">
         <div class="modal-container">
@@ -2722,7 +2736,7 @@
         })();
 
         // ===================================================================
-        // 3. PANEL ADMIN (con login en modal) - lógica del !DOCTYPE html.txt
+        // 3. PANEL ADMIN (lógica del !DOCTYPE html.txt)
         // ===================================================================
         (function() {
             const db = firebase.firestore();
@@ -2743,109 +2757,7 @@
             let currentFilter = 'all';
             let stats = { total:0, activas:0, canceladas:0, futuras:0, pasadas:0 };
             let selectedMonth = new Date();
-            let currentUser = null;
             let unsubscribe = null;
-
-            // Elementos
-            const authPlaceholder = document.getElementById('authPlaceholder');
-            const adminPanel = document.getElementById('adminPanel');
-            const loginModal = document.getElementById('loginModal');
-
-            // ===== FUNCIONES DE AUTENTICACIÓN =====
-            function checkAuthState() {
-                const user = auth.currentUser;
-                if (user && user.email) {
-                    // Usuario autenticado con email
-                    currentUser = user;
-                    authPlaceholder.style.display = 'none';
-                    adminPanel.style.display = 'block';
-                    document.getElementById('userEmailDisplay').innerHTML = `Hola, <strong>${user.email}</strong>`;
-                    startRealtimeListener();
-                } else {
-                    // No autenticado
-                    authPlaceholder.style.display = 'flex';
-                    adminPanel.style.display = 'none';
-                    if (unsubscribe) {
-                        unsubscribe();
-                        unsubscribe = null;
-                    }
-                }
-            }
-
-            // Observar cambios de autenticación
-            auth.onAuthStateChanged(function(user) {
-                if (user && user.email) {
-                    currentUser = user;
-                    authPlaceholder.style.display = 'none';
-                    adminPanel.style.display = 'block';
-                    document.getElementById('userEmailDisplay').innerHTML = `Hola, <strong>${user.email}</strong>`;
-                    startRealtimeListener();
-                } else {
-                    authPlaceholder.style.display = 'flex';
-                    adminPanel.style.display = 'none';
-                    if (unsubscribe) {
-                        unsubscribe();
-                        unsubscribe = null;
-                    }
-                }
-            });
-
-            // ===== LOGIN (modal) =====
-            window.openLoginModal = function() {
-                loginModal.classList.add('show');
-                document.getElementById('emailInputModal').focus();
-            };
-
-            function closeLoginModal() {
-                loginModal.classList.remove('show');
-                document.getElementById('loginErrorModal').style.display = 'none';
-            }
-
-            document.getElementById('loginFormModal').addEventListener('submit', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                const email = document.getElementById('emailInputModal').value.trim();
-                const password = document.getElementById('passwordInputModal').value;
-                const errorEl = document.getElementById('loginErrorModal');
-                errorEl.style.display = 'none';
-                if (!email || !password) {
-                    errorEl.textContent = '❌ Completa ambos campos';
-                    errorEl.style.display = 'block';
-                    return;
-                }
-                const btn = document.getElementById('loginModalBtn');
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Autenticando...';
-                auth.signInWithEmailAndPassword(email, password)
-                    .then(function(userCredential) {
-                        closeLoginModal();
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar';
-                    })
-                    .catch(function(error) {
-                        let msg = '❌ Error de autenticación. ';
-                        switch(error.code) {
-                            case 'auth/user-not-found': msg += 'Usuario no encontrado.'; break;
-                            case 'auth/wrong-password': msg += 'Contraseña incorrecta.'; break;
-                            case 'auth/invalid-email': msg += 'Email inválido.'; break;
-                            case 'auth/too-many-requests': msg += 'Demasiados intentos. Espera un momento.'; break;
-                            default: msg += error.message;
-                        }
-                        errorEl.textContent = msg;
-                        errorEl.style.display = 'block';
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar';
-                    });
-            });
-
-            // Cerrar modal con ESC o clic fuera
-            loginModal.addEventListener('click', function(e) {
-                if (e.target === this) closeLoginModal();
-            });
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') closeLoginModal();
-            });
 
             // ===== FUNCIONES DEL PANEL =====
             function startRealtimeListener() {
@@ -3056,7 +2968,7 @@
                 }).join('');
             }
 
-            // Acciones (se mantienen igual)
+            // Acciones
             window.sendWhatsApp = function(id) {
                 const reserva = allReservations.find(r => r.id === id);
                 if (!reserva) return alert('Reserva no encontrada');
@@ -3459,22 +3371,9 @@
                 a.click();
             };
 
-            // Logout
-            window.logout = function() {
-                if (unsubscribe) {
-                    unsubscribe();
-                    unsubscribe = null;
-                }
-                auth.signOut().then(() => {
-                    // El onAuthStateChanged se encargará de mostrar el placeholder
-                }).catch(console.error);
-            };
-
-            // Cargar configuración de servicios al iniciar
+            // Iniciar el panel
             loadServiceConfig();
-
-            // Inicializar el estado de autenticación
-            checkAuthState();
+            startRealtimeListener();
         })();
     </script>
 </body>
