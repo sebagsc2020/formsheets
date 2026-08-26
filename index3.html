@@ -28,12 +28,12 @@
             font-family: system-ui, -apple-system, sans-serif;
         }
 
-        /* ---------- CONTENEDOR PRINCIPAL (margen derecho 55px) ---------- */
+        /* ---------- CONTENEDOR PRINCIPAL (margen derecho = ancho de la pestaña) ---------- */
         .main-container {
             position: absolute;
             top: 15px;
             left: 15px;
-            right: 55px; /* 40px (handle) + 15px margen */
+            right: 40px; /* 40px es el ancho de la pestaña, sin margen */
             bottom: 15px;
             background: #ffffff;
             border-radius: 12px;
@@ -52,7 +52,7 @@
             background: #1a1a1a;
             border-radius: 16px 0 0 16px;
             box-shadow: -4px 0 24px rgba(0, 0, 0, 0.30);
-            transform: translateX(calc(100% - 55px)); /* 40px handle + 15px margen */
+            transform: translateX(calc(100% - 40px)); /* 40px = handle, sin margen */
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
                         width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             will-change: transform, width;
@@ -62,11 +62,11 @@
             overflow: hidden;
         }
         .drawer.open {
-            width: 100vw;
-            transform: translateX(0);
+            width: calc(100vw - 15px);
+            transform: translateX(15px);
         }
 
-        /* ---------- PESTAÑA (altura total) ---------- */
+        /* ---------- PESTAÑA (altura total, pegada a la derecha) ---------- */
         .drawer-handle {
             position: absolute;
             left: 0;
@@ -112,7 +112,7 @@
             scrollbar-width: thin;
             scrollbar-color: #444 #222;
             pointer-events: auto;
-            margin-left: 40px; /* espacio para la pestaña */
+            margin-left: 40px;
         }
         .drawer-content::-webkit-scrollbar {
             width: 6px;
@@ -126,7 +126,7 @@
         }
 
         /* ============================================================
-           ESTILOS DEL PANEL ADMIN
+           ESTILOS DEL PANEL ADMIN (con tamaño de letra aumentado 10%)
            ============================================================ */
         .drawer-content .container {
             max-width: 100%;
@@ -308,7 +308,7 @@
             opacity: 0.4;
         }
         .drawer-content .today-time {
-            font-size: 1rem;
+            font-size: 1.1rem; /* aumentado 10% */
             font-weight: 700;
             color: #d4af37;
             min-width: 48px;
@@ -327,14 +327,14 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 0.2rem;
-            font-size: 0.85rem;
+            font-size: 0.94rem; /* aumentado 10% */
         }
         .drawer-content .today-phone {
             color: #888;
-            font-size: 0.65rem;
+            font-size: 0.72rem; /* aumentado 10% */
         }
         .drawer-content .today-tag {
-            font-size: 0.5rem;
+            font-size: 0.55rem; /* aumentado 10% */
             font-weight: 700;
             padding: 0.05rem 0.35rem;
             border-radius: 4px;
@@ -357,7 +357,7 @@
             text-align: center;
             color: #777;
             padding: 0.6rem 0.3rem;
-            font-size: 0.8rem;
+            font-size: 0.88rem; /* aumentado 10% */
         }
         .drawer-content .today-empty i {
             font-size: 1.8rem;
@@ -379,17 +379,17 @@
             text-align: center;
         }
         .drawer-content .stat-card .number {
-            font-size: 1.2rem;
+            font-size: 1.32rem; /* aumentado 10% */
             font-weight: 700;
             color: #d4af37;
             display: block;
         }
         .drawer-content .stat-card .number.small {
-            font-size: 1rem;
+            font-size: 1.1rem;
             padding-top: 0.1rem;
         }
         .drawer-content .stat-card .label {
-            font-size: 0.55rem;
+            font-size: 0.66rem; /* aumentado 10% */
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -471,7 +471,7 @@
             flex-direction: column;
         }
         .drawer-content .chart-title {
-            font-size: 0.65rem;
+            font-size: 0.72rem; /* aumentado 10% */
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -498,13 +498,13 @@
             text-align: center;
         }
         .drawer-content .donut-center .percentage {
-            font-size: 1.4rem;
+            font-size: 1.54rem; /* aumentado 10% */
             font-weight: 700;
             color: #d4af37;
             line-height: 1;
         }
         .drawer-content .donut-center .label {
-            font-size: 0.5rem;
+            font-size: 0.55rem; /* aumentado 10% */
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -520,7 +520,7 @@
             display: flex;
             align-items: center;
             gap: 0.3rem;
-            font-size: 0.7rem;
+            font-size: 0.77rem; /* aumentado 10% */
         }
         .drawer-content .legend-color {
             width: 10px;
@@ -563,13 +563,13 @@
             margin-bottom: 0.05rem;
         }
         .drawer-content .metric-card .metric-value {
-            font-size: 0.9rem;
+            font-size: 0.99rem; /* aumentado 10% */
             font-weight: 700;
             color: #e8e8e8;
             margin-bottom: 0.05rem;
         }
         .drawer-content .metric-card .metric-label {
-            font-size: 0.5rem;
+            font-size: 0.55rem; /* aumentado 10% */
             color: #888;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -601,7 +601,7 @@
             bottom: -14px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.45rem;
+            font-size: 0.55rem; /* aumentado 10% */
             color: #888;
         }
         .drawer-content .bar-value {
@@ -609,7 +609,7 @@
             top: -12px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.5rem;
+            font-size: 0.55rem; /* aumentado 10% */
             color: #d4af37;
             font-weight: 600;
         }
@@ -635,7 +635,7 @@
             padding: 0.15rem 0.5rem;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.65rem;
+            font-size: 0.72rem; /* aumentado 10% */
             transition: 0.15s;
         }
         .drawer-content .filter-btn:hover {
@@ -656,7 +656,7 @@
         .drawer-content table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.7rem;
+            font-size: 0.77rem; /* aumentado 10% (era 0.7rem) */
         }
         .drawer-content th {
             background: #2a2a2a;
@@ -665,7 +665,7 @@
             padding: 0.2rem 0.2rem;
             text-align: left;
             border-bottom: 2px solid #3a3a3a;
-            font-size: 0.55rem;
+            font-size: 0.66rem; /* aumentado 10% */
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -681,7 +681,7 @@
             display: inline-block;
             padding: 0.1rem 0.3rem;
             border-radius: 4px;
-            font-size: 0.5rem;
+            font-size: 0.55rem; /* aumentado 10% */
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -697,7 +697,7 @@
             text-align: center;
             padding: 1rem 0.3rem;
             color: #666;
-            font-size: 0.75rem;
+            font-size: 0.88rem; /* aumentado 10% */
         }
         .drawer-content .empty-state i {
             font-size: 1.5rem;
@@ -709,7 +709,7 @@
             text-align: center;
             padding: 1rem;
             color: #888;
-            font-size: 0.75rem;
+            font-size: 0.88rem; /* aumentado 10% */
         }
         .drawer-content .loading i {
             font-size: 1.2rem;
@@ -753,7 +753,7 @@
         @media (max-width: 600px) {
             .drawer {
                 width: 280px;
-                transform: translateX(calc(100% - 51px)); /* 36px + 15px */
+                transform: translateX(calc(100% - 36px)); /* 36px = handle, sin margen */
             }
             .drawer-handle {
                 width: 36px;
@@ -762,11 +762,11 @@
                 margin-left: 36px;
             }
             .main-container {
-                right: 51px;
+                right: 36px;
             }
             .drawer.open {
-                width: 100vw;
-                transform: translateX(0);
+                width: calc(100vw - 15px);
+                transform: translateX(15px);
             }
             .drawer-content .stats-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -782,7 +782,7 @@
                 gap: 0.3rem;
             }
             .drawer-content .today-time {
-                font-size: 0.85rem;
+                font-size: 1rem;
                 min-width: 36px;
             }
             .drawer-content .header-actions h1 {
@@ -793,7 +793,7 @@
                 height: 100px;
             }
             .drawer-content .donut-center .percentage {
-                font-size: 1.2rem;
+                font-size: 1.32rem;
             }
             .drawer-content .action-btn {
                 width: 22px;
@@ -801,7 +801,7 @@
                 font-size: 0.65rem;
             }
             .drawer-content th, .drawer-content td {
-                font-size: 0.55rem;
+                font-size: 0.66rem;
                 padding: 0.15rem 0.1rem;
             }
             .drawer-content .hide-mobile {
@@ -1836,7 +1836,7 @@
 
     <script>
         // ===================================================================
-        // CONFIGURACIÓN DE FIREBASE (usando el mismo SDK compat)
+        // CONFIGURACIÓN DE FIREBASE
         // ===================================================================
         console.log('Inicializando Firebase...');
         const firebaseConfig = {
@@ -1863,12 +1863,12 @@
             let currentTranslate = 0;
             let isOpen = false;
 
-            const MARGIN_RIGHT = 15;
+            // Anchos constantes (sin margen)
             const HANDLE_WIDTH = window.innerWidth <= 600 ? 36 : 40;
             const CLOSED_WIDTH = window.innerWidth <= 600 ? 280 : 360;
 
             function getMaxTranslate() {
-                return CLOSED_WIDTH - HANDLE_WIDTH - MARGIN_RIGHT;
+                return CLOSED_WIDTH - HANDLE_WIDTH;
             }
 
             function updateDrawer(translateX, animate) {
@@ -1891,9 +1891,9 @@
                 if (shouldOpen !== isOpen) {
                     isOpen = shouldOpen;
                     if (isOpen) {
-                        drawer.style.width = '100vw';
-                        drawer.style.transform = 'translateX(0)';
-                        currentTranslate = 0;
+                        drawer.style.width = 'calc(100vw - 15px)';
+                        drawer.style.transform = 'translateX(15px)';
+                        currentTranslate = 15;
                         drawer.classList.add('open');
                     } else {
                         drawer.style.width = CLOSED_WIDTH + 'px';
@@ -1974,11 +1974,11 @@
                 const isMobile = window.innerWidth <= 600;
                 const newHandleWidth = isMobile ? 36 : 40;
                 const newClosedWidth = isMobile ? 280 : 360;
-                const maxT = newClosedWidth - newHandleWidth - MARGIN_RIGHT;
+                const maxT = newClosedWidth - newHandleWidth;
                 if (isOpen) {
-                    drawer.style.width = '100vw';
-                    drawer.style.transform = 'translateX(0)';
-                    currentTranslate = 0;
+                    drawer.style.width = 'calc(100vw - 15px)';
+                    drawer.style.transform = 'translateX(15px)';
+                    currentTranslate = 15;
                 } else {
                     drawer.style.width = newClosedWidth + 'px';
                     drawer.style.transition = 'none';
